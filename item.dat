@@ -1,0 +1,45 @@
+# ITEM DATA FILE
+#  format=  :type:statlist:worth:name:
+#   where statlist= tohit:todam
+
+# Max Items Per Type:
+$1:5:3:4:3:4:4:5
+
+#MONEY
+:0:0:0:0:10:coin:
+
+#WEAPONS (melee)
+:1:4:2:5:dagger:
+:1:5:6:20:axe:
+:1:5:6:20:sword:
+:1:5:4:10:mace:
+:1:6:5:15:flail:
+
+#WEAPONS (reach)
+:2:7:6:25:spear:
+:2:6:7:25:pike:
+:2:7:7:30:halberd:
+
+#WEAPONS (range)
+:3:2:2:4:sling:
+:3:8:1:2:dart:
+:3:5:3:5:knife:
+:3:6:5:15:bow:
+
+#DEFENSE  (shields)
+:4:4:1:20:small:
+:4:3:3:25:medium:
+:4:2:5:30:large:
+
+#DEFENSE  (hats)
+:5:0:1:3:cloth:
+:5:1:1:6:leather:
+:5:2:2:20:bronze:
+:5:3:3:30:iron:
+
+#DEFENSE  (body)
+:6:1:1:10:cloth:
+:6:2:2:20:hyde:
+:6:3:3:30:leather:
+:6:3:4:40:mail:
+:6:1:7:50:plate:
