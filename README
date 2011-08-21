@@ -1,0 +1,19 @@
+FILE_____________________DESCRIPTION
+
+TrollRaider.d7___________Latest running compile
+TrollRaider.d5___________previous running compile
+item.dat_________________item data file
+
+7drl0.c__________________main program file
+7drl0def.h_______________definition header
+7drl0func0.h_____________function header #0
+7drl0func1.h_____________function header #1
+7drl0func2.h_____________function header #2
+7drl0func3.h_____________function header #3
+
+compile with:
+gcc -Wall -lncurses -lm 7drl0.c
+
+
+Move with arrowkeys or numberpad.
+q to quit
