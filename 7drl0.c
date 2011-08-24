@@ -13,11 +13,11 @@ int main( int argc, char* argv[] )
 	STAT_DAT score;
 	LEVEL curlv[MAX_MAPS]; /*current levels*/
 	MYBOOL run;
-//	char* dat_file_name = ;
+//	char* dat_file_name = "scores.dat";
 //	FILE* indata;
 	char* nam = "Skallagrim\n";
 //	char nam[RT_SUB_COLS - 2];
-	WINDOW *display_btm, *display_right;
+	WINDOW *display_btm, *display_right, *cmd_list;
 
 	srand(time(NULL));	    /* use clock value as starting seed */
 
@@ -190,6 +190,31 @@ int main( int argc, char* argv[] )
 			if( toupper(getch()) == 'Y' ) run.bbool = OFF;
 //			else say("Oh ok, then we wont kick you out of here.");
 		}/* end QUIT */
+		else if( cmd == DEBUG_ITEM )
+		{
+			cmd_list = newwin(MAX_ROW,(BTM_SUB_COLS-RT_SUB_COLS),0,0);
+			if( cmd_list == NULL ){ endwin(); return ("ERROR: No Cmd List Window!", FAIL); }
+			for(i=0; i < MAX_LV_ITM; i++)
+			{
+				//winsch(cmd_list,'-');
+				//wsay(cmd_list,curlv->itm[i].name);
+				if( wprintw(cmd_list,"\n %d %s [%d,%d] %d",i,curlv->itm[i].name,curlv->itm[i].stats[0],curlv->itm[i].stats[1], curlv->itm[i].type) == ERR ) return(
+ error("ERROR: wprintw err", curlv->itm[i].type));
+
+			}/* end for each item */
+			box(cmd_list,'|','+');
+			overlay(cmd_list,stdscr);
+			wrefresh(cmd_list);
+			mypause();//TODO:Process sub cmd
+			for( r = 0; r < MAX_ROW; r++ )//TODO: Make function and find duplicate usage
+				for( c = 0; c < MAX_COL; c++ )
+				{
+					move(r,c);
+					addch( get_map_icon( ACTIVE_LOCATION ) );
+				}/* end [r][c] screen initialization */
+			delwin(cmd_list);
+			touchwin(stdscr);
+		}/* end debug_item cmd if */
 		else exit( error("ERROR: cmd processing", cmd ) );
 //check for death
 	}/* end run while */

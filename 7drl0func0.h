@@ -7,7 +7,8 @@ double dist( int ar, int br, int ac, int bc );
 void wsay( WINDOW* where, char* string );
 int rng(int max_die_face);
 int smallest( int a, int b );
-int fill_wall( LEVEL* l, int dr, int dc, int cr, int cc );
+int set_loc( char t, LOC* s );//type spot
+int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc );
 void myflush( FILE *in );
 void mypause( void );
 
@@ -16,8 +17,9 @@ void mypause( void );
 
 int error( char* msg, int ref )
 {
-	fprintf( stderr, "\n %s [ %d ]\n", msg, ref );
-	return FAIL;
+	fprintf( stderr, " %s [ %d ] \n", msg, ref );
+	if( ref != 0 ) return ref;
+	else return FAIL;
 }/* end error func */
 
 
@@ -55,7 +57,7 @@ void wsay( WINDOW* where, char* string)
 	{
 		wmove(where,0,i);
 		if( winsch(where,string[i++]) == ERR )
-			exit( error("ERROR: wsay message insert display", FAIL) );
+			exit( error("ERROR: wsay message insert display", string[--i]) );
 	}/*end string !terminated while*/
 
 	wrefresh(where);
@@ -84,39 +86,77 @@ int smallest( int a, int b )
 
 
 
-int fill_wall( LEVEL* l, int dr, int dc, int cr, int cc )//map, door row, door col, corner row, corner column
+int set_loc( char t, LOC* s )//type spot
+{
+	switch(t)
+	{
+		case 'w': case 'W': case '#'://WALL
+			s->is_floor = OFF;
+			s->is_occupied = OFF;
+			s->is_visible = ONN;
+			s->is_wall = ONN;
+			s->is_door = OFF;
+			s->is_ustair = OFF;
+			s->is_dstair = OFF;
+			s->is_trap = OFF;
+			break;
+		case 'f': case 'F': case '.'://FLOOR
+			s->is_floor = ONN;
+			s->is_occupied = OFF;
+			s->is_visible = ONN;
+			s->is_wall = OFF;
+			s->is_door = OFF;
+			s->is_ustair = OFF;
+			s->is_dstair = OFF;
+			s->is_trap = OFF;
+			break;
+		case 'b': case 'B': case '+'://DOOR
+			s->is_floor = OFF;
+			s->is_occupied = OFF;
+			s->is_visible = ONN;
+			s->is_wall = OFF;
+			s->is_door = ONN;
+			s->is_ustair = OFF;
+			s->is_dstair = OFF;
+			s->is_trap = OFF;
+			break;
+		default:
+			if( t != 0 )return t;
+			else return FAIL;
+	}/* end type switch */
+	return 0;
+}/* end set_loc func */
+
+
+
+int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc )//map, door row, door col, corner row, corner column
 {
 	int i, j;
-		for( i = smallest(dr,cr); i < biggest(dr,cr); i++ )
-			for( j = smallest(dc,cc); j < biggest(dc,cc); j++ )
-			{//NOTE: Biggest returns zero if it's arguments are the same
-				if( ( i > MAX_ROW )||( j > MAX_COL ) ) return FAIL;
-				else{
-					l->map[i][j].is_floor = OFF;
-					l->map[i][j].is_occupied = OFF;
-					l->map[i][j].is_visible = ONN;
-					l->map[i][j].is_wall = ONN;
-					l->map[i][j].is_door = OFF;
-					l->map[i][j].is_ustair = OFF;
-					l->map[i][j].is_dstair = OFF;
-					l->map[i][j].is_trap = OFF;
-				}/*end else*/
-			}/* end ij ffor */
+
+	for( i = smallest(dr,cr); i < biggest(dr,cr); i++ )
+	for( j = smallest(dc,cc); j < biggest(dc,cc); j++ )
+	{//NOTE: Biggest returns zero if it's arguments are the same
+		if( ( i > MAX_ROW )||( j > MAX_COL ) ) return FAIL;
+		else{
+			set_loc(t,&l->map[i][j]);
+		}/*end else*/
+	}/* end ij ffor */	
+		
 	return 0;
 }/* end fill_wall func */
 
 
 
-void myflush ( FILE *in )
-{
-  int ch;
-
-  do
-    ch = fgetc ( in ); 
-  while ( ch != EOF && ch != '\n' ); 
-
-  clearerr ( in );
-}/* end myflush func */
+//void myflush ( FILE *in )
+//{
+//  int ch;
+//
+//  do
+//    ch = fgetc ( in ); 
+//  while ( ch != EOF && ch != '\n' ); 
+//
+//  clearerr ( in );
+//}/* end myflush func */
 
 
 

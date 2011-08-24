@@ -33,6 +33,8 @@ int get_cmd( void )
 			return WAIT;
 		case 'q': case 'Q':/*QUIT*/
 			return QUIT;
+		case 'I':/* DEBUGGING */
+			return DEBUG_ITEM;
 		default:
 			return NO_ACTION;
 	}/*end input switch*/

@@ -6,7 +6,7 @@
 $1:5:3:4:3:4:4:5
 
 #MONEY
-:0:0:0:0:10:coin:
+:0:0:0:10:coin:
 
 #WEAPONS (melee)
 :1:4:2:5:dagger:

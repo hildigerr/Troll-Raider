@@ -6,10 +6,26 @@
 #include <math.h>
 
 
+//#define DEBUG 1
+#ifdef DEBUG
+	#define MAX_LV_ITM 10
+	#define MAX_ITM_TYPES 1
+	#define MAX_ITM_PER_TYPE 1
+	#define ITEM_DAT "item4debug.dat"
+#else
+	#define MAX_LV_ITM 10
+	#define MAX_ITM_TYPES 7
+	#define MAX_ITM_PER_TYPE 5
+	#define ITEM_DAT "item.dat"
+#endif
+
+
 #define MALLOC(x) ((x *)malloc(sizeof(x)))
 #define CALLOC(n,x) ((x *)calloc(n, sizeof(x)))
 
 #define say(x) wsay(display_btm,x)
+#define fill_wall(x,y,z,w,v) fill('w', x,y,z,w,v)
+#define fill_floor(x,y,z,w,v) fill('.', x,y,z,w,v)
 
 /* Current Level Array Access Definitions */
 //#define TVILLAGE 0 /* Troll Village */
@@ -41,8 +57,8 @@
 #define MAX_ITEM_STATS 2
 
 #define MAX_ITM_NAME_LEN 10
-#define MAX_ITM_TYPES 7
-#define MAX_ITM_PER_TYPE 5
+//#define MAX_ITM_TYPES 7
+//#define MAX_ITM_PER_TYPE 5
 
 
 /* Equipment Slots */
@@ -60,7 +76,7 @@
 #define MAX_COL 60
 
 #define MAX_LV_MON 0
-#define MAX_LV_ITM 10
+//#define MAX_LV_ITM 10
 
 #define MAX_HUTS 5
 #define MAX_HUT_WID 4//These are
@@ -100,7 +116,8 @@
 #define SOUTH_EAST 7
 #define SOUTH_WEST 8
 #define WAIT		 9
-#define QUIT		10
+#define QUIT		 10
+#define DEBUG_ITEM 11
 
 /* Storyline Time Definitions */
 #define BEGINNING 0
@@ -111,7 +128,14 @@ typedef struct boo_struct{
 	unsigned bbool : 1;
 }MYBOOL;
 
+//typedef struct coord_struct{
+//	int x;
+//	int y;
+//	int z;
+//}COORDINATES;
+
 typedef struct loc_struct{
+//	COORDINATES axis;
 	unsigned is_floor : 1;
 	unsigned is_occupied : 1;
 	unsigned is_visible : 1;

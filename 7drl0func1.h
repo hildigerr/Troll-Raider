@@ -8,6 +8,7 @@ int init_mon(PLAYER* m, short type);
 int init_lv(LEVEL* l, short t);
 /*****************************************************************/
 
+
 int init_itm(ITEM* itm, short lv_type )
 {	
 	int i, m, s[MAX_ITEM_STATS];
@@ -17,151 +18,202 @@ int init_itm(ITEM* itm, short lv_type )
 	MYBOOL done;
 
 /* READ IN DATA FILE */
-	if( ( datafile = fopen( "item.dat", READ_ONLY ) ) == NULL )
+	if( ( datafile = fopen( ITEM_DAT, READ_ONLY ) ) == NULL )
 		return( error("ERROR: Missing \"item.dat\" file", FAIL ) );
 
 /* Initialize Necessary Variables */
 	done.bbool = OFF;
 	itm->worth = NOT_PLACED;
 	m = NOT_PLACED;
-//	if( m == 1 ) return( error( "BARF! BS Error!", m ) );
 	for( i=0; i < MAX_ITEM_STATS; i++ ) s[i] = NOT_PLACED;
 
 	itm->type = rng(MAX_ITM_TYPES) - 1;//Get Item Type == [0,MAX_ITM_TYPES)
 
-	while( !feof(datafile) && (done.bbool == OFF))
+	while(done.bbool == OFF)
 	{
-	/* Skip Over Comment Line */
-		if( ( c = fgetc(datafile) ) == '#' ) while( fgetc(datafile) != '\n' ) /*error("BARF! Reading Comment", m)*/;
-	/* Read In Maximum Items For This Type */
-		else if( c == '$' )
-		{
-			error("BARF! Found Max Enties List", m );
-			if( m == NOT_PLACED )
+		while( !feof(datafile) )
+		{		
+		/* Skip Over Comment Lines */
+			if( ( c = fgetc(datafile) ) == '#' ) while( fgetc(datafile) != '\n' ) /*error("BARF! Reading Comment", m )*/;
+		/* Read In Maximum Items For This Type */
+			else if( c == '$' )
 			{
-			/* Find The Appropriate Entry */
-				fseek( datafile, ( sizeof(char) * ( itm->type * 2 ) ), SEEK_CUR );//Will need rewrite if becomes more than 9//TODO:Make more robust
-			/* Get Entry */
-//				m = atoi( (char*)fgetc(datafile) );
-				b[0] = fgetc(datafile);	b[1] = '\0'; m = atoi(b); error("BARF! Got m ",m);
-			/* Veriy Entry's Legality */
-				if( ( m < 0)||( m > MAX_ITM_PER_TYPE ) )
+				//error("BARF! Found Max Enties List", itm->type );
+				if( m == NOT_PLACED )
 				{
-					fclose(datafile);
-					return( error("ERROR: Max Item Per Type Out of Range.  m = ", m) );
-				}/* end m verify if */
-			/* Process Entry */
-				else m = rng(m) - 1;// m now ==(0,MAX_ITM_PER_TYPE]
-			/* Go To The Next Line */ error("BARF! m is now ", m );
-				while( fgetc(datafile) != '\n' );
-			/* Record Position -- We Should Not Have to rewind before here */
-				here = ftell(datafile);
-				if( here < 0 ) //( fgetpos(datafile,here) != 0 )//
-				{
-					fclose(datafile);
-					return(error("ERROR: Failed to record file position in \"itm.dat\" file!" , m));
-				}/* end get position if */
-			}/* end m not placed if */
-			else{/* m != NOT_PLACED */
-				fclose(datafile);
-				return( error("ERROR: Double MAX Entries in \"itm.dat\" file!", m) );
-			}/* end already got m else */		
-		}/* end $ if */
-	/* Read In Entries */
-		else if( c == ':' )
-		{
-//			error("BARF! Found an Item entry", c);
-			if( ( m < 0)||( m > MAX_ITM_PER_TYPE ) )
-			{
-				fclose(datafile);
-				return( error("ERROR: Bad item Generated", m) );
-			}/* end m verify if */
-			else{/* m is ok */
-			/* Get Item Type */
-				b[0] = fgetc(datafile);	b[1] = '\0';//shouldn't need  to change b[1]
-				c = atoi(b); error(" BARF: Got Item Type =", c );
-			/* Verify That We Havn't Passed Our Item's Type Section */ //SHOULD BE UNNECESSARY
-				if( c > itm->type )
-				{
-					error("BARF: itm->type ==",itm->type);
-					if( fseek(datafile,here,SEEK_SET) != 0 ) //( fsetpos( datafile, here ) != 0 )
+				/* Find The Appropriate Entry */
+					fseek( datafile, ( sizeof(char) * ( itm->type * 2 ) ), SEEK_CUR );//Will need rewrite if becomes more than 9//TODO:Make more robust
+				/* Get Entry */
+					b[0] = fgetc(datafile);	b[1] = '\0'; m = atoi(b); //error("BARF! Got m", m);
+				/* Veriy Entry's Legality */
+					if( ( m < 0)||( m > MAX_ITM_PER_TYPE ) )
 					{
 						fclose(datafile);
-						return(error("ERROR: Failed to rewind datafile",c));
-					}/* end rewind if */
-				}/* end gone too far if */
-			/* Process The Section if of Correct Type */
-				else if( c == itm->type )
+						return( error("ERROR: Max Item Per Type Out of Range.  m = ", m) );
+					}/* end m verify if */
+				/* Process Entry */
+					else m = rng(m) - 1;// m now ==(0,MAX_ITM_PER_TYPE]
+				/* Go To The Next Line */
+					//error("BARF! m is now ", m );
+					while( fgetc(datafile) != '\n' );
+				/* Record Position -- We Should Not Have to rewind before here */
+					here = ftell(datafile);
+					if( here < 0 ) //( fgetpos(datafile,here) != 0 )//
+					{
+						fclose(datafile);
+						return(error("ERROR: Failed to record file position in \"itm.dat\" file!" , m));
+					}/* end get position if *//*now:end position verification if */
+				}/* end m not placed if */
+				else/* m != NOT_PLACED : m is already gotten */
 				{
-					error("BARF: Found itm type section", itm->type);
-					error("BARF: m is curretly", m );
-					/* Find Correct Listing In This Section */
-					while( m > 0 )
-						if( m-- == 1 )//Found It!
+					fclose(datafile);
+					return( error("ERROR: Double MAX Entries in \"itm.dat\" file!", m) );
+				}/* end m != NOT_PLACED else */
+			}/* end line begins with '$' if */
+		/* Read In Entries */
+			else if( c == ':' )
+			{
+				//error("BARF! Found an Item entry", c);
+			/* Check if we should be done *///Report output
+				if(done.bbool == ONN)//DAY6BUG Infinite Loop Checker
+				{
+					#if DEBUG
+					if( itm->is_ == ONN ) error("itm is_ set ONN", MAX_ITEM_STATS);
+					error("Item type", itm->type );
+					error("Item Worth",itm->worth );
+					for( i = 0 ; i < MAX_ITEM_STATS ; i++ )
+					{
+						error("Stat number",i);
+						error("stat quality",itm->stats[i]);
+					}/* end MAX_ITEM_STATS for */
+					error(itm->name,MAX_ITM_NAME_LEN);
+					mypause();//DO NOT SUPPRESS
+					#endif
+				}/* end done.bbool == ONN : DAY6BUG Infinite Loop Checker */
+			/* Process Data Table */
+				else /* done.bbool == OFF */
+				{
+				/* Verify Readiness */
+					if( ( m < 0)||( m > MAX_ITM_PER_TYPE ) )
+					{
+						fclose(datafile);
+						return( error("ERROR: Bad item Generated", m) );
+					}/* end m out of range if */
+					else/* m is in range */
+					{
+					/* Get Item Type */
+						b[0] = fgetc(datafile);	b[1] = '\0';//shouldn't need  to change b[1]
+						c = atoi(b); //error(" BARF: Got Item Type =", c );
+					/* Verify That We Havn't Passed Our Item's Type Section */ //SHOULD BE UNNECESSARY
+						if( c > itm->type )
 						{
-							error("BARF! m is now ", m);
-							fgetc(datafile);//bypass ':'
-						/* Get Item Stats */
-							for( i = 0; i < MAX_ITEM_STATS; i++ )
+							error("BARF: GOT PASED OUR ITEM : itm->type ==",itm->type); //mypause();
+							if( fseek(datafile,here,SEEK_SET) != 0 ) //( fsetpos( datafile, here ) != 0 )
 							{
-								error("BARF: Getting item stat",i);
-								mypause();
-								while( ( c == fgetc(datafile) ) != ':' )
+								fclose(datafile);
+								return(error("ERROR: Failed to rewind datafile",c));
+							}/* end rewind failed if */
+						}/* end need rewind if */
+					/* Process The Section if of Correct Type */
+						else if( c == itm->type )
+						{
+							//error("BARF: Found correct itm type section", itm->type); //mypause();
+						/* Find Correct Listing In This Section */
+							while( m >= 0 )//Searching...
+							{
+								if( m-- == 0 )//FOUND IT!
 								{
-									error("BARF: Converting to int", c);
-									b[0] = c; b[1] = '\0'; c = atoi(b);
-									error("BARF: IS now int", c);
-									mypause();
-									if( s[i] == NOT_PLACED ) s[i] = c;
-									else s[i] = ( ( s[i] * 10 ) + c );
-								}/* end !end of current number while */
-							}/* end get item stats for */
-						/* Get Item Worth */
-							while( ( c == fgetc(datafile) ) != ':' )
-							{
-								b[0] = c; b[1] = '\0';
-								if( itm->worth == NOT_PLACED ) itm->worth = atoi(b);
-								else itm->worth = ( ( itm->worth * 10 ) + atoi(b) );
-							}/* end get item worth while */
-						/* Get Item Name */
-							i = 0;
-							while( ( c == fgetc(datafile) ) != ':' )
-							{
-								if( i > MAX_ITM_NAME_LEN )
+									fgetc(datafile);//bypass ':'
+								/* Get Item Stats */
+									for( i = 0; i < MAX_ITEM_STATS; i++ )
+									{
+										//error("BARF: Getting item stat",i);	//mypause();
+										while( ( ( c = fgetc(datafile) ) != ':' )&&( !feof(datafile) ) )
+										{
+											if(( c <48 )||(c > 57)) { error("BAD INPUT", c);mypause(); }
+											//error("BARF: Converting to int", c);
+											b[0] = c; b[1] = '\0'; c = atoi(b);//error("BARF: IS now int", c);
+											if( s[i] == NOT_PLACED ) s[i] = c;
+											else s[i] = ( ( s[i] * 10 ) + c );
+											//error("BARF: Got itm stat", s[i]);
+										}/* end !end of current number or file while */
+									}/* end get item stats for */
+								/* Get Item Worth */
+									//error("BARF: Getting Item Worth", c );
+									while( ( ( c = fgetc(datafile) ) != ':' )&&( !feof(datafile) ) )
+									{
+										if(( c <48 )||(c > 57)) { error("BAD INPUT", c); mypause(); }
+										//error("BARF: Converting to int", c);
+										b[0] = c; b[1] = '\0';
+										if( itm->worth == NOT_PLACED ) itm->worth = atoi(b);
+										else itm->worth = ( ( itm->worth * 10 ) + atoi(b) );
+										//error("BARF: Got item worth", itm->worth ); //mypause();
+									}/* end get item worth while */
+								/* Get Item Name */
+									i = 0;
+									while( ( ( c = fgetc(datafile) ) != ':' )&&( !feof(datafile) ) )
+									{
+										//error("BARF: Getting Item Name",c); //mypause();
+										if( i > MAX_ITM_NAME_LEN )
+										{
+											fclose(datafile);
+											return(error("ERROR: Item Name Too Long",i));//TODO: Make truncate name instead
+										}/* end name length check if */
+										else if( ( c < 65 )||( c > 122 ))//ASCII
+										{
+											fclose(datafile);
+											return(error("ERROR: Bad Item Name Input",c));
+										}/* end ASCII rang check if */
+										else/* havn't exceeded MAX_ITM_NAME_LEN and is a character */
+											itm->name[i++] = c;
+									}/* end get item name while */
+									itm->name[i] = '\0';
+								/* Set other Item Flags */
+									done.bbool = ONN;
+									//error("BARF: ITEM DONE!",i);//mypause();
+								}/* end m ==-- Found Correct Listing In section if */
+								else //Go to next Listing
 								{
-									fclose(datafile);
-									return(error("ERROR: Item Name Too Long",i));
-								}/* end name length check if */
-								else/* havn't exceeded MAX_ITM_NAME_LEN */
-									itm->name[i++] = c;
-							}/* end get item name while */
-							itm->name[i] = '\0';
-							done.bbool = ONN;
-							error("BARF: ITEM DONE!",i);
-						}/* end m == 1 : Found Correct Listing In section if */
-						else //Go to next Listing
-							while( fgetc(datafile) != '\n' ) error("BARF: Skipping This Listing M",m);
-				}/* end c == itm->type if */
-				else /* Havn't Reached Our Section Yet */
-					 while( fgetc(datafile) != '\n' ) /*error("BARF: Skipping section", c)*/;
-			}/* end m is ok else */
-		}/* end ':' else */
-		else if( c == '\n' ) /* error("BARF: BLANK LINE" , c)*/;//continue;
-		else
+									while( fgetc(datafile) != '\n' ) /* error("BARF: Skipping This Listing M=",m) */;
+									fgetc(datafile);//bypass ':'
+									if( (c = fgetc(datafile) ) != itm->type ) error("DAY6Bug",FAIL);
+									//fgetc(datafile);
+								}/* end skip line in correct section else */
+							}/* end m>= 0 while : Done Searching */
+						}/* end c == itm->type if : Finished Processing Correct Section */
+						else /* Havn't Reached Our Section Yet */
+							while( fgetc(datafile) != '\n' ) /*error("BARF: Skipping section", c)*/;
+					}/* end m within range else */
+				}/* end done.bbool == OFF else : Processing Data Table Complete */
+			}/* end line begins with ':' if */
+		/* Skip Blank Lines */
+			else if( c == '\n' ) /* error("BARF: BLANK LINE" , c)*/;//continue;
+			else /* Catch Any Unexpected Input and Report it */
+			{
+				fclose(datafile);
+				return( error("ERROR: Unexpected Input From \"Itm.dat\" file", c) );
+			}/* end unexpected input else */
+			//error("BARF: SHOULD EXIT NOW IF PAUSED",c);
+			//if( done.bbool == ONN ) mypause();//TESTING
+			if( done.bbool == ONN ) break;//Force Completion//
+		}/* end !feof while */
+		//error("BARF: FOUND END OF FILE OR BROKE OUT OF LOOP",c);
+		if( done.bbool != ONN )
 		{
 			fclose(datafile);
-			return( error("ERROR: Unexpected Input From \"Itm.dat\" file", c) );
-		}/* end unexpected else */
-		error("BARF! finished",m);
-		//if(m > NOT_PLACED ) mypause();//TESTING
-	}/* end file access while */
+			return(error("ERROR: Item data not found. Possible broken datafile.",FAIL));
+		}/* end !done if */
+	}/* end !done while */
 
+	//error("BARF: Successfully initialized item!", itm->type );//mypause();
+
+/* Adjust Item Based on Lv and Whatever *///no adjustment for now
 	for(i=0; i < MAX_ITEM_STATS; i++ )
 	{
 		itm->stats[i] = s[i];
 
 	}/*end i<MAX_ITEM_STATS for*/
-
+/* Set Item Flags */
 	itm->is_ = ONN;
 
 	fclose(datafile);
@@ -281,24 +333,10 @@ int init_lv(LEVEL* l, short t)
 		{
 			if( ( ( r == 0 )||( c == 0 ) )||( ( r == (MAX_ROW-1) )||( c == (MAX_COL-1) ) ) )
 			{/* Border is always wall */
-				l->map[r][c].is_floor = OFF;
-				l->map[r][c].is_occupied = OFF;
-				l->map[r][c].is_visible = ONN;
-				l->map[r][c].is_wall = ONN;
-				l->map[r][c].is_door = OFF;
-				l->map[r][c].is_ustair = OFF;
-				l->map[r][c].is_dstair = OFF;
-				l->map[r][c].is_trap = OFF;
+				set_loc('w',&l->map[r][c]);
 			}/*end border ray check*/
 			else{/* Interior is floors for now */
-				l->map[r][c].is_floor = ONN;
-				l->map[r][c].is_occupied = OFF;
-				l->map[r][c].is_visible = ONN;
-				l->map[r][c].is_wall = OFF;
-				l->map[r][c].is_door = OFF;
-				l->map[r][c].is_ustair = OFF;
-				l->map[r][c].is_dstair = OFF;
-				l->map[r][c].is_trap = OFF;
+				set_loc('.',&l->map[r][c]);
 			}//end else4DEBUG
 		}/* end map RC ffor */
 
@@ -306,11 +344,14 @@ int init_lv(LEVEL* l, short t)
 	for( i = 0; i < MAX_LV_MON; i++ )
 		if( init_mon(&l->mon[i],l->type) == FAIL )
 			return( error("ERROR init_mon !success", i) );
+		
 
 /* Initialize Items */
-	for( r = 0; r < MAX_LV_ITM; r++ )
+	for( i = 0; i < MAX_LV_ITM; r++ )
 		if( init_itm(&l->itm[i],l->type) == FAIL )
 			return( error("ERROR init_itm !success", i) );
+//		else if( i > 0 )
+//			return( error("SUCCESS: Second Item returns Success", l->type) );
 
 /* Generate Map Based on Type */
 	n = rng(MAX_HUTS);	//n = MAX_HUTS;//TESTING
@@ -339,14 +380,15 @@ int init_lv(LEVEL* l, short t)
 							done.bbool = OFF;
 				}/* end done.bbool while */	
 			/* Set Building Enterance Flags */
-				l->map[r][c].is_floor = OFF;
-				l->map[r][c].is_occupied = OFF;
-				l->map[r][c].is_visible = ONN;
-				l->map[r][c].is_wall = OFF;
-				l->map[r][c].is_door = ONN;
-				l->map[r][c].is_ustair = OFF;
-				l->map[r][c].is_dstair = OFF;
-				l->map[r][c].is_trap = OFF;
+				set_loc( '+', &l->map[r][c] );
+				//l->map[r][c].is_floor = OFF;
+				//l->map[r][c].is_occupied = OFF;
+				//l->map[r][c].is_visible = ONN;
+				//l->map[r][c].is_wall = OFF;
+				//l->map[r][c].is_door = ONN;
+				//l->map[r][c].is_ustair = OFF;
+				//l->map[r][c].is_dstair = OFF;
+				//l->map[r][c].is_trap = OFF;
 			/* Expand Building Dimensions */
 				/* Make Enterance Face Fathest Wall */
 				length[NORTH_SOUTH] = biggest( DISTANCE_TO_NORTH_WALL, DISTANCE_TO_SOUTH_WALL );
