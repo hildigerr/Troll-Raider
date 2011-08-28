@@ -5,27 +5,31 @@
 #include <ctype.h>
 #include <math.h>
 
+#define version " d15.5"
 
-//#define DEBUG 1
-#ifdef DEBUG
+#define DEBUG 1
+
+//#define DEBUG_DAY6BUG 1
+#ifdef DEBUG_DAY6BUG
 	#define MAX_LV_ITM 10
 	#define MAX_ITM_TYPES 1
 	#define MAX_ITM_PER_TYPE 1
 	#define ITEM_DAT "item4debug.dat"
 #else
 	#define MAX_LV_ITM 10
-	#define MAX_ITM_TYPES 7
-	#define MAX_ITM_PER_TYPE 5
+//	#define MAX_ITM_TYPES 7
+	#define MAX_ITM_PER_TYPE 6
 	#define ITEM_DAT "item.dat"
 #endif
-
 
 #define MALLOC(x) ((x *)malloc(sizeof(x)))
 #define CALLOC(n,x) ((x *)calloc(n, sizeof(x)))
 
-#define say(x) wsay(display_btm,x)
+#define say(x) nsay(display_btm,x)
 #define fill_wall(x,y,z,w,v) fill('w', x,y,z,w,v)
 #define fill_floor(x,y,z,w,v) fill('.', x,y,z,w,v)
+
+#define squared(x) (x * x)
 
 /* Current Level Array Access Definitions */
 //#define TVILLAGE 0 /* Troll Village */
@@ -57,9 +61,6 @@
 #define MAX_ITEM_STATS 2
 
 #define MAX_ITM_NAME_LEN 10
-//#define MAX_ITM_TYPES 7
-//#define MAX_ITM_PER_TYPE 5
-
 
 /* Equipment Slots */
 #define WEP 0 /*Weapon*/
@@ -67,16 +68,29 @@
 #define ARM 2 /*Armor*/
 #define HAT 3 /*Head*/
 #define MAX_SLOTS 4
+
 #define MAX_HOLD 10
 
 #define ONN 0 /*for bit manipulation with OFF*/
+
+/* Equipment Types */
+#define MONEY  0
+#define MELEE  1
+#define REACH  2
+#define RANGE1 3
+#define RANGE2 4
+#define SHIELD 5
+#define TYPHAT 6
+#define TYPARM 7
+#ifndef MAX_ITM_TYPES
+	#define MAX_ITM_TYPES 8
+#endif
 
 /* Map/LV Size Definitions */
 #define MAX_ROW 20
 #define MAX_COL 60
 
 #define MAX_LV_MON 0
-//#define MAX_LV_ITM 10
 
 #define MAX_HUTS 5
 #define MAX_HUT_WID 4//These are
@@ -92,10 +106,13 @@
 #define RT_SUB_ROWS 20//should be same as MAX_ROW
 #define RT_SUB_COLS 20
 
-#define FAIL 1
+#define KEY_ESC 27
 #define READ_ONLY "r"
-#define NOT_PLACED -99 //creature location r,c
-#define CHECK_FLOAT -99.9
+
+#define FAIL 1
+#define CANCEL -1
+#define NOT_PLACED 99
+#define CHECK_FLOAT 99.9
 
 /* Map Generation Macros */
 #define ACTIVE_LOCATION	curlv[pc.maplv].map[r][c]
@@ -105,7 +122,7 @@
 #define DISTANCE_TO_SOUTH_WALL dist( hutspot[0][i], MAX_COL      , hutspot[1][i], hutspot[1][i] )
 #define DISTANCE_TO_WEST_WALL  dist( hutspot[0][i], hutspot[0][i], hutspot[1][i], 0             )
 
-/* get_cmd return values */
+/* get_cmd return values *//* get_subi_cmd return values */
 #define NO_ACTION  0
 #define NORTH      1
 #define SOUTH		 2
@@ -117,12 +134,19 @@
 #define SOUTH_WEST 8
 #define WAIT		 9
 #define QUIT		 10
-#define DEBUG_ITEM 11
+#define SUB_FIN    10
+#define INVENTORY  11
+#define EQUIPMENT  12
+#define DROP_ITEM  13
+#define REMOVE_ITM 14
+#define DESTROY_ITEM 15
+#define DEBUG_ITEM -9
 
 /* Storyline Time Definitions */
-#define BEGINNING 0
-#define MIDDLE 1
-#define END 2
+#define INTRO 0
+#define BEGINNING 1
+#define MIDDLE 2
+#define END 3
 
 typedef struct boo_struct{
 	unsigned bbool : 1;
@@ -134,6 +158,18 @@ typedef struct boo_struct{
 //	int z;
 //}COORDINATES;
 
+
+
+typedef struct item_struct{
+	char name[MAX_ITM_NAME_LEN + 1];
+	unsigned is_ : 1;
+	unsigned is_equipped :1;
+	unsigned is_2handed : 1;
+	unsigned short int type;
+	int stats[MAX_ITEM_STATS];
+	int worth;
+}ITEM;
+
 typedef struct loc_struct{
 //	COORDINATES axis;
 	unsigned is_floor : 1;
@@ -144,15 +180,8 @@ typedef struct loc_struct{
 	unsigned is_ustair : 1;
 	unsigned is_dstair : 1;
 	unsigned is_trap : 1;
+	ITEM litter;
 }LOC;
-
-typedef struct item_struct{
-	char name[MAX_ITM_NAME_LEN + 1];
-	unsigned is_ : 1;
-	unsigned short int type;
-	int stats[MAX_ITEM_STATS];
-	int worth;
-}ITEM;
 
 typedef struct statistics_structure {
 	int food;	
@@ -178,7 +207,7 @@ typedef struct pc_struct{
 typedef struct level_struct{
 	LOC map[MAX_ROW][MAX_COL];
 	PLAYER mon[MAX_LV_MON];
-	ITEM itm[MAX_LV_ITM];
+//	ITEM itm[MAX_LV_ITM];
 	int type; /* Current Level Array Access */
 	unsigned is_new : 1; /* Unexplored */
 }LEVEL;

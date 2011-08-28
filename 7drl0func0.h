@@ -2,14 +2,14 @@
 /*INDEX*   --   ordered list of functions contained in this file */
 int error( char* msg, int ref );
 double biggest( double a, double b );
-int squared( int x );
 double dist( int ar, int br, int ac, int bc );
 void wsay( WINDOW* where, char* string );
+void nsay( WINDOW* where, char* string );
 int rng(int max_die_face);
 int smallest( int a, int b );
 int set_loc( char t, LOC* s );//type spot
 int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc );
-void myflush( FILE *in );
+//void myflush( FILE *in );
 void mypause( void );
 
 /*****************************************************************/
@@ -33,13 +33,6 @@ double biggest( double a, double b )
 
 
 
-int squared( int x )
-{
-	return (x * x);
-}/* end squared func */
-
-
-
 double dist( int ar, int br, int ac, int bc )
 {
 	return sqrt( squared( ar - br ) + squared( ac - bc ) );
@@ -47,7 +40,7 @@ double dist( int ar, int br, int ac, int bc )
 
 
 
-void wsay( WINDOW* where, char* string)
+void wsay( WINDOW* where, char* string)//DEPRICATED
 {
 	int i = 0;
 
@@ -62,6 +55,25 @@ void wsay( WINDOW* where, char* string)
 
 	wrefresh(where);
 }/* end wsay func */
+
+void nsay( WINDOW* where, char* string)
+{
+	int i = 0;
+
+/* Move all lines up */
+	wmove(where,0,0);
+	if( wdeleteln(where) == ERR )
+		exit( error("ERROR: deleteln err", FAIL ) );
+/* print string at end */
+	else while(string[i] != '\0')
+	{
+		wmove(where,BTM_SUB_ROWS-1,i);
+		if( winsch(where,string[i++]) == ERR )
+			exit( error("ERROR: wsay message insert display", string[--i]) );
+	}/*end string !terminated while*/
+
+	wrefresh(where);
+}/* end nsay func */
 
 
 
@@ -143,7 +155,7 @@ int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc )//map, door row, doo
 	}/* end ij ffor */	
 		
 	return 0;
-}/* end fill_wall func */
+}/* end fill func */
 
 
 

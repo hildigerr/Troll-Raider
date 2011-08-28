@@ -9,9 +9,11 @@ int story_line( short when, WINDOW* where )
 
 	switch( when )
 	{
+		case INTRO:
+			printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", version);
+			opt = NO_ACTION;			
+			break;
 		case BEGINNING:
-			printf("\n\n\t7DRL0\tBy HILDIGERR\n\n");
-			opt = NO_ACTION;
 			break;
 		case MIDDLE:
 			if( where == NULL ) break;
