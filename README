@@ -16,10 +16,5 @@ gcc -Wall -lncurses -lm 7drl0.c
 
 
 Move with arrowkeys or numberpad.
-<<<<<<< HEAD
 q to quit
-=======
-q to quit
->>>>>>> d893ee8b04ae997cc8b69d58fe1c7c71ace8076e
-
 I to see level inventory (debug cmd)
