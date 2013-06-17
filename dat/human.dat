@@ -1,0 +1,35 @@
+#There are 3 types of humans:
+#  Innocents, Commoners, and Heroes
+
+# :I:Q:M:N:...:@String:
+#  I = Type Number
+#  Q = Max Qt of Starting Equipment
+#  M:N = Equipment Reference Values ... See item.dat ... N = !number if rand item of type ... number is maximum still rand of everything below
+#  String = Name
+
+
+
+#Max Entries Per Type
+$3:4:5
+
+
+#Innocent
+:0:0:@Infant:
+:0:0:@Toddler:
+:0:1:0:N:@Child:
+
+#Common
+:1:4:2:0:6:1:7:1:0:1:@Farm-hand:
+:1:4:2:1:6:1:7:1:0:2:@Farmer:
+:1:4:1:N:7:3:6:2:0:3:@Fighter:
+:1:4:4:N:6:2:7:3:0:3:@Archer:
+
+#Hero
+:2:7:1:N:5:N:1:N:2:N:7:N:6:N:0:N:@Warrior:
+:2:5:7:1:6:1:3:N:1:N:0:N:@Mage:
+:2:5:2:N:7:N:1:N:5:N:0:N:@Paladin:
+:2:4:4:N:7:4:6:3:0:N:@Ranger:
+:2:6:3:N:1:N:7:3:6:2:0:N:0:N:@Rogue:
+
+## Expand list into table
+## for(rng(Q)) get(M, rng(N))
