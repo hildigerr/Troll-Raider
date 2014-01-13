@@ -1,4 +1,4 @@
-/* $Id: map.c,v 1.4 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: map.c,v 1.5 2014/01/13 05:42:59 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * map.c -- Map Utility Functions.                                            *
@@ -59,20 +59,20 @@ int set_loc( char t, LOC* s )//type spot
  * FUNCTION:    fill
  * ARGUMENTS:   char    t
  *              LEVEL*  l
- *              int     dr
- *              int     dc
- *              int     cr
- *              int     cc
+ *              COORD   d
+ *              COORD   c
  * RETURNS:     int
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc )
+int fill( char t, LEVEL* l, COORD d, COORD c )
 {
-	int i, j;
-    //NOTE: Biggest returns zero if it's arguments are the same
-	for( i = smallest(dr,cr); i < biggest(dr,cr); i++ )
-        for( j = smallest(dc,cc); j < biggest(dc,cc); j++ ) {
+	int i, j, s = smallest(d.colx,c.colx),
+		b[2] = { biggest(d.rowy,c.rowy), biggest(d.colx,c.colx) };
+	/* NOTE: Biggest returns zero if it's arguments are the same. */
+
+	for( i = smallest(d.rowy,c.rowy); i < b[0]; i++ )
+        for( j = s; j < b[1]; j++ ) {
             if( ( i > MAX_ROW )||( j > MAX_COL ) ) return FAIL;
             else set_loc(t,&l->map[i][j]);
         }/* End ij ffor */
@@ -241,7 +241,7 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 			done  = true;
 			if( i == 0 ) continue;
 			else for( z = 1; z <= i; z++ )
-				if( dist( hutspot[z-1].colx, hutspot[z].colx,hutspot[z-1].rowy, hutspot[z].rowy ) < MIN_HUT_DIST )
+				if( dist( hutspot[z-1], hutspot[z] ) < MIN_HUT_DIST )
 					done  = false;
 		}/* end done  while */
 
@@ -269,7 +269,7 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 		}/*end done  while */
 
         /* Fill Building With Wall */
-		if( fill_wall( l , room[i].a.rowy, room[i].a.colx, room[i].b.rowy, room[i].b.colx ) == FAIL )
+		if( fill_wall( l , room[i].a, room[i].b ) == FAIL )
 			return( ERROR( NULL, "Failed to Fill Building Walls", i) );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)

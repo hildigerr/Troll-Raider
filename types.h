@@ -1,4 +1,4 @@
-/* $Id: types.h,v 1.4 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: types.h,v 1.5 2014/01/13 05:42:59 moonsdad Exp $ */
 /******************************************************************************
  ******************************************************************************/
 #pragma once
@@ -104,17 +104,18 @@
 #define DFMAX  3    /* Maximum Dungeon Name Flavors */
 #define MAX_MAPS	9 /* TOTAL NUMBER OF MAPS PER GAME */
 
-typedef struct item_struct {
+typedef struct {
 	char name[MAX_ITEM_NAME_LEN + 1];
 	unsigned is_ : 1;
 	unsigned is_equipped :1;
 	unsigned is_2handed : 1;
+	unsigned is_XXX : 1; /* unused */
 	unsigned short int type;
 	int stats[MAX_ITEM_STATS];
 	int worth;
-}ITEM;
+} ITEM;
 
-typedef struct pc_struct {
+typedef struct {
 	char name[MAX_NAME_LEN+1];
 	int hp[2];//[0]MAX//[1]CUR
 	int stats[MAX_STATS];
@@ -128,26 +129,26 @@ typedef struct pc_struct {
 	unsigned is_alive : 1;
 	unsigned is_human : 1;
 	unsigned is_awake : 1;
-}PLAYER;
+} PLAYER;
 
-typedef struct statistics_structure {
+typedef struct {
 	int food;
 	unsigned long turn;
 	int family;//TODO: make family types and rank score based on who saved
 	unsigned short hut_qt;
-}STAT_DAT;
+} STAT_DAT;
 
-typedef struct coord_struct {
+typedef struct {
 	int colx;
 	int rowy;
-}COORD;
+} COORD;
 
-typedef struct rect_struct {
+typedef struct {
 	COORD a;
 	COORD b;
-}RECT;
+} RECT;
 
-typedef struct loc_struct{
+typedef struct {
 	unsigned is_floor : 1;
 	unsigned is_occupied : 1;
 	unsigned is_visible : 1;
@@ -156,8 +157,8 @@ typedef struct loc_struct{
 	unsigned is_ustair : 1;
 	unsigned is_dstair : 1;
 	unsigned is_trap : 1;
-	ITEM litter;
-}LOC;
+	ITEM litter; /* TODO: make ptr, malloc as needed */
+} LOC;
 
 typedef struct level_struct{
 	LOC map[MAX_ROW][MAX_COL];

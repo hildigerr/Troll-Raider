@@ -1,4 +1,4 @@
-/* $Id: calc.c,v 1.3 2013/05/06 05:04:01 moonsdad Exp $ */
+/* $Id: calc.c,v 1.4 2014/01/13 05:42:59 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * calc.c -- My Math Functions.                                               *
@@ -20,16 +20,14 @@ inline double biggest( double a, double b )
 
 /******************************************************************************
  * FUNCTION:    dist                                                          *
- * ARGUMENTS:   int     ar  -- Point a Row                                    *
- *              int     br  -- Point b Row                                    *
- *              int     ac  -- Point a Col                                    *
- *              int     bc  -- Point b Col                                    *
+ * ARGUMENTS:   COORD     a  -- First Point                                   *
+ *              COORD     b  -- Second Point                                  *
  * RETURNS:     double      -- distance between point a and b                 *
  ******************************************************************************/
-inline double dist( int ar, int br, int ac, int bc )
+inline double dist( COORD a, COORD b )
 {
-	return sqrt( squared( ar - br ) + squared( ac - bc ) );
-}/* end dist func */
+	return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
+}/* End dist Func */
 
 
 /******************************************************************************

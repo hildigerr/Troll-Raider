@@ -1,4 +1,4 @@
-/* $Id: calc.h,v 1.2 2013/05/06 05:04:01 moonsdad Exp $ */
+/* $Id: calc.h,v 1.3 2014/01/13 05:42:59 moonsdad Exp $ */
 /******************************************************************************
  * calc -- My Math Functions.                                                 *
  ******************************************************************************/
@@ -7,6 +7,9 @@
 /* System Headers */
 #include <stdlib.h>
 #include <math.h>
+
+/* Local Header */
+#include "types.h"
 
 /* Macro Functions */
 #define squared(x) (x * x)
@@ -22,13 +25,11 @@ inline double biggest( double a, double b );
 
 /******************************************************************************
  * FUNCTION:    dist                                                          *
- * ARGUMENTS:   int     ar  -- Point a Row                                    *
- *              int     br  -- Point b Row                                    *
- *              int     ac  -- Point a Col                                    *
- *              int     bc  -- Point b Col                                    *
+ * ARGUMENTS:   COORD     a  -- First Point                                   *
+ *              COORD     b  -- Second Point                                  *
  * RETURNS:     double      -- distance between point a and b                 *
  ******************************************************************************/
-inline double dist( int ar, int br, int ac, int bc );
+inline double dist( COORD a, COORD b );
 
 
 /******************************************************************************

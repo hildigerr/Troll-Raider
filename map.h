@@ -1,4 +1,4 @@
-/* $Id: map.h,v 1.1 2013/05/05 22:04:12 moonsdad Exp $ */
+/* $Id: map.h,v 1.2 2014/01/13 05:42:59 moonsdad Exp $ */
 /******************************************************************************
  * map -- Map Utility Functions.                                              *
  ******************************************************************************/
@@ -16,8 +16,8 @@
  * ARGUMENTS:   char t
  *              LOC* s
  * RETURNS:     int
- * WARNING:     
- * NOTE:        
+ * WARNING:
+ * NOTE:
  ******************************************************************************/
 int set_loc( char t, LOC* s );
 
@@ -26,17 +26,15 @@ int set_loc( char t, LOC* s );
  * FUNCTION:    fill
  * ARGUMENTS:   char    t
  *              LEVEL*  l
- *              int     dr
- *              int     dc
- *              int     cr
- *              int     cc
+ *              COORD   d
+ *              COORD   c
  * RETURNS:     int
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-int fill( char t, LEVEL* l, int dr, int dc, int cr, int cc );
-#define fill_wall(x,y,z,w,v) fill('w', x,y,z,w,v)
-#define fill_floor(x,y,z,w,v) fill('.', x,y,z,w,v)
+int fill( char t, LEVEL* l, COORD d, COORD c );
+#define fill_wall(x,y,z) fill('w', x,y,z)
+#define fill_floor(x,y,z) fill('.', x,y,z)
 
 /******************************************************************************
  * FUNCTION:    init_lv
