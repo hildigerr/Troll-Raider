@@ -92,6 +92,7 @@ int main( int argc, char* argv[] )
     raw();     /* Disable input buffering */
     noecho();  /* Disable input echoing */
 	keypad(stdscr, TRUE); /* enable arrowkeys and such */
+	atexit( endwin );
 
     /* RUN GAME */
 	while( run == true ) {
@@ -163,11 +164,7 @@ int main( int argc, char* argv[] )
 
             /* PROCESS CMD */
 			r = pc.locr; c = pc.locc;
-			if( cmd == NO_ACTION ) {
-				//NEED TO GET ANOTHER CMD//DEPRECATED: Now checked for at input
-				say("NEED TO GET ANOTHER CMD");//SHOULD NOT DISPLAY NOW
-			}/* end cmd is NO_ACTION if */
-			else if( ( cmd > NO_ACTION )&&( cmd < WAIT ))/* MOVING */ {
+			if( ( cmd > NO_ACTION )&&( cmd < WAIT ))/* MOVING */ {
                 /* Find Target Location */
 				if( cmd == SOUTH_WEST )		 { r += 1; c -= 1; }/* end SW if */
 				else if( cmd == SOUTH )		 { r += 1;         }/* end S  if */
@@ -238,11 +235,11 @@ int main( int argc, char* argv[] )
 			else if( ( cmd >= INVENTORY )&&( cmd <= DESTROY_ITEM) ) {
                 /* Create Data Display Windows */
 				cmd_list[0] = newwin((MAX_ROW - BTM_SUB_ROWS ),(BTM_SUB_COLS - RT_SUB_COLS),0,0);
-				if( cmd_list[0] == NULL ){ endwin(); return ERROR(NULL, "No Cmd List Window!", 0); }
+				if( cmd_list[0] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 0); }
 				cmd_list[1] = subwin(cmd_list[0],(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,0);
-				if( cmd_list[1] == NULL ){ endwin(); return ERROR(NULL, "No Cmd List Window!", 1); }
+				if( cmd_list[1] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 1); }
 				cmd_list[2] = subwin(cmd_list[0],(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,((BTM_SUB_COLS - RT_SUB_COLS)/2));
-				if( cmd_list[2] == NULL ){ endwin(); return ERROR(NULL, "No Cmd List Window!", 2); }
+				if( cmd_list[2] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 2); }
                 /* Display Data on New Window */
                 /* Inventory *//* LHS */
 				wprintw(cmd_list[1],"\n # Inventory [Hit,Dam] $");
@@ -272,20 +269,17 @@ int main( int argc, char* argv[] )
 				done_with_sub = false;
 				do{
                     /* Get Input */
-					if( ( cmd > INVENTORY )&&( cmd < PICK_UP ) );/*All i sub cmds accessed directly in this range*/
+					if( ( cmd > INVENTORY )&&( cmd < PICK_UP ) ); /* All i sub cmds accessed directly in this range */
 					else while( ( cmd = get_subi_cmd() ) == NO_ACTION );
                     /* Process sub cmd */
 					if( cmd == REMOVE_ITEM )
 					{
                         /* count how many items we have equipped */
 						cmd = 0; /* initialize for temporary iterative use */
-						for( i = 0; i < MAX_SLOTS; i++ )	if( pc.equip[i] != NULL ) { cmd += 1; itmptr = pc.equip[i]; }
+						for( i = 0; i < MAX_SLOTS; i++ ) if( pc.equip[i] != NULL ) { cmd += 1; itmptr = pc.equip[i]; }
 
-						if( cmd == 0 )/*Nothing to remove*/
-						{
-							say("You have nothing equipped.");
-						}/* end Nothing to remove if */
-						else if( cmd == 1 ) //assume unequipping that one
+						if( cmd == 0 ) { say("You have nothing equipped."); }
+						else if( cmd == 1 ) /* assume unequipping that one */
 						{
                             /* confirm */
 							say("Do you really want to remove that item? ");
@@ -311,25 +305,19 @@ int main( int argc, char* argv[] )
 								done_with_sub = true;
 							}/* end remove item else */
 						}/* end more than one item to remove else */
-						cmd = NO_ACTION;/*
-			 Reset cmd for general use *///Not Necessary
+						cmd = NO_ACTION;/* Reset cmd for general use *///Not Necessary
 					}/* end REMOVE_ITM if */
 					else if( cmd == EQUIPMENT )/* Equip Item */
 					{
                         /* Which Item? */
-						do{
-							say("Equip which item? ");
-						}while(( cmd = get_slot('i')) == NOT_PLACED );
-						if( cmd == CANCEL ) {say("Equip Item Canceled."); continue;}
+						do{ say("Equip which item? "); } while(( cmd = get_slot('i')) == NOT_PLACED );
+						if( cmd == CANCEL ) { say("Equip Item Canceled."); continue; }
 						else itmptr = &pc.inventory[cmd];
                         /* Verify Equipability */
 						if( is_equipable( itmptr ) == true )
 						{
                             /* Verify and Unequipp if needed */
-							if( itmptr->is_equipped == true )
-							{
-								say("That item is already equipped.");
-							}/* end already equipped if */
+							if( itmptr->is_equipped == true ) { say("That item is already equipped."); }
                             /* Check item type and slot if needed */
 							else switch( slot_of(itmptr) )
 							{
@@ -579,7 +567,7 @@ else if( cmd == PICK_UP )
 /* Display And Save High Score Report */
 
 /* TERMINATE PROGRAM */
-	endwin();/* End curses mode */
+//	endwin();/* End curses mode */
 //	fclose(indata);
 	return 0;
 }/* end main func */

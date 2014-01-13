@@ -35,13 +35,13 @@ void wsay( WINDOW* where, char* string )
  * ARGUMENTS:   WINDOW*     d       -- Reference to the window to initialize  *
  *              PLAYER*     p       -- The player whose statistics to display *
  *              STAT_DAT*   s       -- Game statistics to display             *
- * RETURNS:     bool                                                           *
+ * RETURNS:     bool                                                          *
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
 bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
 {
 	int i;
-	char* dflav[DFMAX] ={ /* for each dungeon lv an ambiguous 5 letter name */
+	char* dflav[DFMAX] ={ /* for each dungeon lv an arbitrary 5 letter name */
                              "Vault",
                              "Jails",
                              "Depth"    };
