@@ -27,12 +27,6 @@
 #define KEY_ESC 27
 #define READ_ONLY "r"
 
-/* For Bit Manipulation */ /* Opposite of Traditional Value */
-#define ONN 0
-#ifndef OFF //TODO: change reused OFF to OFH or this to BOFF and BONN
-    #define OFF 1
-#endif
-
 /* Macros */
 #define ERROR(w,b,s) _ERROR(w,b,s,DEBUG_DISPLAY)
 #define BARF(m,i)    _ERROR("BARF",m,i,1)

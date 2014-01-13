@@ -9,3 +9,5 @@
 *.obj
 *.elf
 a.out
+
+workspace*.c

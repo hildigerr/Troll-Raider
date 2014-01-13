@@ -1,4 +1,4 @@
-/* $Id: map.c,v 1.3 2013/05/05 22:04:12 moonsdad Exp $ */
+/* $Id: map.c,v 1.4 2014/01/13 04:43:47 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * map.c -- Map Utility Functions.                                            *
@@ -11,41 +11,41 @@
  * ARGUMENTS:   char t
  *              LOC* s
  * RETURNS:     int
- * WARNING:     
- * NOTE:        
+ * WARNING:
+ * NOTE:
  ******************************************************************************/
 int set_loc( char t, LOC* s )//type spot
 {
 	switch(t) {
 		case 'w': case 'W': case '#'://WALL
-			s->is_floor = OFF;
-			s->is_occupied = OFF;
-			s->is_visible = ONN;
-			s->is_wall = ONN;
-			s->is_door = OFF;
-			s->is_ustair = OFF;
-			s->is_dstair = OFF;
-			s->is_trap = OFF;
+			s->is_floor = false;
+			s->is_occupied = false;
+			s->is_visible = true;
+			s->is_wall = true;
+			s->is_door = false;
+			s->is_ustair = false;
+			s->is_dstair = false;
+			s->is_trap = false;
 			break;
 		case 'f': case 'F': case '.'://FLOOR
-			s->is_floor = ONN;
-			s->is_occupied = OFF;
-			s->is_visible = ONN;
-			s->is_wall = OFF;
-			s->is_door = OFF;
-			s->is_ustair = OFF;
-			s->is_dstair = OFF;
-			s->is_trap = OFF;
+			s->is_floor = true;
+			s->is_occupied = false;
+			s->is_visible = true;
+			s->is_wall = false;
+			s->is_door = false;
+			s->is_ustair = false;
+			s->is_dstair = false;
+			s->is_trap = false;
 			break;
 		case 'b': case 'B': case '+'://DOOR
-			s->is_floor = OFF;
-			s->is_occupied = OFF;
-			s->is_visible = ONN;
-			s->is_wall = OFF;
-			s->is_door = ONN;
-			s->is_ustair = OFF;
-			s->is_dstair = OFF;
-			s->is_trap = OFF;
+			s->is_floor = false;
+			s->is_occupied = false;
+			s->is_visible = true;
+			s->is_wall = false;
+			s->is_door = true;
+			s->is_ustair = false;
+			s->is_dstair = false;
+			s->is_trap = false;
 			break;
 		default:
 			if( t != 0 )return t;
@@ -95,7 +95,7 @@ int init_lv( LEVEL* l, short t )
     /* Keep Track of Current Level and Position in curlv array */
 	l->type = t;
 
-	l->is_new = ONN; /* Initially Unexplored */
+	l->is_new = true; /* Initially Unexplored */
 
     /* Set All map flags Initially in Case Some Slip Through */
 	for( r = 0; r < MAX_ROW; r++ )
@@ -106,7 +106,7 @@ int init_lv( LEVEL* l, short t )
 				set_loc( 'w', &l->map[r][c] );
 			}/* End border ray check */
 			else set_loc('.',&l->map[r][c]); /* Interior is floors for now */
-				
+
             /* Initialize Item Locations */
 			if( set_empty_item(&l->map[r][c].litter) != 0 )
 				return( ERROR( NULL, "Litter Bug!", l->map[r][c].litter.type) );
@@ -125,15 +125,15 @@ int init_lv( LEVEL* l, short t )
  ******************************************************************************/
 char get_map_icon(LOC here)
 {
-	if( here.is_visible != ONN ) return ' ';
-	else if( here.is_wall == ONN ) return '#';
-	else if( here.is_occupied == ONN ) return 'o';//tempfortest
-	else if( here.litter.is_ == ONN ) return '&';//tempfortest
-	else if( here.is_floor == ONN ) return '.';
-	else if( here.is_door == ONN ) return '+';
-	else if( here.is_ustair == ONN ) return '>';
-	else if( here.is_dstair == ONN ) return '<';
-	else if( here.is_trap == ONN ) return 'x';//tempfortest
+	if( here.is_visible != true ) return ' ';
+	else if( here.is_wall == true ) return '#';
+	else if( here.is_occupied == true ) return 'o';//tempfortest
+	else if( here.litter.is_ == true ) return '&';//tempfortest
+	else if( here.is_floor == true ) return '.';
+	else if( here.is_door == true ) return '+';
+	else if( here.is_ustair == true ) return '>';
+	else if( here.is_dstair == true ) return '<';
+	else if( here.is_trap == true ) return 'x';//tempfortest
 	else return '&';//DEBUG SYMBOL
 }/* end get_map_icon func */
 
@@ -155,35 +155,35 @@ int buildgen( LEVEL* outside, LEVEL* inside )
     /* copy/invert ouside map to inside map */
 	for( r = 1; r < (MAX_ROW -1); r++ )
 		for( c = 1; c < (MAX_COL -1); c++ )
-			if( outside->map[r][c].is_wall == ONN )
+			if( outside->map[r][c].is_wall == true )
                 set_loc( '.' , &inside->map[r][c] );
-			else if( outside->map[r][c].is_floor == ONN )
+			else if( outside->map[r][c].is_floor == true )
                 set_loc( '#' , &inside->map[r][c] );
-			else if( outside->map[r][c].is_door == ONN ) {
+			else if( outside->map[r][c].is_door == true ) {
                 //Both a door and exit to lv
 				set_loc( '.' , &inside->map[r][c] );
                 //tmp use trap to help find door location
-				inside->map[r][c].is_trap = ONN; 
+				inside->map[r][c].is_trap = true;
 			}/* end outside_door if */
 
     /* Locate/Create exit doors */
 	for( r = 1; r < (MAX_ROW -1); r++ )
 		for( c = 1; c < (MAX_COL -1); c++ )
-			if( inside->map[r][c].is_trap == ONN ) {
+			if( inside->map[r][c].is_trap == true ) {
                 //second found wall should usually be made exit door
-				inside->map[r][c].is_trap = OFF;//stop tmp use
-				found_first = OFF;
-				done  = OFF;
+				inside->map[r][c].is_trap = false;//stop tmp use
+				found_first = false;
+				done  = false;
 				for( i = r-1; i <= r+1; i++ )
-					if( done  == ONN ) break;
+					if( done  == true ) break;
 					else for( j = c-1; j <= c+1; j++ )
-						if( inside->map[i][j].is_wall == ONN ) {
-							if( found_first == OFF )
-								found_first = ONN;
+						if( inside->map[i][j].is_wall == true ) {
+							if( found_first == false )
+								found_first = true;
 							else{
 								set_loc( '+', &inside->map[i][j] );
-								inside->map[i][j].is_dstair = ONN;
-								done  = ONN;
+								inside->map[i][j].is_dstair = true;
+								done  = true;
 								break;
 							}/* end place exit door else */
 						}/* end is_wall if */
@@ -233,21 +233,21 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 	for( i = 0; i < (n+1); i++ )
 	{
         /* Find centers of Buildings */
-		done  = OFF;
-		while( done  == OFF )
+		done  = false;
+		while( done  == false )
 		{
 			while( ( hutspot[i].rowy = rng(MAX_ROW) - ( 3 + MIN_HUT_HGT ) ) <2 );//ERROR("r=", hutspot[i].rowy );
 			while( ( hutspot[i].colx = rng(MAX_COL) - ( 3 + MIN_HUT_WID ) ) <2 );//ERROR("c=", hutspot[i].colx );
-			done  = ONN;
+			done  = true;
 			if( i == 0 ) continue;
 			else for( z = 1; z <= i; z++ )
-				if( dist( hutspot[z-1].colx, hutspot[z].colx,hutspot[z-1].rowy, hutspot[z].rowy ) < MIN_HUT_DIST )				
-					done  = OFF;
-		}/* end done  while */	
-        
+				if( dist( hutspot[z-1].colx, hutspot[z].colx,hutspot[z-1].rowy, hutspot[z].rowy ) < MIN_HUT_DIST )
+					done  = false;
+		}/* end done  while */
+
         /* Expand Building Dimensions */
-		done  = OFF;
-		while( done  == OFF )
+		done  = false;
+		while( done  == false )
 		{
             /* create room dimensions */
 			do{
@@ -259,19 +259,19 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 				room[i].b.rowy = hutspot[i].rowy + dvert;
 				room[i].b.colx = hutspot[i].colx + dhorz;
 			}while( ( ( room[i].a.rowy < 2  )||( room[i].a.colx < 2 ) )||( ( room[i].b.rowy > ( MAX_ROW - 2 ) )||( room[i].b.colx > ( MAX_COL - 2 ) ) ) );
-            
+
             /* check for conflicts with other rooms */
-			if( l->map[room[i].a.rowy][room[i].a.colx].is_wall == ONN );//top-left
-			else if(l->map[room[i].a.rowy][room[i].b.colx].is_wall == ONN );//top-right
-			else if(l->map[room[i].b.rowy][room[i].a.colx].is_wall == ONN );//btm-left
-			else if(l->map[room[i].b.rowy][room[i].b.colx].is_wall == ONN );//btm-right
-			else done  = ONN;
+			if( l->map[room[i].a.rowy][room[i].a.colx].is_wall == true );//top-left
+			else if(l->map[room[i].a.rowy][room[i].b.colx].is_wall == true );//top-right
+			else if(l->map[room[i].b.rowy][room[i].a.colx].is_wall == true );//btm-left
+			else if(l->map[room[i].b.rowy][room[i].b.colx].is_wall == true );//btm-right
+			else done  = true;
 		}/*end done  while */
-        
+
         /* Fill Building With Wall */
 		if( fill_wall( l , room[i].a.rowy, room[i].a.colx, room[i].b.rowy, room[i].b.colx ) == FAIL )
 			return( ERROR( NULL, "Failed to Fill Building Walls", i) );
-	
+
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
 		/* TODO: Make Enterance Face Fathest Wall? */
 			switch( rng(4) )//NOW: Face Random Direction
@@ -282,7 +282,7 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 				case WEST:hutspot[i].colx = room[i].a.colx; break;//WEST
 				default: exit(ERROR(NULL, "badswitch",FAIL));
 			}/* end cardinal direction switch */
-            
+
             /* Set Building Enterance Flags */
 			set_loc( '+', &l->map[hutspot[i].rowy][hutspot[i].colx] );
 	}/* end i for */

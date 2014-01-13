@@ -1,4 +1,4 @@
-/* $Id: types.h,v 1.3 2013/06/16 18:04:17 moonsdad Exp $ */
+/* $Id: types.h,v 1.4 2014/01/13 04:43:47 moonsdad Exp $ */
 /******************************************************************************
  ******************************************************************************/
 #pragma once
@@ -70,7 +70,7 @@
 
 /* Equipment Slots */
 #define WEP 0 /*Weapon*//* Main Hand */
-#define OFF 1 /*Off-Hand (shield or weapon)*///REUSED for bit manipulation
+#define OFF 1 /*Off-Hand (shield or weapon)*/
 #define ARM 2 /*Armor*/
 #define HAT 3 /*Head*/
 #define MAX_SLOTS 4
@@ -131,7 +131,7 @@ typedef struct pc_struct {
 }PLAYER;
 
 typedef struct statistics_structure {
-	int food;	
+	int food;
 	unsigned long turn;
 	int family;//TODO: make family types and rank score based on who saved
 	unsigned short hut_qt;

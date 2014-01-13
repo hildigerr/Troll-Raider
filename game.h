@@ -1,11 +1,11 @@
-/* $Id: game.h,v 1.2 2013/05/06 05:04:01 moonsdad Exp $ */
+/* $Id: game.h,v 1.3 2014/01/13 04:43:47 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * game.c -- Game Utility Functions.                                          *
  ******************************************************************************/
 #pragma once
 
-#define VERSION "4.0"
+#define VERSION "4.1"
 
 /* System Header */
 #include <ctype.h>

@@ -1,4 +1,4 @@
-/* $Id: player.h,v 1.1 2013/05/05 22:04:12 moonsdad Exp $ */
+/* $Id: player.h,v 1.2 2014/01/13 04:43:47 moonsdad Exp $ */
 /******************************************************************************
  * player -- Player Character Utility Functions.                              *
  ******************************************************************************/
@@ -33,11 +33,11 @@ int init_player(PLAYER* p);
 /******************************************************************************
  * FUNCTION:    init_mon
  * ARGUMENTS:   PLAYER* who, int k, int innocent_qt, int hero_iqt
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt );
+bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt );
 
 
 

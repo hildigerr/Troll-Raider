@@ -1,11 +1,11 @@
-/* $Id: trollraider.c,v 1.2 2014/01/13 03:20:59 moonsdad Exp $ */
+/* $Id: trollraider.c,v 1.3 2014/01/13 04:43:47 moonsdad Exp $ */
 
 /******************************************************************************
  *                             Troll Raider                                   *
  * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
  ******************************************************************************/
 
-/* System Header */ 
+/* System Header */
 #include <time.h>
 
 /* Local Header */
@@ -16,15 +16,7 @@
 #define MAX_ITEM_WINDOWS 3
 #define MAX_ADITIONAL_WINDOW_POINTERS_NEEDED 3
 
-// int main( int argc, char* argv[] )
-// {
-//     int cmd;
-//     unsigned int i; /* iterator */
-//     
-//     
-//     return 0;
-// }/* End main Func */
-
+/***********************************************************************MAIN: */
 int main( int argc, char* argv[] )
 {
 	int r, c, cmd;  /* row, column, command */
@@ -41,8 +33,8 @@ int main( int argc, char* argv[] )
 
 	srand(time(NULL));	    /* use clock value as starting seed */
 
-	run = ONN;
-	skip_a_turn = OFF;
+	run = true;
+	skip_a_turn = false;
 
     /* READ IN DATA FILE(S) For Saved Game */
 //	if( ( indata = fopen( dat_file_name, READ_ONLY ) ) == NULL )
@@ -83,11 +75,11 @@ int main( int argc, char* argv[] )
                       score.hut_qt, 1 ) );
 	else if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == FAIL )
 		exit( ERROR( NULL, "Failed to create huts :^(", FAIL ) );
- 
+
 	//INTRO Must be before curses initialization for now
     //Actually displays only after program termination
-	pc.attdir =	story_line( INTRO, NULL );   
-    
+	pc.attdir =	story_line( INTRO, NULL );
+
     /* INITIALIZE CURSES */
     initscr(); /* Start curses mode *///RETURNS WINDOW*
 	display_btm = subwin(stdscr,BTM_SUB_ROWS,BTM_SUB_COLS,MAX_ROW,0);
@@ -99,8 +91,8 @@ int main( int argc, char* argv[] )
 	keypad(stdscr, TRUE); /* enable arrowkeys and such */
 
     /* RUN GAME */
-	while( run == ONN ) {
-    
+	while( run == true ) {
+
         /* Set-up/Update RH Display */
 		if( init_display_right( display_right, &pc, &score ) == FAIL ) {
 			endwin();/* End curses mode */
@@ -108,7 +100,7 @@ int main( int argc, char* argv[] )
 		}/* end setup RH Display fail if */
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
-		if(curlv[pc.maplv].is_new == ONN) {
+		if(curlv[pc.maplv].is_new == true) {
 			for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
                 move(r,c);
                 addch( get_map_icon( ACTIVE_LOCATION ) );
@@ -147,7 +139,7 @@ int main( int argc, char* argv[] )
 				}/* end pc.attdir switch */
 			}/* end initial turn if */
 //			else
-			curlv[pc.maplv].is_new = OFF;
+			curlv[pc.maplv].is_new = false;
 		}/* end is_new if */
 
         /* UPDATE PLAYER LOCATION */
@@ -159,12 +151,12 @@ int main( int argc, char* argv[] )
 		wrefresh(display_btm);
 		wrefresh(display_right);
 
-        if( skip_a_turn == ONN ) skip_a_turn = OFF;
+        if( skip_a_turn == true ) skip_a_turn = false;
         else /* TAKE TURN */ do {
-        
+
             /* GET CMD INPUT */
 			while( ( cmd = get_cmd() ) == NO_ACTION );
-			need_more_cmd = OFF;
+			need_more_cmd = false;
 
             /* PROCESS CMD */
 			r = pc.locr; c = pc.locc;
@@ -189,44 +181,44 @@ int main( int argc, char* argv[] )
 					exit( ERROR(NULL, "Move Out of Vertical Bounds", r ) );
 				else if( ( c > MAX_COL )||( c < 0 ) )
 					exit( ERROR(NULL, "Move Out of Horizontal Bounds", c ) );
-				else if( ACTIVE_LOCATION.is_wall == ONN ){
+				else if( ACTIVE_LOCATION.is_wall == true ){
                     say("You bumped into a wall!"); }//Currently Takes a Turn
                 /* MOVE possibilities */
-				else if( ACTIVE_LOCATION.is_occupied == ONN ) {say("Attack!");}
-				else if( ACTIVE_LOCATION.is_door == ONN ) {
+				else if( ACTIVE_LOCATION.is_occupied == true ) {say("Attack!");}
+				else if( ACTIVE_LOCATION.is_door == true ) {
 					if( pc.maplv == HVILLAGE ) {
 						say("Do you want to enter the building? ");
 						if( toupper( getch() ) == 'N' )
-                            need_more_cmd = ONN;
+                            need_more_cmd = true;
 						else { /* */
                             pc.maplv = IN_HHUTS;
-                            curlv[HVILLAGE].is_new = ONN;
+                            curlv[HVILLAGE].is_new = true;
                             pc.locr = r;
                             pc.locc = c;
                         }/* End Else */
 					}/* end HVILLAGE if */
 					else if(( pc.maplv == IN_HHUTS )
-                         &&( ACTIVE_LOCATION.is_dstair == ONN )) {
+                         &&( ACTIVE_LOCATION.is_dstair == true )) {
                             say("Do you want to exit the building? ");
                             if( toupper( getch() ) == 'N' )
-                                need_more_cmd = ONN;
+                                need_more_cmd = true;
                             else { /* */
                                 pc.maplv = HVILLAGE;
-                                curlv[IN_HHUTS].is_new = ONN;
+                                curlv[IN_HHUTS].is_new = true;
                             }/* End Else */
 					}/* end HVILLAGE if */
 					else if( skill_check(pc.stats[STR],0) == FAIL)
 						say("The door is stuck!");
 					else;
 						//open door, move char, etc...
-				}/* end door if */ else /* Move Normally */ { 
-					if( ACTIVE_LOCATION.is_ustair == ONN )
+				}/* end door if */ else /* Move Normally */ {
+					if( ACTIVE_LOCATION.is_ustair == true )
                         {say("You found some ascending stairs!");}
-					else if( ACTIVE_LOCATION.is_dstair == ONN )
+					else if( ACTIVE_LOCATION.is_dstair == true )
                         {say("You found some descending stairs!");}
-					else if( ACTIVE_LOCATION.is_trap == ONN )
+					else if( ACTIVE_LOCATION.is_trap == true )
                         {say("You have stepped into a trap!");}
-					else if( ACTIVE_LOCATION.litter.is_ == ONN )
+					else if( ACTIVE_LOCATION.litter.is_ == true )
                         {say("You have found an item!");}
 					move(pc.locr,pc.locc);
 					addch(get_map_icon(curlv[pc.maplv].map[pc.locr][pc.locc]));//MAYBE DEFINE TO PREVIOUS_LOCATION
@@ -237,7 +229,7 @@ int main( int argc, char* argv[] )
 			else if( cmd == WAIT ){/*DO NOTHING*/say("You wait...");}
 			else if( cmd == QUIT ) {
 				say("Are you sure you want to quit? ");
-				if( toupper(getch()) == 'Y' ) run = OFF;
+				if( toupper(getch()) == 'Y' ) run = false;
 //				else say("Oh ok, then we wont kick you out of here.");
 			}/* end QUIT */
 			else if( ( cmd >= INVENTORY )&&( cmd <= DESTROY_ITEM) ) {
@@ -252,7 +244,7 @@ int main( int argc, char* argv[] )
                 /* Inventory *//* LHS */
 				wprintw(cmd_list[1],"\n # Inventory [Hit,Dam] $");
 				for(i=0; i < MAX_HOLD; i++)
-					if( pc.inventory[i].is_equipped == OFF )
+					if( pc.inventory[i].is_equipped == false )
 						wprintw(cmd_list[1],"\n %d. %s [%d,%d] %d",i,pc.inventory[i].name,pc.inventory[i].stats[0],pc.inventory[i].stats[1], pc.inventory[i].worth);
                 /* Equipment *//* RHS */
 				wprintw(cmd_list[2],"\n # Equipment [Hit,Dam] $");
@@ -274,7 +266,7 @@ int main( int argc, char* argv[] )
 					wrefresh(cmd_list[i]);
 				}/* end MAX_ITEM_WINDOWS for */
                 /* SUB CMD */
-				done_with_sub = OFF;
+				done_with_sub = false;
 				do{
                     /* Get Input */
 					if( ( cmd > INVENTORY )&&( cmd < PICK_UP ) );/*All i sub cmds accessed directly in this range*/
@@ -284,7 +276,7 @@ int main( int argc, char* argv[] )
 					{
                         /* count how many items we have equipped */
 						cmd = 0; /* initialize for temporary iterative use */
-						for( i = 0; i < MAX_SLOTS; i++ )	if( pc.equip[i] != NULL ) { cmd += 1; itmptr = pc.equip[i]; } 
+						for( i = 0; i < MAX_SLOTS; i++ )	if( pc.equip[i] != NULL ) { cmd += 1; itmptr = pc.equip[i]; }
 
 						if( cmd == 0 )/*Nothing to remove*/
 						{
@@ -297,9 +289,9 @@ int main( int argc, char* argv[] )
 							if( toupper( getch() ) == 'Y' )
 							{
 								for( i = 0; i < MAX_SLOTS; i++ ) if( itmptr == pc.equip[i] ) pc.equip[i] = NULL;//TODO TEST
-								itmptr->is_equipped = OFF;
+								itmptr->is_equipped = false;
 								say("Item removed");
-								done_with_sub = ONN;
+								done_with_sub = true;
 							}/* end affirm remove item if */
 							else say("Canceled! Item still equipped.");
 						}/* end only one item to unequip if */
@@ -310,11 +302,11 @@ int main( int argc, char* argv[] )
 								say("Canceled: Item still equipped.");
 							else if( pc.equip[cmd] == NULL ) say("You have no item equipped for that slot");
 							else{
-								pc.equip[cmd]->is_equipped = OFF;
+								pc.equip[cmd]->is_equipped = false;
 								pc.equip[cmd] = NULL;
 								say("Item removed");
-								done_with_sub = ONN;
-							}/* end remove item else */	
+								done_with_sub = true;
+							}/* end remove item else */
 						}/* end more than one item to remove else */
 						cmd = NO_ACTION;/*
 			 Reset cmd for general use *///Not Necessary
@@ -328,10 +320,10 @@ int main( int argc, char* argv[] )
 						if( cmd == CANCEL ) {say("Equip Item Canceled."); continue;}
 						else itmptr = &pc.inventory[cmd];
                         /* Verify Equipability */
-						if( is_equipable( itmptr ) == ONN )
+						if( is_equipable( itmptr ) == true )
 						{
                             /* Verify and Unequipp if needed */
-							if( itmptr->is_equipped == ONN )
+							if( itmptr->is_equipped == true )
 							{
 								say("That item is already equipped.");
 							}/* end already equipped if */
@@ -345,63 +337,63 @@ int main( int argc, char* argv[] )
 										say("Are you sure you want to replace the item you currently have equipped? ");//TODO Takes 2 turns//make skip turn flag
 										if( toupper(getch()) == 'Y' )
 										{
-											pc.equip[slot_of(itmptr)]->is_equipped = OFF;//Unequip old item
-											itmptr->is_equipped = ONN;
+											pc.equip[slot_of(itmptr)]->is_equipped = false;//Unequip old item
+											itmptr->is_equipped = true;
 											pc.equip[slot_of(itmptr)] = itmptr;
 											say("Equipment swapped!");
-											done_with_sub = ONN;
+											done_with_sub = true;
 										}/* end yes if */
 										else /* assume no */ say("Canceled. You did not replace your equipped item.");
 									}/* end slot is ! empty if */
 									else /* slot is empty */
 									{
-										itmptr->is_equipped = ONN;
+										itmptr->is_equipped = true;
 										pc.equip[slot_of(itmptr)] = itmptr;
 										say("Item equipped!");
-										done_with_sub = ONN;
+										done_with_sub = true;
 									}/* end empty slot else */
 									break;
 								case WEP: /* can be in WEP or OFF */
 								/* if unarmed arm without hesitation in 1st slot */
 									if( pc.equip[WEP] == NULL )
 									{
-										itmptr->is_equipped = ONN;
+										itmptr->is_equipped = true;
 										pc.equip[WEP] = itmptr;
 										say("Item equipped!");
-										done_with_sub = ONN;
+										done_with_sub = true;
 									}/* end unarmed if */
 								/* else if !have secondary equipment arm in offhand without hesitation */
 									else if( pc.equip[OFF] == NULL )
 									{
-										itmptr->is_equipped = ONN;
+										itmptr->is_equipped = true;
 										pc.equip[OFF] = itmptr;
 										say("Item equipped!");
-										done_with_sub = ONN;
+										done_with_sub = true;
 									}/* end off-hand unarmed if */
 								/* else ask if want to replace 1st or 2nd */
 									else{
 										do{say("Replace which item?");}while( ( cmd = get_hand() ) == NOT_PLACED);
 										if( cmd == WEP )
 										{
-											pc.equip[WEP]->is_equipped = OFF;
-											itmptr->is_equipped = ONN;
+											pc.equip[WEP]->is_equipped = false;
+											itmptr->is_equipped = true;
 											pc.equip[WEP] = itmptr;
 											say("Equipment swapped!");
-											done_with_sub = ONN;
+											done_with_sub = true;
 										}/* end replace WEP hand if */
 										else if( cmd == OFF )
 										{
-											pc.equip[OFF]->is_equipped = OFF;
-											itmptr->is_equipped = ONN;
+											pc.equip[OFF]->is_equipped = false;
+											itmptr->is_equipped = true;
 											pc.equip[OFF] = itmptr;
 											say("Equipment swapped!");
-											done_with_sub = ONN;
+											done_with_sub = true;
 										}/* end replace OFF else */
 										/* else canceled *//////////////////////////////expecting more?//TODO
 									}/* end armed else */
 									break;
 								case OFF: /* These are all 2handed weapons *///TODO
-									if( itmptr->is_2handed == OFF ) ERROR(NULL,"Strange Item!", itmptr->type );
+									if( itmptr->is_2handed == false ) ERROR(NULL,"Strange Item!", itmptr->type );
 									//if 2handed confirm unequip if necessary else equip
 									//else not 2handed and...there are no 2handed weapons to return off
 									break;
@@ -423,7 +415,7 @@ int main( int argc, char* argv[] )
 						else if( cmd < MAX_HOLD )/* User Selects Item */
 						{
 						/* Check for item existence @ slot location */
-							if( pc.inventory[cmd].is_ == OFF )
+							if( pc.inventory[cmd].is_ == false )
 							{
 								say("You have no item in that slot.");
 							}/* end no item if */
@@ -436,7 +428,7 @@ int main( int argc, char* argv[] )
 								/* destroy item */
 									set_empty_item(&pc.inventory[cmd]);
 									say("Item Destroyed!");
-									done_with_sub = ONN;
+									done_with_sub = true;
 								}else /* assume no */
 								{
 									say("Canceled. Nothing was destroyed.");
@@ -460,7 +452,7 @@ int main( int argc, char* argv[] )
 									set_empty_item(pc.equip[cmd]);
 									pc.equip[cmd] = NULL;
 									say("Item Destroyed!");
-									done_with_sub = ONN;
+									done_with_sub = true;
 								}else /* assume no */
 								{
 									say("Canceled. Nothing was destroyed.");
@@ -482,7 +474,7 @@ int main( int argc, char* argv[] )
 						else if( cmd < MAX_HOLD )/* User Selects Item */
 						{
 						/* Check for item existence @ slot location */
-							if( pc.inventory[cmd].is_ == OFF )
+							if( pc.inventory[cmd].is_ == false )
 							{
 								say("You have no item in that slot.");
 							}/* end no item if */
@@ -490,13 +482,13 @@ int main( int argc, char* argv[] )
 							{
 							/* Drop item */
 								// copy item to floor//remove from player//	set_empty_item();
-								if( ACTIVE_LOCATION.litter.is_ == OFF )
+								if( ACTIVE_LOCATION.litter.is_ == false )
 								{
 									swap_item( &ACTIVE_LOCATION.litter, &pc.inventory[cmd] );
 									say("Item Dropped!");
 								}/* end empty floor location */
 								else say("You can't drop that here.");//TODO
-								done_with_sub = ONN;
+								done_with_sub = true;
 							}/* end real item else */
 						}/* end item selection if */
 						else if( cmd < (MAX_SLOTS+10) )/* User Selects Equip */
@@ -510,16 +502,16 @@ int main( int argc, char* argv[] )
 							{
 							/* Drop item */
 								// copy item to floor// remove from player //	set_empty_item(pc.equip[cmd]);
-								if( ACTIVE_LOCATION.litter.is_ == OFF )
+								if( ACTIVE_LOCATION.litter.is_ == false )
 								{
-									pc.equip[cmd]->is_equipped = OFF;
+									pc.equip[cmd]->is_equipped = false;
 									swap_item( &ACTIVE_LOCATION.litter, pc.equip[cmd] );
 									pc.equip[cmd] = NULL;
 									say("Item dropped!");
-									if( slot_of( &ACTIVE_LOCATION.litter ) != ARM ) need_more_cmd = ONN;//equipped items that are non Armor are free to drop 
+									if( slot_of( &ACTIVE_LOCATION.litter ) != ARM ) need_more_cmd = true;//equipped items that are non Armor are free to drop
 								}/* end empty floor location */
 								else say("You can't drop that here.");//TODO
-								done_with_sub = ONN;
+								done_with_sub = true;
 							}/* end item exists else */
 						}/* end equip select if */
 						else/* Handle Impossible Errors */
@@ -527,10 +519,10 @@ int main( int argc, char* argv[] )
 					}/* end DROP_ITEM sub cmd */
 					else /* CANCELED */
 					{
-						need_more_cmd = ONN;
-						done_with_sub = ONN;
+						need_more_cmd = true;
+						done_with_sub = true;
 					}/* end canceled else */
-				}while(done_with_sub == OFF);/* end sub cmd */
+				}while(done_with_sub == false);/* end sub cmd */
 			/* Replace Map *///TODO: Make function and find duplicate usage
 				for( r = 0; r < MAX_ROW; r++ )
 					for( c = 0; c < MAX_COL; c++ )
@@ -546,18 +538,18 @@ int main( int argc, char* argv[] )
 ////////////////////////////////////////////////
 else if( cmd == PICK_UP )
 {
-	if( ACTIVE_LOCATION.litter.is_ == OFF )
+	if( ACTIVE_LOCATION.litter.is_ == false )
 	{
 		say("There is nothing to pick up.");
 	}/* end no litter if */
-	else if( pc.inventory[MAX_SLOTS-1].is_ != OFF )
+	else if( pc.inventory[MAX_SLOTS-1].is_ != false )
 	{
 		say("You're inventory is full!");
 	}/* end inventory full if */
 	else{
 		for(i = 0; i < MAX_SLOTS; i++ )
 		{
-			if( pc.inventory[i].is_ == OFF )
+			if( pc.inventory[i].is_ == false )
 			{
 				swap_item(&ACTIVE_LOCATION.litter, &pc.inventory[i]);
 				say("Item picked up!");
@@ -572,10 +564,10 @@ else if( cmd == PICK_UP )
 #ifdef DEBUG
 	//DELETED//UNUSED
 #endif
-				need_more_cmd = ONN;
+				need_more_cmd = true;
 			}/* end debug_item cmd if */
 			else exit( ERROR(NULL, "cmd processing", cmd) );
-		}while( need_more_cmd == ONN );/* end need more cmd do */
+		}while( need_more_cmd == true );/* end need more cmd do */
 
 //check for end of turn stuff
 		score.turn += 1;

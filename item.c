@@ -1,4 +1,4 @@
-/* $Id: item.c,v 1.4 2013/06/16 18:04:16 moonsdad Exp $ */
+/* $Id: item.c,v 1.5 2014/01/13 04:43:47 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * item.c -- item Utility Functions.                                          *
@@ -10,13 +10,13 @@
  * FUNCTION:    getp_item
  * ARGUMENTS:   ITEM* itm   -- The Item Being Generated
  *              int t       -- The Item Type
- *              int m       -- 
+ *              int m       --
  * RETURNS:     int
  * WARNING:
  * NOTE:
  ******************************************************************************/
 int getp_item(ITEM* itm, int t, int m )
-{	
+{
 	int i, s[MAX_ITEM_STATS];
 	char c, b[2];
 	FILE* datafile;
@@ -28,7 +28,7 @@ int getp_item(ITEM* itm, int t, int m )
 		return( ERROR( NULL, "Missing \"item.dat\" file", FAIL ) );
 
     /* Initialize Necessary Variables */
-	done = OFF;
+	done = false;
 	itm->worth = NOT_PLACED;
 	for( i = 0; i < MAX_ITEM_STATS; i++ ) s[i] = NOT_PLACED;
 
@@ -36,17 +36,17 @@ int getp_item(ITEM* itm, int t, int m )
         return( ERROR( NULL, "bad t input to getp_item func", t ) );
 	else itm->type = t;
 
-	if(( itm->type == REACH )||( itm->type == RANGE2 )) itm->is_2handed = ONN;
-	else itm->is_2handed = OFF;
+	if(( itm->type == REACH )||( itm->type == RANGE2 )) itm->is_2handed = true;
+	else itm->is_2handed = false;
 
-	while(done == OFF) {
-		while( !feof(datafile) ) {		
-        
+	while(done == false) {
+		while( !feof(datafile) ) {
+
             /* Skip Over Comment Lines */
 			if( ( c = fgetc(datafile) ) == '#' )
                 while( fgetc(datafile) != '\n' )
                     /*ERROR("BARF! Reading Comment", m )*/;
-                    
+
             /* Read In Maximum Items For This Type */
 			else if( c == '$' )
 			{
@@ -61,16 +61,16 @@ int getp_item(ITEM* itm, int t, int m )
                                  "in \"item.dat\" file!" , m ) );
 				}/* end get position if *//*now:end position verification if */
 			}/* end line begins with '$' if */
-            
+
             /* Read In Entries */
 			else if( c == ':' ) {
 				//ERROR("BARF! Found an Item entry", c);
                 /* Check if we should be done *///Report output
-				if(done == ONN)//DAY6BUG Infinite Loop Checker
+				if(done == true)//DAY6BUG Infinite Loop Checker
 				{
 					#ifdef DEBUG
-					if( itm->is_ == ONN )
-                        ERROR(NULL,"item is_ set ONN", MAX_ITEM_STATS);
+					if( itm->is_ == true )
+                        ERROR(NULL,"item is_ set true", MAX_ITEM_STATS);
 					ERROR(NULL,"Item type", itm->type );
 					ERROR(NULL,"Item Worth",itm->worth );
 					for( i = 0 ; i < MAX_ITEM_STATS ; i++ ) {
@@ -80,10 +80,10 @@ int getp_item(ITEM* itm, int t, int m )
 					ERROR(NULL,itm->name,MAX_ITEM_NAME_LEN);
 					mypause();//DO NOT SUPPRESS
 					#endif
-				}/* end done == ONN : DAY6BUG Infinite Loop Checker */
-                
+				}/* end done == true : DAY6BUG Infinite Loop Checker */
+
                 /* Process Data Table */
-				else /* done == OFF */
+				else /* done == false */
 				{
                     /* Verify Readiness */
 					if( ( m < 0)||( m > MAX_ITEM_PER_TYPE ) ) {
@@ -104,7 +104,7 @@ int getp_item(ITEM* itm, int t, int m )
 								return( ERROR( NULL, "Failed to rewind datafile",c ) );
 							}/* end rewind failed if */
 						}/* end need rewind if */
-                        
+
                         /* Process The Section if of Correct Type */
 						else if( c == itm->type ) {
 							//ERROR("BARF: Found correct item type section", itm->type); //mypause();
@@ -159,7 +159,7 @@ int getp_item(ITEM* itm, int t, int m )
 									}/* end get item name while */
 									itm->name[i] = '\0';
                                     /* Set other Item Flags */
-									done = ONN;
+									done = true;
 									//ERROR("BARF: ITEM DONE!",i);//mypause();
 								}/* end m ==-- Found Correct Listing In section if */
 								else //Go to next Listing
@@ -174,7 +174,7 @@ int getp_item(ITEM* itm, int t, int m )
 						else /* Havn't Reached Our Section Yet */
 							while( fgetc(datafile) != '\n' ) /*ERROR("BARF: Skipping section", c)*/;
 					}/* end m within range else */
-				}/* end done == OFF else : Processing Data Table Complete */
+				}/* end done == false else : Processing Data Table Complete */
 			}/* end line begins with ':' if */
             /* Skip Blank Lines */
 			else if( c == '\n' ) /* ERROR("BARF: BLANK LINE" , c)*/;//continue;
@@ -184,11 +184,11 @@ int getp_item(ITEM* itm, int t, int m )
 				return( ERROR( NULL, "Unexpected Input From \"Item.dat\" file", c) );
 			}/* end unexpected input else */
 			//ERROR("BARF: SHOULD EXIT NOW IF PAUSED",c);
-			//if( done == ONN ) mypause();//TESTING
-			if( done == ONN ) break;//Force Completion//
+			//if( done == true ) mypause();//TESTING
+			if( done == true ) break;//Force Completion//
 		}/* end !feof while */
 		//ERROR("BARF: FOUND END OF FILE OR BROKE OUT OF LOOP",c);
-		if( done != ONN )
+		if( done != true )
 		{
 			fclose(datafile);
 			return(ERROR(NULL,"Item data not found. Possible broken datafile.",FAIL));
@@ -203,10 +203,10 @@ int getp_item(ITEM* itm, int t, int m )
 		itm->stats[i] = s[i];
 
 	}/*end i<MAX_ITEM_STATS for*/
-    
+
     /* Set Item Flags */
-	itm->is_ = ONN;
-	itm->is_equipped = OFF;
+	itm->is_ = true;
+	itm->is_equipped = false;
 
 	fclose(datafile);
 	return 0;
@@ -227,9 +227,9 @@ int set_empty_item(ITEM* itm)
 	if( strncpy(itm->name, "empty", MAX_ITEM_NAME_LEN) == NULL )
         return FAIL;
 
-	itm->is_ = OFF;
-	itm->is_equipped = OFF;
-	itm->is_2handed = OFF;
+	itm->is_ = false;
+	itm->is_equipped = false;
+	itm->is_2handed = false;
 	itm->type = NOT_PLACED;
 
 	for(i=0; i < MAX_ITEM_STATS; i++ )
@@ -276,9 +276,9 @@ int slot_of( ITEM* ptr )
 int is_equipable( ITEM* im )//Will change as more types of items are added
 {
 	if(( im->type > 0 )&&(im->type < MAX_ITEM_TYPES))
-		return ONN;
+		return true;
 	else
-		return OFF;
+		return false;
 }/* end is_equipable func */
 
 
@@ -333,7 +333,7 @@ void swap_item(ITEM* itmi, ITEM* itmj )
 	tmp.worth = itmi->worth;
 	itmi->worth = itmj->worth;
 	itmj->worth = tmp.worth;
-	
+
 }/* end swap_item func */
 
 
@@ -354,7 +354,7 @@ int pick_up(ITEM* itm_ol, ITEM* itm_nu)
 	itm_nu->is_ = itm_ol->is_;
 	itm_nu->is_2handed = itm_ol->is_2handed;
 
-	itm_nu->is_equipped = OFF;//Cannot pickup and equip at once
+	itm_nu->is_equipped = false;//Cannot pickup and equip at once
 	itm_nu->type = itm_ol->type;
 
 	for(i=0; i < MAX_ITEM_STATS; i++ )
@@ -364,7 +364,7 @@ int pick_up(ITEM* itm_ol, ITEM* itm_nu)
 	}/*end i<MAX_ITEM_STATS for*/
 
 	itm_nu->worth = itm_ol->worth;
-	
+
 	return 0;/*WARNING: always succeeds*/
 }/* end pick_up func */
 
