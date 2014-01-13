@@ -1,4 +1,4 @@
-/* $Id: map.c,v 1.5 2014/01/13 05:42:59 moonsdad Exp $ */
+/* $Id: map.c,v 1.6 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * map.c -- Map Utility Functions.                                            *
@@ -10,11 +10,11 @@
  * FUNCTION:    set_loc
  * ARGUMENTS:   char t
  *              LOC* s
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int set_loc( char t, LOC* s )//type spot
+bool set_loc( char t, LOC* s )//type spot
 {
 	switch(t) {
 		case 'w': case 'W': case '#'://WALL
@@ -49,9 +49,9 @@ int set_loc( char t, LOC* s )//type spot
 			break;
 		default:
 			if( t != 0 )return t;
-			else return FAIL;
+			else return false;
 	}/* End type Switch */
-	return 0;
+	return true;
 }/* End set_loc Func */
 
 
@@ -61,11 +61,11 @@ int set_loc( char t, LOC* s )//type spot
  *              LEVEL*  l
  *              COORD   d
  *              COORD   c
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-int fill( char t, LEVEL* l, COORD d, COORD c )
+bool fill( char t, LEVEL* l, COORD d, COORD c )
 {
 	int i, j, s = smallest(d.colx,c.colx),
 		b[2] = { biggest(d.rowy,c.rowy), biggest(d.colx,c.colx) };
@@ -73,10 +73,10 @@ int fill( char t, LEVEL* l, COORD d, COORD c )
 
 	for( i = smallest(d.rowy,c.rowy); i < b[0]; i++ )
         for( j = s; j < b[1]; j++ ) {
-            if( ( i > MAX_ROW )||( j > MAX_COL ) ) return FAIL;
+            if( ( i > MAX_ROW )||( j > MAX_COL ) ) return false;
             else set_loc(t,&l->map[i][j]);
         }/* End ij ffor */
-	return 0;
+	return true;
 }/* End fill Func */
 
 
@@ -84,11 +84,11 @@ int fill( char t, LEVEL* l, COORD d, COORD c )
  * FUNCTION:    init_lv
  * ARGUMENTS:   LEVEL*  l
  *              short   t
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int init_lv( LEVEL* l, short t )
+bool init_lv( LEVEL* l, short t )
 {
 	int r, c;
 
@@ -108,11 +108,11 @@ int init_lv( LEVEL* l, short t )
 			else set_loc('.',&l->map[r][c]); /* Interior is floors for now */
 
             /* Initialize Item Locations */
-			if( set_empty_item(&l->map[r][c].litter) != 0 )
+			if( set_empty_item(&l->map[r][c].litter) != true )
 				return( ERROR( NULL, "Litter Bug!", l->map[r][c].litter.type) );
 		}/* end map RC ffor */
 
-	return 0;
+	return true;
 }/*end init_lv func */
 
 
@@ -146,7 +146,7 @@ char get_map_icon(LOC here)
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int buildgen( LEVEL* outside, LEVEL* inside )
+bool buildgen( LEVEL* outside, LEVEL* inside )
 {
 	int r, c, i, j;
 	bool found_first;
@@ -190,7 +190,7 @@ int buildgen( LEVEL* outside, LEVEL* inside )
 			}/* end is_trap if */
 /* TODO: Generate sub buildings attached to main buildings with tunnels */
 
-	return 0;//warning always succeeds
+	return true;//warning always succeeds
 }/* end buildgen */
 
 
@@ -201,7 +201,7 @@ int buildgen( LEVEL* outside, LEVEL* inside )
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
+bool towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 {
 	unsigned short i,z;
 	int dvert, dhorz;
@@ -209,7 +209,7 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 	RECT room[MAX_HUTS];
 	bool done;
 
-	if(( n < 1 )||( n > MAX_HUTS )) return FAIL;
+	if(( n < 1 )||( n > MAX_HUTS )) return false;
 
 	/* initialize rooms */
 	for( i = 0; i < MAX_HUTS; i++ )
@@ -269,12 +269,12 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 		}/*end done  while */
 
         /* Fill Building With Wall */
-		if( fill_wall( l , room[i].a, room[i].b ) == FAIL )
+		if( fill_wall( l , room[i].a, room[i].b ) == false )
 			return( ERROR( NULL, "Failed to Fill Building Walls", i) );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
 		/* TODO: Make Enterance Face Fathest Wall? */
-			switch( rng(4) )//NOW: Face Random Direction
+			switch( rng(4) )//NOW: Face Random DirectionFAIL
 			{
 				case NORTH:hutspot[i].rowy = room[i].a.rowy; break;//NORTH
 				case SOUTH:hutspot[i].rowy = room[i].b.rowy - 1; break;//SOUTH
@@ -290,7 +290,7 @@ int towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 	/* Place NPCs */
 
 
-	return 0;
+	return true;
 }/* end towngen func */
 
 

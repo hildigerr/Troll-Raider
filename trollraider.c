@@ -1,4 +1,4 @@
-/* $Id: trollraider.c,v 1.3 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: trollraider.c,v 1.4 2014/01/13 06:26:03 moonsdad Exp $ */
 
 /******************************************************************************
  *                             Troll Raider                                   *
@@ -46,34 +46,34 @@ int main( int argc, char* argv[] )
 		exit( ERROR( "fgets", "failed to get string", sizeof(pc.name) ) );
 
     /* INITIALIZE PLAYER */
-	if( init_player( &pc ) == FAIL )
+	if( init_player( &pc ) == false )
 		exit( ERROR( NULL, "Failed to initialize player", FAIL ) );
-	if( init_stat_data( &score ) == FAIL )
+	if( init_stat_data( &score ) == false )
 		exit( ERROR( NULL, "Failed to initialize scores", FAIL ) );
 
     /* GIVE PC A CLUB */
-	if( getp_item( &pc.inventory[0], 1, 1 ) == FAIL )
+	if( getp_item( &pc.inventory[0], 1, 1 ) == false )
         return( ERROR(NULL, "Failed to get starting equipment",2) );
 
 	score.hut_qt = rng(MAX_HUTS);// score.hut_qt = MAX_HUTS;//TESTING//
 
     /* INITIALIZE MAPS */
 	for( i = 0; i < MAX_MAPS; i++ )
-        if( init_lv( &curlv[i], i ) == FAIL )
+        if( init_lv( &curlv[i], i ) == false )
             exit( ERROR( NULL, "Failed to initialize level", i ) );
 
     /* INITIALIZE NPC ARRAY */
 	r = score.hut_qt * rng(2);//innocent qt
 	c = MAX_MAPS + ( rng(MAX_MAPS) / 2 );//initial hero qt
 	for( i = 0; i < MAX_NPC; i++ )
-		if( init_mon( &npc[i], i, r, c ) == FAIL )
+		if( init_mon( &npc[i], i, r, c ) == false )
 			return( ERROR( NULL, "init_mon !success", i ) );
 
     /* Generate Dungeon */
-	if( towngen(&curlv[HVILLAGE], score.hut_qt) == FAIL )
+	if( towngen(&curlv[HVILLAGE], score.hut_qt) == false )
 		exit( _ERROR( NULL, "Failed to create town with n huts : n = ",
                       score.hut_qt, 1 ) );
-	else if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == FAIL )
+	else if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == false )
 		exit( ERROR( NULL, "Failed to create huts :^(", FAIL ) );
 
 	//INTRO Must be before curses initialization for now
@@ -94,7 +94,7 @@ int main( int argc, char* argv[] )
 	while( run == true ) {
 
         /* Set-up/Update RH Display */
-		if( init_display_right( display_right, &pc, &score ) == FAIL ) {
+		if( init_display_right( display_right, &pc, &score ) == false ) {
 			endwin();/* End curses mode */
 			exit(ERROR(NULL,"Failed to initialize right hand display",FAIL));
 		}/* end setup RH Display fail if */
@@ -123,7 +123,7 @@ int main( int argc, char* argv[] )
 				else if( cmd == '9' ) pc.attdir = NORTH_EAST;
 				else if( cmd == '1' ) pc.attdir = SOUTH_WEST;
 				else if( cmd == '3' ) pc.attdir = SOUTH_EAST;
-				else if( toupper(cmd) == 'Q' ){ endwin(); return 0; }
+				else if( toupper(cmd) == 'Q' ){ endwin(); exit(0); }
 				else pc.attdir = NORTH_WEST;
 
                 /* Get Players Starting Position */
@@ -207,7 +207,7 @@ int main( int argc, char* argv[] )
                                 curlv[IN_HHUTS].is_new = true;
                             }/* End Else */
 					}/* end HVILLAGE if */
-					else if( skill_check(pc.stats[STR],0) == FAIL)
+					else if( skill_check(pc.stats[STR],0) == false)
 						say("The door is stuck!");
 					else;
 						//open door, move char, etc...

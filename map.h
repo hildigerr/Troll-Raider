@@ -1,4 +1,4 @@
-/* $Id: map.h,v 1.2 2014/01/13 05:42:59 moonsdad Exp $ */
+/* $Id: map.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * map -- Map Utility Functions.                                              *
  ******************************************************************************/
@@ -19,7 +19,7 @@
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int set_loc( char t, LOC* s );
+bool set_loc( char t, LOC* s );
 
 
 /******************************************************************************
@@ -32,7 +32,7 @@ int set_loc( char t, LOC* s );
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-int fill( char t, LEVEL* l, COORD d, COORD c );
+bool fill( char t, LEVEL* l, COORD d, COORD c );
 #define fill_wall(x,y,z) fill('w', x,y,z)
 #define fill_floor(x,y,z) fill('.', x,y,z)
 
@@ -40,11 +40,11 @@ int fill( char t, LEVEL* l, COORD d, COORD c );
  * FUNCTION:    init_lv
  * ARGUMENTS:   LEVEL*  l
  *              short   t
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int init_lv( LEVEL* l, short t );
+bool init_lv( LEVEL* l, short t );
 
 /******************************************************************************
  * FUNCTION:    get_map_icon
@@ -64,7 +64,7 @@ char get_map_icon(LOC here);
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int buildgen( LEVEL* outside, LEVEL* inside );
+bool buildgen( LEVEL* outside, LEVEL* inside );
 
 /******************************************************************************
  * FUNCTION:
@@ -73,7 +73,7 @@ int buildgen( LEVEL* outside, LEVEL* inside );
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int towngen( LEVEL* l, unsigned short n );
+bool towngen( LEVEL* l, unsigned short n );
 
 
 

@@ -1,4 +1,4 @@
-/* $Id: cwin.c,v 1.4 2013/05/06 05:04:01 moonsdad Exp $ */
+/* $Id: cwin.c,v 1.5 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * cwin.c -- Curses Window Functions.                                         *
@@ -35,17 +35,17 @@ void wsay( WINDOW* where, char* string )
  * ARGUMENTS:   WINDOW*     d       -- Reference to the window to initialize  *
  *              PLAYER*     p       -- The player whose statistics to display *
  *              STAT_DAT*   s       -- Game statistics to display             *
- * RETURNS:     int                                                           *
+ * RETURNS:     bool                                                           *
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
-int init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
+bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
 {
 	int i;
 	char* dflav[DFMAX] ={ /* for each dungeon lv an ambiguous 5 letter name */
                              "Vault",
                              "Jails",
                              "Depth"    };
-                             
+
 	wmove(d,1,1);
 	wprintw( d, " %s  LV %.2f   $%d\n\n  HP %d/%d\n",
         p->name, p->explv, p->money, p->hp[1], p->hp[0] );//[0]MAX//[1]CUR
@@ -58,7 +58,7 @@ int init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
 			case CON:	wprintw(d,"  CON ");		break;
 			case CHA:	wprintw(d,"  CHA ");		break;
 			case LUC:	wprintw(d,"  LUC ");		break;
-			default:    return FAIL;
+			default:    return false;
 		}/* End i Switch */
 		wprintw( d, "%d", p->stats[i] );
 	}/* End MAX_STATS i For */
@@ -81,7 +81,7 @@ int init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
 	}/*end switch*/
 	wprintw(d,"\n  Turn: %d\n",s->turn);
 	box(d,'|','-');//
-	return 0;
+	return true;
 }/* end init_display_right func*/
 
 

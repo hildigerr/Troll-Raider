@@ -1,4 +1,4 @@
-/* $Id: game.h,v 1.3 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: game.h,v 1.4 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * game.c -- Game Utility Functions.                                          *
@@ -61,11 +61,11 @@ inline int story_line( short when, WINDOW* where );
 /******************************************************************************
  * FUNCTION:skill_check
  * ARGUMENTS:int ability, int adjust
- * RETURNS:int
+ * RETURNS:bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-inline int skill_check( int ability, int adjust );
+inline bool skill_check( int ability, int adjust );
 
 
 

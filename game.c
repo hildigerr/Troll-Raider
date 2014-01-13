@@ -1,4 +1,4 @@
-/* $Id: game.c,v 1.4 2013/06/16 18:04:16 moonsdad Exp $ */
+/* $Id: game.c,v 1.5 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * game.c -- Game Utility Functions.                                          *
@@ -22,7 +22,7 @@ inline int get_cmd( void )
 		case '3':					/*SOUTH_EAST*/	return SOUTH_EAST;
 		case '1':					/*SOUTH_WEST*/	return SOUTH_WEST;
 		case '5':					/*WAIT*/		return WAIT;
-		case 'q': 
+		case 'q':
 		case 'Q': case KEY_ESC:		/*QUIT*/		return QUIT;
 		case 'g': case ',':         /*PICK UP*/     return PICK_UP;
 		case 'i': 					/*INVENTORY*/   return INVENTORY;
@@ -45,19 +45,19 @@ inline int get_subi_cmd( void )
 	switch( getch() ) {
 		case 'f': case 'F': case KEY_ESC:   /* exit sub cmd prompt */
         case 'q': case 'Q': case ' ':          return SUB_FIN;
-        
-		case 'D': case 'd':					/* drop an item */		
+
+		case 'D': case 'd':					/* drop an item */
                                                return DROP_ITEM;
-                                               
+
 		case 'E': case 'e': case 'r':       /* Equip/Ready an Item */
         case 'w': case 'W':                    return EQUIPMENT;
-        
+
 		case 'u': case 'U': case 'R':       /* Remove an Item */
         case 't': case 'T':                    return REMOVE_ITEM;
-        
+
 		case 'K': case 'k':                 /* Destroy an Item */
         case 'x': case 'X':                    return DESTROY_ITEM;
-        
+
 		default:                               return NO_ACTION;
 	}/* End input Switch */
 }/* End get_cmd Func */
@@ -78,9 +78,9 @@ inline int get_slot( char t )
 	switch (getch()) {
 		case KEY_ESC: case ' ': case 'q': case 'Q':	return CANCEL;
 			case 'a': case 'A':
-                if( t == 'e' ) return 0; else if( t == 'u' )return 10; 
+                if( t == 'e' ) return 0; else if( t == 'u' )return 10;
 			case 'b': case 'B':
-                if( t == 'e' ) return 1; else if( t == 'u' )return 11; 
+                if( t == 'e' ) return 1; else if( t == 'u' )return 11;
 			case 'c': case 'C':
                 if( t == 'e' ) return 2; else if( t == 'u' )return 12;
 			case 'd': case 'D':
@@ -129,7 +129,7 @@ inline int story_line( short when, WINDOW* where )
 	switch( when ) {
 		case INTRO:
 			printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
-			opt = NO_ACTION;			
+			opt = NO_ACTION;
 			break;
 		case BEGINNING:
 			break;
@@ -160,11 +160,11 @@ inline int story_line( short when, WINDOW* where )
  * FUNCTION:    skill_check                                                   *
  * ARGUMENTS:   int     ability     -- The ability score being tested.        *
  *              int     adjust      -- Adjustment to the test.                *
- * RETURNS:     int                 -- Result of test 0 || FAIL               *
+ * RETURNS:     bool                 -- Result of test                        *
  ******************************************************************************/
-inline int skill_check( int ability, int adjust )//TODO: Make more interesting
+inline bool skill_check( int ability, int adjust )//TODO: Make more interesting
 {
-	return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? 0 : FAIL;
+	return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
 }/* end skill_check func */
 
 

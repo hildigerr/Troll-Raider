@@ -1,4 +1,4 @@
-/* $Id: player.c,v 1.4 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: player.c,v 1.5 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * player.c -- Player Character Utility Functions.                            *
@@ -9,36 +9,36 @@
 /******************************************************************************
  * FUNCTION:    init_stat_data
  * ARGUMENTS:   STAT_DAT* d
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-inline int init_stat_data( STAT_DAT* d )
+inline bool init_stat_data( STAT_DAT* d )
 {
 	d->food = 0;
 	d->turn = 0;
 	d->family = 0;
 	d->hut_qt = 0;
-	return 0;//WARNING Always succeeds
+	return true;//WARNING Always succeeds
 }/* end init_stat_data func */
 
 
 /******************************************************************************
  * FUNCTION:    init_player
  * ARGUMENTS:   PLAYER* p
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int init_player(PLAYER* p)
+bool init_player(PLAYER* p)
 {
 	int i = 0;
 
-	if(p->name == NULL) return FAIL;
+	if(p->name == NULL) return false;
 
 	for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = rng(MAX_STAT_VAL);
 	for( i = 0; i < MAX_HOLD; i++ )
-		if( set_empty_item( &p->inventory[i] ) != 0 ) return FAIL;
+		if( set_empty_item( &p->inventory[i] ) != true ) return false;
 
     for( i = 0; i < MAX_SLOTS; i++ ) p->equip[i] = NULL;
 
@@ -57,7 +57,7 @@ int init_player(PLAYER* p)
 
 //	p->attdir = NO_ACTION;
 
-	return 0;
+	return true;
 }/* end init_player func */
 
 
@@ -71,8 +71,7 @@ int init_player(PLAYER* p)
 bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k]
 {
 	int t, s, q, m, n, stat_seed, i = 0;
-    bool fail;
-	fail = false;
+    bool fail = false;
 	FILE* datafile;
 	char c, b[2];
 
@@ -81,7 +80,7 @@ bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k
 
         /* READ IN DATA FILE */
 		if( !( datafile = fopen( MON_DAT, READ_ONLY ) ) )
-			return( ERROR( NULL, " Missing \"human.dat\" file", FAIL ) );
+			return( (bool)ERROR( NULL, " Missing \"human.dat\" file", (int)false ) );
 
         /* Get to Max Types Location in datafile */
 		do{ c = fgetc(datafile); } while( c != '$' );
@@ -141,22 +140,22 @@ bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k
 	who->hp[0] = who->stats[CON];
 	who->hp[1] = who->hp[0];
 	for( i = 0; i < MAX_HOLD; i++ )
-		if( ( set_empty_item( &who->inventory[i] )  ) != 0 ) fail = true;
+		if( ( set_empty_item( &who->inventory[i] )  ) != true ) fail = true;
    for( i = 0; i < MAX_SLOTS; i++ )	who->equip[i] = NULL;
 
 	who->name[0] = ' '; who->name[1] = '\0';//TODO testing tmp change etc
 
 	if( k < MAX_FAM )//Early Finish for Family//They do not have equipment
 	{
-		if( fail == true ) return FAIL;
-		else return 0;
+		if( fail == true ) return false;
+		else return true;
 	}/* end early finish if *///for family
 
 	while( !feof(datafile) )
 	{
 		c = fgetc(datafile);
 	/* Skip Over Comment Lines */
-		if( ( c ) == '#' ) while( fgetc(datafile) != '\n' ) ;//if( feof(datafile) ) return FAIL/*error("BARF! Reading Comment", m )*/;
+		if( ( c ) == '#' ) while( fgetc(datafile) != '\n' ) ;//if( feof(datafile) ) return false/*error("BARF! Reading Comment", m )*/;
 		else if( c == '\n' );
 		else if( c == ':' )//Read in Entries
 		{
@@ -175,7 +174,7 @@ bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k
 						fgetc(datafile); //Bypass ':'
 						b[0] = fgetc(datafile);	b[1] = '\0'; n = atoi(b);
 						fgetc(datafile); //Bypass ':'
-						if( getp_item( &who->inventory[0], m, n ) == FAIL ) fail = true;
+						if( getp_item( &who->inventory[0], m, n ) == false ) fail = true;
 					}/* end q for */
 					do{ c = fgetc(datafile); }while( ( !feof(datafile) )&&( c != '@' ) );
 				/* Get Name */
@@ -204,7 +203,7 @@ bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k
 	}/* end feof while */
 
 	fclose(datafile);
-	return FAIL;
+	return fail;
 }/* end init_mon func */
 
 

@@ -1,4 +1,4 @@
-/* $Id: item.c,v 1.5 2014/01/13 04:43:47 moonsdad Exp $ */
+/* $Id: item.c,v 1.6 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * item.c -- item Utility Functions.                                          *
@@ -11,11 +11,11 @@
  * ARGUMENTS:   ITEM* itm   -- The Item Being Generated
  *              int t       -- The Item Type
  *              int m       --
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int getp_item(ITEM* itm, int t, int m )
+bool getp_item(ITEM* itm, int t, int m )
 {
 	int i, s[MAX_ITEM_STATS];
 	char c, b[2];
@@ -25,16 +25,17 @@ int getp_item(ITEM* itm, int t, int m )
 
     /* READ IN DATA FILE */
 	if( ( datafile = fopen( ITEM_DAT, READ_ONLY ) ) == NULL )
-		return( ERROR( NULL, "Missing \"item.dat\" file", FAIL ) );
+		return( (bool)ERROR( NULL, "Missing \"item.dat\" file", (int)false ) );
 
     /* Initialize Necessary Variables */
 	done = false;
 	itm->worth = NOT_PLACED;
 	for( i = 0; i < MAX_ITEM_STATS; i++ ) s[i] = NOT_PLACED;
 
-	if(( t < 0)||(t > MAX_ITEM_TYPES))
-        return( ERROR( NULL, "bad t input to getp_item func", t ) );
-	else itm->type = t;
+	if(( t < 0)||(t > MAX_ITEM_TYPES)) {
+        ERROR( NULL, "bad t input to getp_item func", t );
+		return false;
+	} else itm->type = t;
 
 	if(( itm->type == REACH )||( itm->type == RANGE2 )) itm->is_2handed = true;
 	else itm->is_2handed = false;
@@ -57,8 +58,9 @@ int getp_item(ITEM* itm, int t, int m )
 				if( here < 0 ) //( fgetpos(datafile,here) != 0 )//
 				{
 					fclose(datafile);
-					return( ERROR( NULL, "Failed to record file position "
-                                 "in \"item.dat\" file!" , m ) );
+					ERROR( NULL, "Failed to record file position "
+                                 "in \"item.dat\" file!" , m );
+					return false;
 				}/* end get position if *//*now:end position verification if */
 			}/* end line begins with '$' if */
 
@@ -88,7 +90,8 @@ int getp_item(ITEM* itm, int t, int m )
                     /* Verify Readiness */
 					if( ( m < 0)||( m > MAX_ITEM_PER_TYPE ) ) {
 						fclose(datafile);
-						return( ERROR( NULL, "Bad item Generated", m ) );
+						ERROR( NULL, "Bad item Generated", m );
+						return false;
 					}/* end m out of range if */
 					else/* m is in range */ {
                         /* Get Item Type */
@@ -101,7 +104,8 @@ int getp_item(ITEM* itm, int t, int m )
 							if( fseek(datafile,here,SEEK_SET) != 0 ) //( fsetpos( datafile, here ) != 0 )
 							{
 								fclose(datafile);
-								return( ERROR( NULL, "Failed to rewind datafile",c ) );
+								ERROR( NULL, "Failed to rewind datafile",c );
+								return false;
 							}/* end rewind failed if */
 						}/* end need rewind if */
 
@@ -147,12 +151,14 @@ int getp_item(ITEM* itm, int t, int m )
 										if( i > MAX_ITEM_NAME_LEN )
 										{
 											fclose(datafile);
-											return(ERROR(NULL, "Item Name Too Long",i));//TODO: Make truncate name instead
+											ERROR(NULL, "Item Name Too Long",i );
+											return false;//TODO: Make truncate name instead
 										}/* end name length check if */
 										else if( ( c < 65 )||( c > 122 ))//ASCII
 										{
 											fclose(datafile);
-											return(ERROR(NULL,"Bad Item Name Input",c));
+											ERROR(NULL,"Bad Item Name Input",c);
+											return false;
 										}/* end ASCII rang check if */
 										else/* havn't exceeded MAX_ITEM_NAME_LEN and is a character */
 											itm->name[i++] = c;
@@ -181,7 +187,8 @@ int getp_item(ITEM* itm, int t, int m )
 			else /* Catch Any Unexpected Input and Report it */
 			{
 				fclose(datafile);
-				return( ERROR( NULL, "Unexpected Input From \"Item.dat\" file", c) );
+				ERROR( NULL, "Unexpected Input From \"Item.dat\" file", c);
+				return false;
 			}/* end unexpected input else */
 			//ERROR("BARF: SHOULD EXIT NOW IF PAUSED",c);
 			//if( done == true ) mypause();//TESTING
@@ -191,7 +198,8 @@ int getp_item(ITEM* itm, int t, int m )
 		if( done != true )
 		{
 			fclose(datafile);
-			return(ERROR(NULL,"Item data not found. Possible broken datafile.",FAIL));
+			ERROR(NULL,"Item data not found. Possible broken datafile.",FAIL);
+			return false;
 		}/* end !done if */
 	}/* end !done while */
 
@@ -209,23 +217,23 @@ int getp_item(ITEM* itm, int t, int m )
 	itm->is_equipped = false;
 
 	fclose(datafile);
-	return 0;
+	return true;
 }/* end getp_item func */
 
 
 /******************************************************************************
  * FUNCTION:    set_empty_item
  * ARGUMENTS:   ITEM*   itm
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int set_empty_item(ITEM* itm)
+bool set_empty_item(ITEM* itm)
 {
 	int i;
 
 	if( strncpy(itm->name, "empty", MAX_ITEM_NAME_LEN) == NULL )
-        return FAIL;
+        return false;
 
 	itm->is_ = false;
 	itm->is_equipped = false;
@@ -239,7 +247,8 @@ int set_empty_item(ITEM* itm)
 	}/*end i<MAX_ITEM_STATS for*/
 
 	itm->worth = 0;
-	return itm->worth;//for fun
+
+	return true;
 }/*end set_empty_item func */
 
 
@@ -269,11 +278,11 @@ int slot_of( ITEM* ptr )
 /******************************************************************************
  * FUNCTION:    is_equipable
  * ARGUMENTS:   ITEM* im
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int is_equipable( ITEM* im )//Will change as more types of items are added
+bool is_equipable( ITEM* im )//Will change as more types of items are added
 {
 	if(( im->type > 0 )&&(im->type < MAX_ITEM_TYPES))
 		return true;
@@ -341,11 +350,11 @@ void swap_item(ITEM* itmi, ITEM* itmj )
  * FUNCTION:    pick_up
  * ARGUMENTS:   ITEM* itm_ol
  *              ITEM* itm_nu
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int pick_up(ITEM* itm_ol, ITEM* itm_nu)
+bool pick_up(ITEM* itm_ol, ITEM* itm_nu)
 {
 	int i;
 
@@ -365,7 +374,7 @@ int pick_up(ITEM* itm_ol, ITEM* itm_nu)
 
 	itm_nu->worth = itm_ol->worth;
 
-	return 0;/*WARNING: always succeeds*/
+	return true;/*WARNING: always succeeds*/
 }/* end pick_up func */
 
 

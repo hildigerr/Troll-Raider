@@ -1,4 +1,4 @@
-/* $Id: item.h,v 1.2 2013/05/06 05:04:02 moonsdad Exp $ */
+/* $Id: item.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * item -- item Utility Functions.                                            *
  ******************************************************************************/
@@ -12,22 +12,22 @@
  * FUNCTION:    getp_item
  * ARGUMENTS:   ITEM* itm   -- The Item Being Generated
  *              int t       -- The Item Type
- *              int m       -- 
- * RETURNS:     int
+ *              int m       --
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int getp_item(ITEM* itm, int t, int m );
+bool getp_item(ITEM* itm, int t, int m );
 
 
 /******************************************************************************
  * FUNCTION:    set_empty_item
  * ARGUMENTS:   ITEM*   itm
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int set_empty_item(ITEM* itm);
+bool set_empty_item(ITEM* itm);
 
 
 /******************************************************************************
@@ -43,11 +43,11 @@ int slot_of( ITEM* ptr );
 /******************************************************************************
  * FUNCTION:    is_equipable
  * ARGUMENTS:   ITEM* im
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int is_equipable( ITEM* im );
+bool is_equipable( ITEM* im );
 
 /******************************************************************************
  * FUNCTION:    swap_item
@@ -62,11 +62,11 @@ void swap_item(ITEM* itmi, ITEM* itmj );
  * FUNCTION:    pick_up
  * ARGUMENTS:   ITEM* itm_ol
  *              ITEM* itm_nu
- * RETURNS:     int
+ * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-int pick_up(ITEM* itm_ol, ITEM* itm_nu);
+bool pick_up(ITEM* itm_ol, ITEM* itm_nu);
 
 
 

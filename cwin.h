@@ -1,4 +1,4 @@
-/* $Id: cwin.h,v 1.2 2013/05/06 05:04:01 moonsdad Exp $ */
+/* $Id: cwin.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
  * cwin -- Curses Window Functions.                                           *
  ******************************************************************************/
@@ -33,10 +33,10 @@ void wsay( WINDOW* where, char* string );
  * ARGUMENTS:   WINDOW*     d       -- Reference to the window to initialize  *
  *              PLAYER*     p       -- The player whose statistics to display *
  *              STAT_DAT*   s       -- Game statistics to display             *
- * RETURNS:     int                                                           *
+ * RETURNS:     bool                                                           *
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
-int init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s );
+bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s );
 
 
 
