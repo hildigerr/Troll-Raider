@@ -2,3 +2,10 @@
 */CVS/*
 .cvsignore
 */.cvsignore
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+a.out
