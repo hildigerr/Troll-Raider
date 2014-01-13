@@ -1,4 +1,4 @@
-/* $Id: cwin.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: cwin.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
  * cwin -- Curses Window Functions.                                           *
  ******************************************************************************/
@@ -7,10 +7,8 @@
 /* System Header */
 #include <curses.h>
 
-/* Local Headers */
-#include "rmhv_stdlib.h"
+/* Local Header */
 #include "calc.h"
-#include "types.h"
 
 /* Display Window Definitions */
 #define BTM_SUB_ROWS 4

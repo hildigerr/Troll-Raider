@@ -1,10 +1,12 @@
-/* $Id: player.c,v 1.5 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: player.c,v 1.6 2014/01/13 08:50:50 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * player.c -- Player Character Utility Functions.                            *
  ******************************************************************************/
 
+/* Local Headers */
 #include "player.h"
+#include "item.h"
 
 /******************************************************************************
  * FUNCTION:    init_stat_data

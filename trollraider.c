@@ -1,18 +1,21 @@
-/* $Id: trollraider.c,v 1.4 2014/01/13 06:26:03 moonsdad Exp $ */
+/* $Id: trollraider.c,v 1.5 2014/01/13 08:50:50 moonsdad Exp $ */
 
 /******************************************************************************
  *                             Troll Raider                                   *
  * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
  ******************************************************************************/
 
-/* System Header */
+/* System Headers */
 #include <time.h>
 
-/* Local Header */
+/* Local Headers */
 #include "trollraider.h"
+#include "game.h"
+#include "player.h"
+#include "item.h"
+#include "map.h"
 
 /* Defined Constants */
-#define DEBUG
 #define MAX_ITEM_WINDOWS 3
 #define MAX_ADITIONAL_WINDOW_POINTERS_NEEDED 3
 

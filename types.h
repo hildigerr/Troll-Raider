@@ -1,4 +1,4 @@
-/* $Id: types.h,v 1.5 2014/01/13 05:42:59 moonsdad Exp $ */
+/* $Id: types.h,v 1.6 2014/01/13 08:50:50 moonsdad Exp $ */
 /******************************************************************************
  ******************************************************************************/
 #pragma once
@@ -9,6 +9,7 @@
 /* Precompiler Constants */
 #define CANCEL -1
 #define NOT_PLACED 99
+#define CHECK_FLOAT 99.9
 
 /* get_cmd return values *//* get_subi_cmd return values */
 #define NO_ACTION    0

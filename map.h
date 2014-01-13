@@ -1,12 +1,11 @@
-/* $Id: map.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: map.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
  * map -- Map Utility Functions.                                              *
  ******************************************************************************/
  #pragma once
 
-#include "types.h"
+/* Local Header */
 #include "calc.h"
-#include "item.h"
 
 /* Map Generation Macros */
 #define ACTIVE_LOCATION	curlv[pc.maplv].map[r][c]

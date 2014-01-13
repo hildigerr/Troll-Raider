@@ -1,20 +1,12 @@
-/* $Id: game.h,v 1.4 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: game.h,v 1.5 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * game.c -- Game Utility Functions.                                          *
  ******************************************************************************/
 #pragma once
 
-#define VERSION "4.1"
-
-/* System Header */
-#include <ctype.h>
-
-/* Local Headers */
-#include "types.h"
+/* Local Header */
 #include "cwin.h"
-#include "calc.h"
-
 
 /******************************************************************************
  * FUNCTION:    get_cmd, get_subi_cmd                                         *

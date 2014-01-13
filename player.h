@@ -1,14 +1,11 @@
-/* $Id: player.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: player.h,v 1.4 2014/01/13 08:50:50 moonsdad Exp $ */
 /******************************************************************************
  * player -- Player Character Utility Functions.                              *
  ******************************************************************************/
 #pragma once
 
-#include "types.h"
+/* Local Header */
 #include "calc.h"
-#include "item.h"
-#include "game.h"
-
 
 /******************************************************************************
  * FUNCTION:    init_stat_data

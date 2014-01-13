@@ -1,12 +1,8 @@
-/* $Id: calc.h,v 1.3 2014/01/13 05:42:59 moonsdad Exp $ */
+/* $Id: calc.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
  * calc -- My Math Functions.                                                 *
  ******************************************************************************/
 #pragma once
-
-/* System Headers */
-#include <stdlib.h>
-#include <math.h>
 
 /* Local Header */
 #include "types.h"

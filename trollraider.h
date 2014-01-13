@@ -1,12 +1,7 @@
-/* $Id: trollraider.h,v 1.1 2013/05/05 22:04:13 moonsdad Exp $ */
+/* $Id: trollraider.h,v 1.2 2014/01/13 08:50:50 moonsdad Exp $ */
 #pragma once
 
-/* Local Headers */
-#include "calc.h"
-#include "cwin.h"
-#include "player.h"
-#include "map.h"
-//#include "item.h"
+/* Current Development Status */
+#define VERSION "4.1"
+#define DEBUG
 
-/* Precompiler Constants */
-#define CHECK_FLOAT 99.9

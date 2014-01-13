@@ -1,10 +1,12 @@
-/* $Id: map.c,v 1.6 2014/01/13 06:26:02 moonsdad Exp $ */
+/* $Id: map.c,v 1.7 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
  * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * map.c -- Map Utility Functions.                                            *
  ******************************************************************************/
 
+/* Local Headers */
 #include "map.h"
+#include "item.h"
 
 /******************************************************************************
  * FUNCTION:    set_loc
