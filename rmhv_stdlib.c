@@ -1,9 +1,6 @@
 /******************************************************************************
  *                             rmhv_stdlib.c                                  *
  * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
- *  Distributed under the Pirate Software Licence. The terms of this licence  *
- *  arrr...                                                                   *
- *  But if you do fork it, I would appreciate credit for my labour. Thanks.   * 
  ******************************************************************************/
 
 #include "rmhv_stdlib.h"

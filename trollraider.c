@@ -1,11 +1,8 @@
-/* $Id: trollraider.c,v 1.1 2013/05/05 22:04:13 moonsdad Exp $ */
+/* $Id: trollraider.c,v 1.2 2014/01/13 03:20:59 moonsdad Exp $ */
 
 /******************************************************************************
  *                             Troll Raider                                   *
  * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
- *  Distributed under the Pirate Software Licence. The terms of this licence  *
- *  arrr...                                                                   *
- *  But if you do fork it, I would appreciate credit for my labour. Thanks.   *
  ******************************************************************************/
 
 /* System Header */ 
