@@ -85,6 +85,7 @@ int main( int argc, char* argv[] )
 
     /* INITIALIZE CURSES */
     initscr(); /* Start curses mode *///RETURNS WINDOW*
+	atexit( endwin );
 	display_btm = subwin(stdscr,BTM_SUB_ROWS,BTM_SUB_COLS,MAX_ROW,0);
 	if( display_btm == NULL ) exit( ERROR( NULL, "btm sub win", FAIL ) );
 	display_right = subwin(stdscr,RT_SUB_ROWS,RT_SUB_COLS,0,MAX_COL);
@@ -92,7 +93,6 @@ int main( int argc, char* argv[] )
     raw();     /* Disable input buffering */
     noecho();  /* Disable input echoing */
 	keypad(stdscr, TRUE); /* enable arrowkeys and such */
-	atexit( endwin );
 
     /* RUN GAME */
 	while( run == true ) {
