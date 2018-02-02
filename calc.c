@@ -13,7 +13,7 @@
  *              double  b   -- The second value to compare.                   *
  * RETURNS:     double      -- The largest of a and b, or zero if the same.   *
  ******************************************************************************/
-inline double biggest( double a, double b )
+double biggest( double a, double b )
 {
 	return ( a == b )? 0.0 : ( a > b )? a : b;
 }/* End biggest Func */
@@ -25,7 +25,7 @@ inline double biggest( double a, double b )
  *              COORD     b  -- Second Point                                  *
  * RETURNS:     double      -- distance between point a and b                 *
  ******************************************************************************/
-inline double dist( COORD a, COORD b )
+double dist( COORD a, COORD b )
 {
 	return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
 }/* End dist Func */
@@ -36,7 +36,7 @@ inline double dist( COORD a, COORD b )
  * ARGUMENTS:   int     max_die_face                                          *
  * RETURNS:     int     random int 1 to max_die_face                          *
  ******************************************************************************/
-inline int rng( int max_die_face )
+int rng( int max_die_face )
 {
 	return 1 + ( rand() % max_die_face );
 }/* End rng Func */
@@ -48,7 +48,7 @@ inline int rng( int max_die_face )
  *              int     b   -- The second value to compare.                   *
  * RETURNS:     int         -- a iff it is smaller than b.                    *
  ******************************************************************************/
-inline int smallest( int a, int b )
+int smallest( int a, int b )
 {
 	return ( a < b )? a : b;
 }/* End smallest Func */

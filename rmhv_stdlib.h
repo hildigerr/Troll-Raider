@@ -36,9 +36,9 @@
 #define CALLOC(n,x) ((x*)calloc(n,sizeof(x)))
 
 /* Prototypes */
-inline int _ERROR( const char* who, const char* barf, int status, int boo );
+int _ERROR( const char* who, const char* barf, int status, int boo );
 size_t stricpy( char* dest, const char* src, size_t n );
-inline void mypause ( int );
+void mypause ( int );
 
 
 /************************************EOF***************************************/

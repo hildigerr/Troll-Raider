@@ -12,7 +12,7 @@
  * FUNCTION:    get_cmd                                                       *
  * RETURNS:     int         see definitions in types.h                        *
  ******************************************************************************/
-inline int get_cmd( void )
+ int get_cmd( void )
 {
 	switch( getch() ) {
 		case '8': case KEY_UP: 		/*NORTH*/       return NORTH;
@@ -42,7 +42,7 @@ inline int get_cmd( void )
  * FUNCTION:    get_subi_cmd                                                  *
  * RETURNS:     int         see definitions in types.h                        *
  ******************************************************************************/
-inline int get_subi_cmd( void )
+ int get_subi_cmd( void )
 {
 	switch( getch() ) {
 		case 'f': case 'F': case KEY_ESC:   /* exit sub cmd prompt */
@@ -75,7 +75,7 @@ inline int get_subi_cmd( void )
  * if input is a_d and t==u then returns index dereferencer +10 in order to   *
  *  distinguish between i and e                                               *
  ******************************************************************************/
-inline int get_slot( char t )
+ int get_slot( char t )
 {
 	switch (getch()) {
 		case KEY_ESC: case ' ': case 'q': case 'Q':	return CANCEL;
@@ -107,7 +107,7 @@ inline int get_slot( char t )
  * FUNCTION:    get_hand                                                      *
  * RETURNS:     int         -- see definitions in types.h                     *
  ******************************************************************************/
-inline int get_hand( void )
+ int get_hand( void )
 {
 	switch( getch() ) {
 		case '1': case 'r': case 'R': case 'a': case 'A': return WEP;
@@ -124,7 +124,7 @@ inline int get_hand( void )
  *              WINDOW* where   --  Window to display the message to.         *
  * RETURNS:     int                                                           *
  ******************************************************************************/
-inline int story_line( short when, WINDOW* where )
+ int story_line( short when, WINDOW* where )
 {
 	int opt = 0;
 
@@ -164,7 +164,7 @@ inline int story_line( short when, WINDOW* where )
  *              int     adjust      -- Adjustment to the test.                *
  * RETURNS:     bool                 -- Result of test                        *
  ******************************************************************************/
-inline bool skill_check( int ability, int adjust )//TODO: Make more interesting
+ bool skill_check( int ability, int adjust )//TODO: Make more interesting
 {
 	return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
 }/* end skill_check func */

@@ -16,5 +16,5 @@ trollraider: ${OBJS}
 	${CC} -o ${@} ${OBJS}
 
 clean: 
-	rm a.out ${OBJS}
+	rm -f a.out ${OBJS}
 

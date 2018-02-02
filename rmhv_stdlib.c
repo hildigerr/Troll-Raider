@@ -21,7 +21,7 @@
  * Suggested Usage:                                                           *
  *      exit(ERROR( who, "Your error message", status , 1||0 ));              *
  ******************************************************************************/
-inline int _ERROR( const char* who, const char* barf, int status, int boo )
+int _ERROR( const char* who, const char* barf, int status, int boo )
 {
     if( who ) {
         if( boo )
@@ -62,7 +62,7 @@ size_t stricpy( char* dest, const char* src, size_t n )
 /******************************************************************************
  * FUNCTION:    mypause                                                       *
  ******************************************************************************/
-inline void mypause( int display_prompt ) 
+void mypause( int display_prompt ) 
 {
     if( display_prompt )
         printf( "Press [Enter] to continue . . ." );

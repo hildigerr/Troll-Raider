@@ -16,7 +16,7 @@
  *              double  b   -- The second value to compare.                   *
  * RETURNS:     double      -- The largest of a and b, or zero if the same.   *
  ******************************************************************************/
-inline double biggest( double a, double b );
+double biggest( double a, double b );
 
 
 /******************************************************************************
@@ -25,7 +25,7 @@ inline double biggest( double a, double b );
  *              COORD     b  -- Second Point                                  *
  * RETURNS:     double      -- distance between point a and b                 *
  ******************************************************************************/
-inline double dist( COORD a, COORD b );
+double dist( COORD a, COORD b );
 
 
 /******************************************************************************
@@ -33,7 +33,7 @@ inline double dist( COORD a, COORD b );
  * ARGUMENTS:   int     max_die_face                                          *
  * RETURNS:     int     random int 1 to max_die_face                          *
  ******************************************************************************/
-inline int rng( int max_die_face );
+int rng( int max_die_face );
 
 
 /******************************************************************************
@@ -42,7 +42,7 @@ inline int rng( int max_die_face );
  *              int     b   -- The second value to compare.                   *
  * RETURNS:     int         -- a iff it is smaller than b.                    *
  ******************************************************************************/
-inline int smallest( int a, int b );
+int smallest( int a, int b );
 
 
 /************************************EOF***************************************/

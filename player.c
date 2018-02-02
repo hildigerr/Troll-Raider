@@ -15,7 +15,7 @@
  * WARNING:
  * NOTE:
  ******************************************************************************/
-inline bool init_stat_data( STAT_DAT* d )
+ bool init_stat_data( STAT_DAT* d )
 {
 	d->food = 0;
 	d->turn = 0;

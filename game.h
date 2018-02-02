@@ -12,8 +12,8 @@
  * FUNCTION:    get_cmd, get_subi_cmd                                         *
  * RETURNS:     int         see definitions in types.h                        *
  ******************************************************************************/
-inline int get_cmd( void );
-inline int get_subi_cmd( void );
+ int get_cmd( void );
+ int get_subi_cmd( void );
 
 
 /******************************************************************************
@@ -26,14 +26,14 @@ inline int get_subi_cmd( void );
  * if input is a_d and t==u then returns index dereferencer +10 in order to   *
  *  distinguish between i and e                                               *
  ******************************************************************************/
-inline int get_slot(char t);
+ int get_slot(char t);
 
 
 /******************************************************************************
  * FUNCTION:    get_hand                                                      *
  * RETURNS:     int         -- see definitions in types.h                     *
  ******************************************************************************/
-inline int get_hand(void);
+ int get_hand(void);
 
 
 /******************************************************************************
@@ -47,7 +47,7 @@ inline int get_hand(void);
 #define BEGINNING 1
 #define MIDDLE    2
 #define END       3
-inline int story_line( short when, WINDOW* where );
+ int story_line( short when, WINDOW* where );
 
 
 /******************************************************************************
@@ -57,7 +57,7 @@ inline int story_line( short when, WINDOW* where );
  * WARNING:
  * NOTE:
  ******************************************************************************/
-inline bool skill_check( int ability, int adjust );
+ bool skill_check( int ability, int adjust );
 
 
 
