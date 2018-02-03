@@ -81,7 +81,7 @@ int main( int argc, char* argv[] )
 
     //INTRO Must be before curses initialization for now
     //Actually displays only after program termination
-    pc.attdir =    story_line( INTRO, NULL );
+    story_line( INTRO, NULL );
 
     /* INITIALIZE CURSES */
     initscr(); /* Start curses mode *///RETURNS WINDOW*
@@ -98,13 +98,14 @@ int main( int argc, char* argv[] )
     while( run == true ) {
 
         /* Set-up/Update RH Display */
-        if( init_display_right( display_right, &pc, &score ) == false ) {
-            endwin();/* End curses mode */
-            exit(ERROR(NULL,"Failed to initialize right hand display",FAIL));
-        }/* end setup RH Display fail if */
+        if( init_display_right( display_right, &pc, &score ) == false )
+            exit(ERROR(NULL,"Failed to (re)initialize right hand display",FAIL));
+
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
         if(curlv[pc.maplv].is_new == true) {
+            curlv[pc.maplv].is_new = false;
+            
             for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
                 move(r,c);
                 addch( get_map_icon( ACTIVE_LOCATION ) );
@@ -119,31 +120,41 @@ int main( int argc, char* argv[] )
                 /* Get Attack Direction */
                 say("You approach the human village."
                     " From which direction would you like to attack? ");
-                cmd = getch();
-                if     (( toupper(cmd) == 'N' )||(cmd == '8')) pc.attdir = NORTH;
-                else if(( toupper(cmd) == 'S' )||(cmd == '2')) pc.attdir = SOUTH;
-                else if(( toupper(cmd) == 'E' )||(cmd == '6')) pc.attdir = EAST;
-                else if(( toupper(cmd) == 'W' )||(cmd == '4')) pc.attdir = WEST;
-                else if( cmd == '9' ) pc.attdir = NORTH_EAST;
-                else if( cmd == '1' ) pc.attdir = SOUTH_WEST;
-                else if( cmd == '3' ) pc.attdir = SOUTH_EAST;
-                else if( toupper(cmd) == 'Q' ){ endwin(); exit(0); }
-                else pc.attdir = NORTH_WEST;
-
-                /* Get Players Starting Position */
-                switch( pc.attdir ) {
-                    case NORTH: while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 ); pc.locr = 1;               break;
-                    case SOUTH: while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 ); pc.locr = ( MAX_ROW - 2 ); break;
-                    case EAST:  while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 ); pc.locc = ( MAX_COL - 2 ); break;
-                    case WEST:  while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 ); pc.locc = 1;               break;
-                    case NORTH_EAST:     pc.locc = ( MAX_COL - 2 ); pc.locr = 1;                          break;
-                    case SOUTH_EAST:     pc.locc = ( MAX_COL - 2 ); pc.locr = ( MAX_ROW - 2 );            break;
-                    case SOUTH_WEST:     pc.locr = ( MAX_ROW - 2 );    pc.locc = 1;                          break;
-                    case NORTH_WEST:  default:   pc.locc = 1;       pc.locr = 1;
-                }/* end pc.attdir switch */
+                switch( getch() ) {
+                    case 'N': case 'n': case '8': /* NORTH */
+                        while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 );
+                        pc.locr = 1;
+                        break;
+                    case 'S': case 's': case '2': /* SOUTH */
+                        while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 );
+                        pc.locr = ( MAX_ROW - 2 );
+                        break;
+                    case 'E': case 'e': case '6': /* EAST */
+                        while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 );
+                        pc.locc = ( MAX_COL - 2 );
+                        break;
+                    case 'W': case 'w': case '4': /* WEST */
+                        while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 );
+                        pc.locc = 1;
+                        break;
+                    case '9': /* NORTH_EAST */
+                        pc.locc = ( MAX_COL - 2 );
+                        pc.locr = 1;
+                        break;
+                    case '1': /* SOUTH_WEST */
+                        pc.locr = ( MAX_ROW - 2 );
+                        pc.locc = 1;
+                        break;
+                    case '3': /* SOUTH_EAST */
+                        pc.locc = ( MAX_COL - 2 );
+                        pc.locr = ( MAX_ROW - 2 );
+                        break;
+                    case 'Q': case 'q': exit(0);
+                    default: /* NORTH_WEST; */
+                        pc.locc = 1;
+                        pc.locr = 1;
+                }/* end attdir switch */
             }/* end initial turn if */
-//            else
-            curlv[pc.maplv].is_new = false;
         }/* end is_new if */
 
         /* UPDATE PLAYER LOCATION */

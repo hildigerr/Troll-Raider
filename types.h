@@ -125,7 +125,6 @@ typedef struct {
     int locr, locc, maplv;
     ITEM inventory[MAX_HOLD];
     ITEM* equip[MAX_SLOTS];
-    short attdir; /* Attack Direction */
     unsigned is_main  : 1;
     unsigned is_alive : 1;
     unsigned is_human : 1;
