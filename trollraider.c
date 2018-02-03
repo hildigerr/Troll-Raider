@@ -168,12 +168,12 @@ int main( int argc, char* argv[] )
                 /* Find Target Location */
                 if( cmd == SOUTH_WEST )         { r += 1; c -= 1; }/* end SW if */
                 else if( cmd == SOUTH )         { r += 1;         }/* end S  if */
-                else if( cmd == SOUTH_EAST ) { r += 1; c += 1; }/* end SE if */
-                else if( cmd == WEST )         {         c -= 1; }/* end W  if */
-                else if( cmd == EAST )         {            c += 1; }/* end E  if */
-                else if( cmd == NORTH_WEST ) { r -= 1; c -= 1; }/* end NW if */
+                else if( cmd == SOUTH_EAST )    { r += 1; c += 1; }/* end SE if */
+                else if( cmd == WEST )          {         c -= 1; }/* end W  if */
+                else if( cmd == EAST )          {         c += 1; }/* end E  if */
+                else if( cmd == NORTH_WEST )    { r -= 1; c -= 1; }/* end NW if */
                 else if( cmd == NORTH )         { r -= 1;         }/* end SW if */
-                else if( cmd == NORTH_EAST ) { r -= 1; c += 1; }/* end N  if */
+                else if( cmd == NORTH_EAST )    { r -= 1; c += 1; }/* end N  if */
                 else exit( ERROR( NULL, "Bad Logic MOVING cmd filter", cmd ) );
 
                 /* MOVE assess legality */

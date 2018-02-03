@@ -7,14 +7,14 @@
 #include "rmhv_stdlib.h"
 
 /* Precompiler Constants */
-#define CANCEL -1
-#define NOT_PLACED 99
+#define CANCEL      -1
+#define NOT_PLACED  99
 #define CHECK_FLOAT 99.9
 
 /* get_cmd return values *//* get_subi_cmd return values */
 #define NO_ACTION    0
 #define NORTH        1
-#define SOUTH         2
+#define SOUTH        2
 #define EAST         3
 #define WEST         4
 #define NORTH_EAST   5
@@ -33,48 +33,48 @@
 #define DEBUG_ITEM   -9
 
 /* Character Abilities */
-#define STR 0 /*Strength*/
-#define AGI 1 /*Agility*/
-#define MEN 2 /*Mental*/
-#define CON 3 /*Constitution*/
-#define CHA 4 /*Charisma*/
-#define LUC 5 /*Luck*/
-#define MAX_STATS 6
+#define STR         0 /*Strength*/
+#define AGI         1 /*Agility*/
+#define MEN         2 /*Mental*/
+#define CON         3 /*Constitution*/
+#define CHA         4 /*Charisma*/
+#define LUC         5 /*Luck*/
+#define MAX_STATS   6
 #define MAX_STAT_VAL 10
 
 /* Item Statistics */
-#define TO_HIT 0
-#define TO_DAM 1
-#define MAX_ITEM_STATS 2
+#define TO_HIT          0
+#define TO_DAM          1
+#define MAX_ITEM_STATS  2
 
-#define ITEM_DAT "dat//item.dat"
+#define ITEM_DAT "dat/item.dat"
 #define MAX_ITEM_PER_TYPE 6
 #define MAX_ITEM_NAME_LEN 10
 #define MAX_LV_ITEM 10
 
 /* Equipment Types */
-#define MONEY  0
-#define MELEE  1
-#define REACH  2
-#define RANGE1 3
-#define RANGE2 4
-#define SHIELD 5
-#define TYPHAT 6
-#define TYPARM 7
-#define MAX_ITEM_TYPES 8
+#define MONEY           0
+#define MELEE           1
+#define REACH           2
+#define RANGE1          3
+#define RANGE2          4
+#define SHIELD          5
+#define TYPHAT          6
+#define TYPARM          7
+#define MAX_ITEM_TYPES  8
 
 /* NPCs */
-#define MON_DAT "dat//human.dat"
+#define MON_DAT "dat/human.dat"
 #define MAX_NAME_LEN 11
 #define MAX_FAM 45
 #define MAX_NPC 45
 
 /* Equipment Slots */
-#define WEP 0 /*Weapon*//* Main Hand */
-#define OFF 1 /*Off-Hand (shield or weapon)*/
-#define ARM 2 /*Armor*/
-#define HAT 3 /*Head*/
-#define MAX_SLOTS 4
+#define WEP         0 /*Weapon*//* Main Hand */
+#define OFF         1 /*Off-Hand (shield or weapon)*/
+#define ARM         2 /*Armor*/
+#define HAT         3 /*Head*/
+#define MAX_SLOTS   4
 
 #define MAX_HOLD 10
 
@@ -89,7 +89,7 @@
 #define MIN_HUT_HGT  1
 #define MIN_HUT_DIST 4.0
 
-#define EAST_WEST 0
+#define EAST_WEST   0
 #define NORTH_SOUTH 1
 
 /* Current Level Array Access Definitions */

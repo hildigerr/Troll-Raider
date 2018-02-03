@@ -15,25 +15,26 @@
  int get_cmd( void )
 {
     switch( getch() ) {
-        case '8': case KEY_UP:         /*NORTH*/       return NORTH;
-        case '2': case KEY_DOWN:    /*SOUTH*/       return SOUTH;
-        case '6': case KEY_RIGHT:    /*EAST*/        return EAST;
-        case '4': case KEY_LEFT:    /*WEST*/        return WEST;
-        case '9':                    /*NORTH_EAST*/    return NORTH_EAST;
-        case '7':                    /*NORTH_WEST*/    return NORTH_WEST;
-        case '3':                    /*SOUTH_EAST*/    return SOUTH_EAST;
-        case '1':                    /*SOUTH_WEST*/    return SOUTH_WEST;
-        case '5':                    /*WAIT*/        return WAIT;
+        case '8': case KEY_UP:          return NORTH;
+        case '2': case KEY_DOWN:        return SOUTH;
+        case '6': case KEY_RIGHT:       return EAST;
+        case '4': case KEY_LEFT:        return WEST;
+        case '9':                       return NORTH_EAST;
+        case '7':                       return NORTH_WEST;
+        case '3':                       return SOUTH_EAST;
+        case '1':                       return SOUTH_WEST;
+        case '5':                       return WAIT;
         case 'q':
-        case 'Q': case KEY_ESC:        /*QUIT*/        return QUIT;
-        case 'g': case ',':         /*PICK UP*/     return PICK_UP;
-        case 'i':                     /*INVENTORY*/   return INVENTORY;
-        case 'e': case 'w':         /*EQUIPMENT*/   return EQUIPMENT;
-        case 'u': case 'T':         /*UNEQUIP ITEM*/return REMOVE_ITEM;
-        case 'd':                     /*DROP ITEM*/    return DROP_ITEM;
-        case 'K':                   /*DESTROY ITEM*/return DESTROY_ITEM;
-        case 'I':                    /*DEBUGGING*/   return DEBUG_ITEM;
-        default:    return NO_ACTION; //TODO SAVE_GAME
+        case 'Q': case KEY_ESC:         return QUIT;
+        case 'g': case ',':             return PICK_UP;
+        case 'i':                       return INVENTORY;
+        case 'e': case 'w':             return EQUIPMENT;
+        case 'u': case 'T':             return REMOVE_ITEM;
+        case 'd':                       return DROP_ITEM;
+        case 'K':                       return DESTROY_ITEM;
+        case 'I':                       return DEBUG_ITEM;
+        //TODO SAVE_GAME
+        default:    return NO_ACTION; 
     }/* End input Switch */
 }/* End get_cmd Func */
 
@@ -48,7 +49,7 @@
         case 'f': case 'F': case KEY_ESC:   /* exit sub cmd prompt */
         case 'q': case 'Q': case ' ':          return SUB_FIN;
 
-        case 'D': case 'd':                    /* drop an item */
+        case 'D': case 'd':                 /* drop an item */
                                                return DROP_ITEM;
 
         case 'E': case 'e': case 'r':       /* Equip/Ready an Item */
