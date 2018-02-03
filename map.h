@@ -8,7 +8,7 @@
 #include "calc.h"
 
 /* Map Generation Macros */
-#define ACTIVE_LOCATION	curlv[pc.maplv].map[r][c]
+#define ACTIVE_LOCATION    curlv[pc.maplv].map[r][c]
 
 /******************************************************************************
  * FUNCTION:    set_loc

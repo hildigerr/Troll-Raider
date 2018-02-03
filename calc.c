@@ -15,7 +15,7 @@
  ******************************************************************************/
 double biggest( double a, double b )
 {
-	return ( a == b )? 0.0 : ( a > b )? a : b;
+    return ( a == b )? 0.0 : ( a > b )? a : b;
 }/* End biggest Func */
 
 
@@ -27,7 +27,7 @@ double biggest( double a, double b )
  ******************************************************************************/
 double dist( COORD a, COORD b )
 {
-	return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
+    return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
 }/* End dist Func */
 
 
@@ -38,7 +38,7 @@ double dist( COORD a, COORD b )
  ******************************************************************************/
 int rng( int max_die_face )
 {
-	return 1 + ( rand() % max_die_face );
+    return 1 + ( rand() % max_die_face );
 }/* End rng Func */
 
 
@@ -50,7 +50,7 @@ int rng( int max_die_face )
  ******************************************************************************/
 int smallest( int a, int b )
 {
-	return ( a < b )? a : b;
+    return ( a < b )? a : b;
 }/* End smallest Func */
 
 
