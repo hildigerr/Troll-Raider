@@ -52,8 +52,8 @@ size_t stricpy( char* dest, const char* src, size_t n )
 
     if( src && dest ) {
         for( i = 0; ( i < n )&&( src[i] != '\0' ); i++ ) dest[i] = src[i];
-        if( i < n ) dest[i] = '\0'; 
-        
+        if( i < n ) dest[i] = '\0';
+
         return i;
     } else return 0;
 }/* End stricpy Func */
@@ -62,7 +62,7 @@ size_t stricpy( char* dest, const char* src, size_t n )
 /******************************************************************************
  * FUNCTION:    mypause                                                       *
  ******************************************************************************/
-void mypause( int display_prompt ) 
+void mypause( int display_prompt )
 {
     if( display_prompt )
         printf( "Press [Enter] to continue . . ." );

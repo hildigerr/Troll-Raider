@@ -13,7 +13,6 @@
  * RETURNS:     int         see definitions in types.h                        *
  ******************************************************************************/
  int get_cmd( void );
- int get_subi_cmd( void );
 
 
 /******************************************************************************
@@ -60,5 +59,6 @@
  bool skill_check( int ability, int adjust );
 
 
+ bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd );
 
 /************************************EOF***************************************/

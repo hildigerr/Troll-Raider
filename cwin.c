@@ -6,6 +6,8 @@
 
 #include "cwin.h"
 
+WINDOW  *display_btm;
+
 /******************************************************************************
  * FUNCTION:    wsay                                                          *
  * ARGUMENTS:   WINDOW* where   -- The window to which we will write          *

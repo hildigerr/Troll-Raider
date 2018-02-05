@@ -16,6 +16,8 @@
 #define RT_SUB_ROWS  20      /* should be equal to MAX_ROW */
 #define RT_SUB_COLS  20
 
+extern WINDOW  *display_btm;
+
 
 /******************************************************************************
  * FUNCTION:    wsay                                                          *
