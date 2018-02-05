@@ -137,7 +137,6 @@ bool init_mon(PLAYER* who, int k, int innocent_qt, int hero_iqt )// who -> mon[k
     who->maplv = NOT_PLACED;
     who->is_main = false;
     who->is_alive = true;
-    who->attdir = WAIT;
     who->is_awake = false;
     who->hp[0] = who->stats[CON];
     who->hp[1] = who->hp[0];
