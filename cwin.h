@@ -30,6 +30,13 @@ void wsay( WINDOW* where, char* string );
 
 
 /******************************************************************************
+ * FUNCTION:    draw_map                                                      *
+ * ARGUMENTS:   LEVEL* curlv   -- The Level to draw.                          *
+ ******************************************************************************/
+void draw_map( LEVEL * curlv );
+
+
+/******************************************************************************
  * FUNCTION:    init_display_right                                            *
  * ARGUMENTS:   WINDOW*     d       -- Reference to the window to initialize  *
  *              PLAYER*     p       -- The player whose statistics to display *

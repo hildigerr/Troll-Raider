@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include "cwin.h"
+#include "map.h"
 
 WINDOW  *display_btm;
 
@@ -30,6 +31,20 @@ void wsay( WINDOW* where, char* string )
 
     wrefresh(where);
 }/* End wsay Func */
+
+
+/******************************************************************************
+ * FUNCTION:    draw_map                                                      *
+ * ARGUMENTS:   LEVEL* curlv   -- The Level to draw.                          *
+ ******************************************************************************/
+void draw_map( LEVEL * curlv )
+{
+    int r, c;
+    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
+        move(r,c);
+        addch( get_map_icon( curlv->map[r][c] ) );
+    }/* end [r][c] screen initialization */
+}
 
 
 /******************************************************************************

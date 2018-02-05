@@ -104,10 +104,7 @@ int main( int argc, char* argv[] )
         if(curlv[pc.maplv].is_new == true) {
             curlv[pc.maplv].is_new = false;
 
-            for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
-                move(r,c);
-                addch( get_map_icon( ACTIVE_LOCATION ) );
-            }/* end [r][c] screen initialization */
+            draw_map( &curlv[pc.maplv] );
 
             if( score.turn == 0 ) {
                 refresh();
@@ -290,11 +287,9 @@ int main( int argc, char* argv[] )
                 need_more_cmd = manage_inventory( &pc, &ACTIVE_LOCATION, cmd );
 
                 /* Replace Map */
-                for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
-                    move(r,c);
-                    addch( get_map_icon( ACTIVE_LOCATION ) );
-                }/* end [r][c] screen initialization */
+                draw_map( &curlv[pc.maplv] );
                 move(pc.locr,pc.locc); addch('@');
+
                 /* Clean Up */
                 for( i = MAX_ITEM_WINDOWS-1; i <= 0; i-- ) delwin(cmd_list[i]);
                 touchwin(stdscr);
