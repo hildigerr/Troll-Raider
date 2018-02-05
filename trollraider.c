@@ -289,60 +289,45 @@ int main( int argc, char* argv[] )
                 /* SUB CMD */
                 need_more_cmd = manage_inventory( &pc, &ACTIVE_LOCATION, cmd );
 
-            /* Replace Map *///TODO: Make function and find duplicate usage
-                for( r = 0; r < MAX_ROW; r++ )
-                    for( c = 0; c < MAX_COL; c++ )
-                    {
-                        move(r,c);
-                        addch( get_map_icon( ACTIVE_LOCATION ) );
-                    }/* end [r][c] screen initialization */
+                /* Replace Map */
+                for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
+                    move(r,c);
+                    addch( get_map_icon( ACTIVE_LOCATION ) );
+                }/* end [r][c] screen initialization */
                 move(pc.locr,pc.locc); addch('@');
-            /* Clean Up */
+                /* Clean Up */
                 for( i = MAX_ITEM_WINDOWS-1; i <= 0; i-- ) delwin(cmd_list[i]);
                 touchwin(stdscr);
             }/* end INVENTORY cmd */
-////////////////////////////////////////////////
-else if( cmd == PICK_UP )
-{
-    if( ACTIVE_LOCATION.litter.is_ == false )
-    {
-        say("There is nothing to pick up.");
-    }/* end no litter if */
-    else if( pc.inventory[MAX_SLOTS-1].is_ != false )
-    {
-        say("You're inventory is full!");
-    }/* end inventory full if */
-    else{
-        for(i = 0; i < MAX_SLOTS; i++ )
-        {
-            if( pc.inventory[i].is_ == false )
-            {
-                swap_item(&ACTIVE_LOCATION.litter, &pc.inventory[i]);
-                say("Item picked up!");
-                break;
-            }/* end got empty slot if */
-        }/* end MAX_SLOTS for */
-    }/* end pickup else */
-}/* end PICK_UP if */
-////////////////////////////////////////////////
-            else if( cmd == DEBUG_ITEM )
-            {
-#ifdef DEBUG
-    //DELETED//UNUSED
-#endif
-                need_more_cmd = true;
-            }/* end debug_item cmd if */
-            else exit( ERROR(NULL, "cmd processing", cmd) );
-        }while( need_more_cmd == true );/* end need more cmd do */
 
-//check for end of turn stuff
+            else if( cmd == PICK_UP ) {
+                need_more_cmd = true; /* Assume Nothing Happens */
+                if( ACTIVE_LOCATION.litter.is_ == false )
+                    say("There is nothing to pick up.");
+                else if( pc.inventory[MAX_SLOTS-1].is_ != false )
+                    say("You're inventory is full!");
+                else {
+                    for(i = 0; i < MAX_SLOTS; i++ ) {
+                        if( pc.inventory[i].is_ == false ) {
+                            swap_item(&ACTIVE_LOCATION.litter, &pc.inventory[i]);
+                            say("Item picked up!");
+                            need_more_cmd = false;
+                            break;
+                        }/* end got empty slot if */
+                    }/* end MAX_SLOTS for */
+                }/* end pickup else */
+            }/* end PICK_UP if */
+
+            else exit( ERROR(NULL, "cmd processing", cmd) );
+        } while( need_more_cmd == true );/* end need more cmd do */
+
+        //TODO: Enemy actions
+
         score.turn += 1;
     }/* end run while */
 
-/* Display And Save High Score Report */
+    /* TODO: Display And Save High Score Report */
 
-/* TERMINATE PROGRAM */
-//    endwin();/* End curses mode */
-//    fclose(indata);
+    /* TERMINATE PROGRAM */
     return 0;
 }/* end main func */
