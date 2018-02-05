@@ -6,6 +6,7 @@
 
 /* Local Header */
 #include "calc.h"
+#include "types.h"
 
 /* Map Generation Macros */
 #define ACTIVE_LOCATION    curlv[pc.maplv].map[r][c]

@@ -2,8 +2,8 @@
 CC = gcc
 CFLAGS = -g -Wall
 LFLAGS = -lm -lncurses
-SRCS =  rmhv_stdlib.c calc.c cwin.c map.c player.c item.c game.c trollraider.c
-DATA =  item.dat human.dat 
+SRCS =  rmhv_stdlib.c cwin.c map.c player.c item.c game.c trollraider.c
+DATA =  item.dat human.dat
 
 HEADERS = ${SRCS:.c=.h}
 OBJS = ${SRCS:.c=.o}
@@ -15,6 +15,6 @@ test: ${OBJS}
 trollraider: ${OBJS}
 	${CC} -o ${@} ${OBJS}
 
-clean: 
+clean:
 	rm -f a.out ${OBJS}
 

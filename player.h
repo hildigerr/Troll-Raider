@@ -6,6 +6,7 @@
 
 /* Local Header */
 #include "calc.h"
+#include "types.h"
 
 /******************************************************************************
  * FUNCTION:    init_stat_data

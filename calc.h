@@ -1,11 +1,9 @@
 /* $Id: calc.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
+ * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
  * calc -- My Math Functions.                                                 *
  ******************************************************************************/
 #pragma once
-
-/* Local Header */
-#include "types.h"
 
 /* Macro Functions */
 #define squared(x) (x * x)
@@ -16,16 +14,7 @@
  *              double  b   -- The second value to compare.                   *
  * RETURNS:     double      -- The largest of a and b, or zero if the same.   *
  ******************************************************************************/
-double biggest( double a, double b );
-
-
-/******************************************************************************
- * FUNCTION:    dist                                                          *
- * ARGUMENTS:   COORD     a  -- First Point                                   *
- *              COORD     b  -- Second Point                                  *
- * RETURNS:     double      -- distance between point a and b                 *
- ******************************************************************************/
-double dist( COORD a, COORD b );
+#define biggest( a, b ) (( a == b )? 0.0 : ( a > b )? a : b)
 
 
 /******************************************************************************
@@ -33,7 +22,7 @@ double dist( COORD a, COORD b );
  * ARGUMENTS:   int     max_die_face                                          *
  * RETURNS:     int     random int 1 to max_die_face                          *
  ******************************************************************************/
-int rng( int max_die_face );
+#define rng( max_die_face ) (1 + ( rand() % max_die_face ))
 
 
 /******************************************************************************
@@ -42,7 +31,7 @@ int rng( int max_die_face );
  *              int     b   -- The second value to compare.                   *
  * RETURNS:     int         -- a iff it is smaller than b.                    *
  ******************************************************************************/
-int smallest( int a, int b );
+#define smallest( a, b ) (( a < b )? a : b)
 
 
 /************************************EOF***************************************/

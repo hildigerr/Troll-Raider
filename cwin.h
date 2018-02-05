@@ -9,6 +9,7 @@
 
 /* Local Header */
 #include "calc.h"
+#include "types.h"
 
 /* Display Window Definitions */
 #define BTM_SUB_ROWS 4

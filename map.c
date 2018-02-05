@@ -4,9 +4,21 @@
  * map.c -- Map Utility Functions.                                            *
  ******************************************************************************/
 
-/* Local Headers */
+#include <math.h>
+
 #include "map.h"
 #include "item.h"
+
+/******************************************************************************
+ * FUNCTION:    dist                                                          *
+ * ARGUMENTS:   COORD     a  -- First Point                                   *
+ *              COORD     b  -- Second Point                                  *
+ * RETURNS:     double      -- distance between point a and b                 *
+ ******************************************************************************/
+static double dist( COORD a, COORD b )
+{
+    return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
+}/* End dist Func */
 
 /******************************************************************************
  * FUNCTION:    set_loc
