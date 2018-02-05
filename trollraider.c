@@ -53,8 +53,8 @@ int main( int argc, char* argv[] )
     if( init_stat_data( &score ) == false )
         exit( ERROR( NULL, "Failed to initialize scores", FAIL ) );
 
-    /* GIVE PC A CLUB */
-    if( getp_item( &pc.inventory[0], 1, 1 ) == false )
+    /* GIVE PC A STARTING WEAPON */
+    if( getp_item( &pc.inventory[0], 1, 0 ) == false )
         return( ERROR(NULL, "Failed to get starting equipment",2) );
 
     score.hut_qt = rng(MAX_HUTS);// score.hut_qt = MAX_HUTS;//TESTING//

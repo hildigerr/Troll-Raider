@@ -48,9 +48,8 @@
 #define MAX_ITEM_STATS  2
 
 #define ITEM_DAT "dat/item.dat"
-#define MAX_ITEM_PER_TYPE 6
-#define MAX_ITEM_NAME_LEN 10
-#define MAX_LV_ITEM 10
+#define MAX_ITEM_NAME_LEN   10
+#define MAX_LV_ITEM         10
 
 /* Equipment Types */
 #define MONEY           0
@@ -82,7 +81,7 @@
 #define MAX_ROW 20
 #define MAX_COL 60
 
-#define MAX_HUTS 5
+#define MAX_HUTS     5
 #define MAX_HUT_WID  6
 #define MAX_HUT_HGT  4
 #define MIN_HUT_WID  1
@@ -102,29 +101,29 @@
 #define CASL_DN0    6 /* Castles 1st Lower Level */
 #define CASL_DN1    7 /* Castles 2nd Lower Level */
 #define CASL_DN2    8 /* Castles 3rd Lower Level *///current "lowest" level
-#define DFMAX  3    /* Maximum Dungeon Name Flavors */
+#define DFMAX       3 /* Maximum Dungeon Name Flavors */
 #define MAX_MAPS    9 /* TOTAL NUMBER OF MAPS PER GAME */
 
 typedef struct {
     char name[MAX_ITEM_NAME_LEN + 1];
+    int stats[MAX_ITEM_STATS];
+    int worth;
     unsigned is_ : 1;
     unsigned is_equipped :1;
     unsigned is_2handed : 1;
     unsigned is_XXX : 1; /* unused */
     unsigned short int type;
-    int stats[MAX_ITEM_STATS];
-    int worth;
 } ITEM;
 
 typedef struct {
     char name[MAX_NAME_LEN+1];
-    int hp[2];//[0]MAX//[1]CUR
     int stats[MAX_STATS];
+    ITEM inventory[MAX_HOLD];
+    ITEM* equip[MAX_SLOTS];
+    int hp[2];//[0]MAX//[1]CUR
     float explv; /*lv is int val, xp is decimal*/
     int money;
     int locr, locc, maplv;
-    ITEM inventory[MAX_HOLD];
-    ITEM* equip[MAX_SLOTS];
     unsigned is_main  : 1;
     unsigned is_alive : 1;
     unsigned is_human : 1;
@@ -149,6 +148,7 @@ typedef struct {
 } RECT;
 
 typedef struct {
+    ITEM litter; /* TODO: make ptr, malloc as needed */
     unsigned is_floor : 1;
     unsigned is_occupied : 1;
     unsigned is_visible : 1;
@@ -157,10 +157,9 @@ typedef struct {
     unsigned is_ustair : 1;
     unsigned is_dstair : 1;
     unsigned is_trap : 1;
-    ITEM litter; /* TODO: make ptr, malloc as needed */
 } LOC;
 
-typedef struct level_struct{
+typedef struct level_struct {
     LOC map[MAX_ROW][MAX_COL];
     int type; /* Current Level Array Access */
     unsigned is_new : 1; /* Unexplored */

@@ -1,6 +1,7 @@
 # ITEM DATA FILE
 #  format=  :type:statlist:worth:name:
 #   where statlist= tohit:todam
+# names should be limited to 10 characaters.
 
 # Max Items Per Type:
 #money:melee:reach:range:2hrange:shield:hat:body
@@ -13,8 +14,8 @@ $4:6:5:3:1:3:4:5
 :0:0:0:50:gem:
 
 #WEAPONS (melee)
-:1:4:2:5:dagger:
-:1:3:4:10:club:
+:1:4:3:5:club:
+:1:3:4:10:dagger:
 :1:5:5:15:mace:
 :1:5:6:20:axe:
 :1:5:6:20:sword:
@@ -36,19 +37,19 @@ $4:6:5:3:1:3:4:5
 :4:6:5:15:bow:
 
 #DEFENSE  (shields)
-:5:4:1:20:small:
-:5:3:3:25:medium:
-:5:2:5:30:large:
+:5:4:1:20:sml shield:
+:5:3:3:25:med shield:
+:5:2:5:30:lrg shield:
 
 #DEFENSE  (hats)
-:6:0:1:3:cloth:
-:6:1:1:6:leather:
-:6:2:2:20:bronze:
-:6:3:3:30:iron:
+:6:0:1:3:cloth hat:
+:6:1:1:6:leather hat:
+:6:2:2:20:bronze cap:
+:6:3:3:30:iron helm:
 
 #DEFENSE  (body)
-:7:1:1:10:cloth:
-:7:2:2:20:hyde:
-:7:3:3:30:leather:
-:7:3:4:40:mail:
-:7:1:7:50:plate:
+:7:1:1:10:cloths:
+:7:2:2:20:hydes:
+:7:3:3:30:leathers:
+:7:3:4:40:chainmail:
+:7:1:7:50:platemail:
