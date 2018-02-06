@@ -12,13 +12,12 @@
 static DATA * data = NULL;
 
 /******************************************************************************
- * FUNCTION:    getp_item
- * ARGUMENTS:   ITEM* itm   -- The Item Being Generated
- *              int t       -- The Item Type
- *              int m       -- The Item Index
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    getp_item   -- Get Particular Item                            *
+ * ARGUMENTS:   ITEM* itm   -- The Item Being Generated                       *
+ *              int t       -- The Item Type                                  *
+ *              int m       -- The Item Index                                 *
+ * RETURNS:     bool                                                          *
+ * WARNING: Data line validity is not verified.                               *
  ******************************************************************************/
 bool getp_item(ITEM* itm, int t, int m )
 {
@@ -100,19 +99,14 @@ bool set_empty_item(ITEM* itm)
 {
     int i;
 
-    if( strncpy(itm->name, "empty", MAX_ITEM_NAME_LEN) == NULL )
-        return false;
+    if( strncpy( itm->name, "empty", MAX_ITEM_NAME_LEN) == NULL ) return false;
 
     itm->is_ = false;
     itm->is_equipped = false;
     itm->is_2handed = false;
     itm->type = NOT_PLACED;
 
-    for(i=0; i < MAX_ITEM_STATS; i++ )
-    {
-        itm->stats[i] = 0;
-
-    }/*end i<MAX_ITEM_STATS for*/
+    for(i=0; i < MAX_ITEM_STATS; i++ ) itm->stats[i] = 0;
 
     itm->worth = 0;
 
@@ -124,10 +118,8 @@ bool set_empty_item(ITEM* itm)
  * FUNCTION:    slot_of
  * ARGUMENTS:   ITEM* ptr
  * RETURNS:     int
- * WARNING:
- * NOTE:
  ******************************************************************************/
-int slot_of( ITEM* ptr )
+int slot_of( const ITEM* ptr )
 {
     switch( ptr->type )
     {
@@ -165,49 +157,44 @@ bool is_equipable( ITEM* im )//Will change as more types of items are added
  * WARNING:
  * NOTE:
  ******************************************************************************/
-void swap_item(ITEM* itmi, ITEM* itmj )
+void swap_item( ITEM* itmi, ITEM* itmj )
 {
     ITEM tmp;
     int i;
 
     /* Swap Names */
-    strcpy( tmp.name , itmi->name );
-   strcpy( itmi->name, itmj->name);
-    strcpy( itmj->name, tmp.name );
-
-//    tmp.name = itmi->name;
-//    itmi->name = itmj->name;
-//    itmj->name = tmp.name;
+    strncpy( tmp.name,   itmi->name, MAX_ITEM_NAME_LEN );
+    strncpy( itmi->name, itmj->name, MAX_ITEM_NAME_LEN );
+    strncpy( itmj->name, tmp.name,   MAX_ITEM_NAME_LEN );
 
     /* Swap Flags */
-    tmp.is_ = itmi->is_;
+    tmp.is_   = itmi->is_;
     itmi->is_ = itmj->is_;
     itmj->is_ = tmp.is_;
 
-    tmp.is_2handed = itmi->is_2handed;
+    tmp.is_2handed   = itmi->is_2handed;
     itmi->is_2handed = itmj->is_2handed;
-    itmj->is_2handed= tmp.is_2handed;
+    itmj->is_2handed = tmp.is_2handed;
 
-    tmp.is_equipped = itmi->is_equipped;
+    tmp.is_equipped   = itmi->is_equipped;
     itmi->is_equipped = itmj->is_equipped;
     itmj->is_equipped = tmp.is_equipped;
 
     /* Swap Types */
-    tmp.type = itmi->type;
+    tmp.type   = itmi->type;
     itmi->type = itmj->type;
     itmj->type = tmp.type;
-
 
     /* Swap Stats */
     for( i = 0; i < MAX_ITEM_STATS; i++ )
     {
-        tmp.stats[i] = itmi->stats[i];
+        tmp.stats[i]   = itmi->stats[i];
         itmi->stats[i] = itmj->stats[i];
         itmj->stats[i] = tmp.stats[i];
     }/* end MAX_ITEM_STATS for */
 
     /* Swap Worth */
-    tmp.worth = itmi->worth;
+    tmp.worth   = itmi->worth;
     itmi->worth = itmj->worth;
     itmj->worth = tmp.worth;
 
@@ -220,13 +207,13 @@ void swap_item(ITEM* itmi, ITEM* itmj )
  *              ITEM* itm_nu
  * RETURNS:     bool
  * WARNING:
- * NOTE:
+ * NOTE:        XXX UNUSED XXX
  ******************************************************************************/
-bool pick_up(ITEM* itm_ol, ITEM* itm_nu)
+void pick_up( ITEM* itm_ol, ITEM* itm_nu )
 {
     int i;
 
-    strcpy(itm_nu->name, itm_ol->name);
+    strncpy( itm_nu->name, itm_ol->name, MAX_ITEM_NAME_LEN );
 
     itm_nu->is_ = itm_ol->is_;
     itm_nu->is_2handed = itm_ol->is_2handed;
@@ -235,14 +222,9 @@ bool pick_up(ITEM* itm_ol, ITEM* itm_nu)
     itm_nu->type = itm_ol->type;
 
     for(i=0; i < MAX_ITEM_STATS; i++ )
-    {
         itm_nu->stats[i] = itm_ol->stats[i];
 
-    }/*end i<MAX_ITEM_STATS for*/
-
     itm_nu->worth = itm_ol->worth;
-
-    return true;/*WARNING: always succeeds*/
 }/* end pick_up func */
 
 
