@@ -326,3 +326,15 @@ int main( int argc, char* argv[] )
     /* TERMINATE PROGRAM */
     return 0;
 }/* end main func */
+
+
+///////////////////////////////////////////////////////////////////////////TODO:
+// wsay( where, "You have saved all your family "
+//              "and slaughered the humans." );
+// //TODO: output qt of family saved
+// mypause(0);//more();
+// wsay( where, "You smell another human settlement nearby, "
+//              "do you want to approach it? " );
+// //TODO: output direction and? you must attack from that direction
+// if( toupper(getch()) == 'Y' )
+

@@ -28,12 +28,11 @@
         case 'q':
         case 'Q': case KEY_ESC:         return QUIT;
         case 'g': case ',':             return PICK_UP;
-        case 'i':                       return INVENTORY;
+        case 'i': case 'I':             return INVENTORY;
         case 'e': case 'w':             return EQUIPMENT;
         case 'u': case 'T':             return REMOVE_ITEM;
         case 'd':                       return DROP_ITEM;
         case 'K':                       return DESTROY_ITEM;
-        case 'I':                       return DEBUG_ITEM;
         //TODO SAVE_GAME
         default:    return NO_ACTION;
     }/* End input Switch */
@@ -80,26 +79,26 @@ static int get_subi_cmd( void )
  int get_slot( char t )
 {
     switch (getch()) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':    return CANCEL;
-            case 'a': case 'A':
-                if( t == 'e' ) return 0; else if( t == 'u' )return 10;
-            case 'b': case 'B':
-                if( t == 'e' ) return 1; else if( t == 'u' )return 11;
-            case 'c': case 'C':
-                if( t == 'e' ) return 2; else if( t == 'u' )return 12;
-            case 'd': case 'D':
-                if( t == 'e' ) return 3; else if( t == 'u' )return 13;
-                else return NOT_PLACED;
-            case '1': if(( t == 'i' )||( t == 'u' ))return 1; else return 0;
-            case '2': if(( t == 'i' )||( t == 'u' ))return 2; else return 1;
-            case '3': if(( t == 'i' )||( t == 'u' ))return 3; else return 2;
-            case '4': if(( t == 'i' )||( t == 'u' ))return 4; else return 3;
-            case '5': if(( t == 'i' )||( t == 'u' ))return 5;
-            case '6': if(( t == 'i' )||( t == 'u' ))return 6;
-            case '7': if(( t == 'i' )||( t == 'u' ))return 7;
-            case '8': if(( t == 'i' )||( t == 'u' ))return 8;
-            case '9': if(( t == 'i' )||( t == 'u' ))return 9;
-            case '0': if(( t == 'i' )||( t == 'u' ))return 0;
+        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+        case 'a': case 'A':
+            if( t == 'e' ) return 0; else if( t == 'u' )return 10;
+        case 'b': case 'B':
+            if( t == 'e' ) return 1; else if( t == 'u' )return 11;
+        case 'c': case 'C':
+            if( t == 'e' ) return 2; else if( t == 'u' )return 12;
+        case 'd': case 'D':
+            if( t == 'e' ) return 3; else if( t == 'u' )return 13;
+            else return NOT_PLACED;
+        case '1': if(( t == 'i' )||( t == 'u' ))return 1; else return 0;
+        case '2': if(( t == 'i' )||( t == 'u' ))return 2; else return 1;
+        case '3': if(( t == 'i' )||( t == 'u' ))return 3; else return 2;
+        case '4': if(( t == 'i' )||( t == 'u' ))return 4; else return 3;
+        case '5': if(( t == 'i' )||( t == 'u' ))return 5;
+        case '6': if(( t == 'i' )||( t == 'u' ))return 6;
+        case '7': if(( t == 'i' )||( t == 'u' ))return 7;
+        case '8': if(( t == 'i' )||( t == 'u' ))return 8;
+        case '9': if(( t == 'i' )||( t == 'u' ))return 9;
+        case '0': if(( t == 'i' )||( t == 'u' ))return 0;
         default: return NOT_PLACED;
     }/* End input Switch */
 }/* End get_slot Func */
@@ -118,42 +117,6 @@ static int get_subi_cmd( void )
         default: return NOT_PLACED;
     }/* End input Switch */
 }/* End get_hand Func */
-
-
-/******************************************************************************
- * FUNCTION:    story_line                                                    *
- * ARGUMENTS:   short   when    --  Storyline Time (eg: INTRO, END, etc...)   *
- *              WINDOW* where   --  Window to display the message to.         *
- * RETURNS:     int                                                           *
- ******************************************************************************/
- int story_line( short when, WINDOW* where )
-{
-    int opt = 0;
-
-    switch( when ) {
-        case BEGINNING:
-            break;
-        case MIDDLE:
-            if( where == NULL ) break;
-            wsay( where, "You have saved all your family "
-                         "and slaughered the humans." );
-            //TODO: output qt of family saved
-            mypause(0);//more();
-            wsay( where, "You smell another human settlement nearby, "
-                         "do you want to approach it? " );
-            //TODO: output direction and? you must attack from that direction
-            if( toupper(getch()) == 'Y' ) opt = 0;
-            else opt = 0;
-            break;
-        case END:
-            if( where == NULL ) break;
-            break;
-        default:
-            opt = NO_ACTION;
-    }/* End when Switch */
-
-    return opt;
-}/* End story_line Func */
 
 
 /******************************************************************************

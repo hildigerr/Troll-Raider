@@ -36,20 +36,6 @@
 
 
 /******************************************************************************
- * FUNCTION:    story_line                                                    *
- * ARGUMENTS:   short   when    --  Storyline Time (eg: INTRO, END, etc...)   *
- *              WINDOW* where   --  Window to display the message to.         *
- * RETURNS:     int                                                           *
- ******************************************************************************/
-/* Storyline Time Definitions */
-#define INTRO     0
-#define BEGINNING 1
-#define MIDDLE    2
-#define END       3
- int story_line( short when, WINDOW* where );
-
-
-/******************************************************************************
  * FUNCTION:skill_check
  * ARGUMENTS:int ability, int adjust
  * RETURNS:bool

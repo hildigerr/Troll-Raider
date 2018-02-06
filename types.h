@@ -30,7 +30,6 @@
 #define REMOVE_ITEM  14
 #define DESTROY_ITEM 15
 #define PICK_UP      16
-#define DEBUG_ITEM   -9
 
 /* Character Abilities */
 #define STR         0 /*Strength*/
