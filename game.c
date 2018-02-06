@@ -161,11 +161,13 @@ static int get_subi_cmd( void )
  *    REMOVE_ITEM -- Unequip an item, keeping it ininventory.                 *
  *    DESTROY_ITEM -- Destroy an item so that it no longer exists.            *
  ******************************************************************************/
+ #define BUFFER_SIZE 80
  bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd )
 {
     ITEM * itmptr;
     unsigned int i; /* iterator */
     bool done_with_sub = false;
+    char buf[BUFFER_SIZE];
 
     while( done_with_sub == false) {
 
@@ -188,28 +190,35 @@ static int get_subi_cmd( void )
                 if( cnt == 0 ) say("You have nothing equipped.");
 
                 else if( cnt == 1 ) { /* assume unequipping that one */
-                    // TODO: Use item's name.
-                    say("Do you really want to remove that item? ");
+                    snprintf( buf, BUFFER_SIZE,
+                        "Do you really want to remove your %s?", itmptr->name );
+                    say( buf );
                     if( toupper( getch() ) == 'Y' ) {
                         pc->equip[j] = NULL;
                         itmptr->is_equipped = false;
-                        say("Item removed");
+                        snprintf( buf,BUFFER_SIZE, "%s removed", itmptr->name );
+                        say( buf );
                         done_with_sub = true;
-                    }/* end affirm remove item if */
-                    else say("Canceled! Item still equipped.");
+                    } else { /* Assume Negative Response */
+                        snprintf( buf, BUFFER_SIZE,
+                            "Canceled! %s still equipped.", itmptr->name );
+                        say( buf );
+                    }/* End Canceled Else */
                 }/* end only one item to unequip if */
 
                 else { /* Select Slot */
                     do{ say("Remove which item? "); }
                     while( ( cnt = get_e_slot() ) == NOT_PLACED );
 
-                    if( cnt == CANCEL ) say("Canceled: Item still equipped.");
+                    if( cnt == CANCEL ) say("Canceled: Items still equipped.");
                     else if( pc->equip[cnt] == NULL )
                         say("You have no item equipped for that slot");
                     else{
+                        snprintf( buf,BUFFER_SIZE,
+                            "%s removed", pc->equip[cnt]->name );
+                        say( buf );
                         pc->equip[cnt]->is_equipped = false;
                         pc->equip[cnt] = NULL;
-                        say("Item removed");
                         done_with_sub = true;
                     }/* end remove item else */
                 }/* end more than one item to remove else */
