@@ -218,6 +218,8 @@ static int get_subi_cmd( void )
                             "%s removed", pc->equip[cnt]->name );
                         say( buf );
                         pc->equip[cnt]->is_equipped = false;
+                        if( pc->equip[cnt]->is_2handed )
+                            pc->equip[(cnt==WEP)?OFF:WEP] = NULL;
                         pc->equip[cnt] = NULL;
                         done_with_sub = true;
                     }/* end remove item else */
@@ -237,9 +239,9 @@ static int get_subi_cmd( void )
 
                 /* Verify Equipability */
                 if( !is_equipable(itmptr) )
-                    say("You cannot equip that item.");
+                    say("You cannot equip that item."); // TODO use name
                 else if( itmptr->is_equipped )
-                    say("That item is already equipped.");
+                    say("That item is already equipped."); // TODO use name
 
                 /* Check item type and slot if needed */
                 else switch( slot_of_itmptr ) {
@@ -284,19 +286,36 @@ static int get_subi_cmd( void )
                         if( pc->equip[WEP] == NULL ) slot = WEP;
                         /* else arm in offhand without hesitation if possible */
                         else if( pc->equip[OFF] == NULL ) slot = OFF;
-                        if( slot == NOT_PLACED ) {
-                            /* Ask if want to replace 1st or 2nd Slot */
-                            say("Replace which item?");
-                            slot = get_hand();
+
+                        else { /* Otherwise we Have to Ask */
+                            if( pc->equip[OFF]->is_2handed ) {
+                                    snprintf( buf, BUFFER_SIZE,
+                                        "Are you sure you want to replace the %s "
+                                        "you currently have equipped? ",
+                                            pc->equip[OFF]->name );
+                                    say(buf);
+                                    if( toupper(getch()) == 'Y' ) {
+                                        /* Begin Unequiping of old item */
+                                        pc->equip[OFF] = NULL;
+                                        slot = WEP;
+                                    }/* End Affirm Swaping If */
+                            } else { /* Dual Wielding */
+                                /* Ask if want to replace 1st or 2nd Slot */
+                                say("Replace which item?");
+                                slot = get_hand();
+                            }/* End Dual Wield Else */
+
+                            /* Complete Unequiping of Old Item  */
                             if( ( slot == WEP )||( slot == OFF ) ) {
                                 pc->equip[slot]->is_equipped = false;
                                 snprintf( buf, BUFFER_SIZE,
                                     "%s removed!", pc->equip[slot]->name );
                                 say(buf);
-                            }/* En Swapped If *//* Else Assume Canceled */
-                        }/* End ask for slot Else */
+                                //TODO: takes extra turn.
+                            }/* End unequiping If */
+                        }/* End Ask Else */
 
-                        /* Equip Selection */
+                        /* Equip New Item */
                         if( ( slot == WEP )||( slot == OFF ) ) {
                             snprintf( buf, BUFFER_SIZE,
                                 "%s equipped!", itmptr->name );
@@ -311,14 +330,68 @@ static int get_subi_cmd( void )
                         }/* End Canceled Else */
                     } /* End WEP Case */ break;
 
-                    case OFF: /* These are all 2handed weapons *///TODO
-                        if( itmptr->is_2handed == false ) Error( "Strange Item!", itmptr->type );
-                        //if 2handed confirm unequip if necessary else equip
-                        //else not 2handed and...there are no 2handed weapons to return off
-                        break;
-                    //case MAX_SLOTS://which one to use????
+                    case OFF: { /* Two-handed Weapons */
+                        #define EMPTY_HANDED 0
+                        #define WEP_ONLY     1
+                        #define OFF_ONLY     2
+                        #define DUAL_WIELD   3
+                        #define TWO_HANDED   7
+                        int determinent = ( (pc->equip[WEP])? 1 : 0 ) +
+                            ( (pc->equip[OFF])?
+                                ( (pc->equip[OFF]->is_2handed)? 6 : 2 ) : 0 );
+                        char yn = 'A'; /* Ask */
 
-                    default: Error( "Hit switch default!", slot_of(itmptr) );
+                        assert( itmptr->is_2handed );
+
+                        if( determinent == DUAL_WIELD )
+                            snprintf( buf, BUFFER_SIZE,
+                                "Are you sure you want to replace "
+                                "the %s and %s with your %s? ",
+                                    pc->equip[WEP]->name, pc->equip[OFF]->name,
+                                        itmptr->name );
+                        else if( determinent > EMPTY_HANDED )
+                            snprintf( buf, BUFFER_SIZE,
+                                "Are you sure you want to replace "
+                                "your %s with your %s? ",
+                                    (determinent == WEP_ONLY)?
+                                        pc->equip[WEP]->name :
+                                        pc->equip[OFF]->name,
+                                        itmptr->name );
+                        else yn = 'Y'; /* EMPTY_HANDED -- Assume Yes */
+
+                        if( yn != 'Y' ) { say(buf); yn = toupper(getch()); }
+
+                        if( yn == 'Y' ) { /* Unequip old and Equip new */
+
+                            /* Uneqip Old Item *///TODO say it's so, take extra turn(s)
+                            if( pc->equip[WEP] )
+                                pc->equip[WEP]->is_equipped = false;
+                            if( pc->equip[OFF] )
+                                pc->equip[OFF]->is_equipped = false;
+
+                            /* Equip New Item */
+                            snprintf( buf, BUFFER_SIZE,
+                                "%s equipped!", itmptr->name );
+                            say(buf);
+                            itmptr->is_equipped = true;
+                            pc->equip[WEP] = itmptr; //XXX Is this how I want to do it?
+                            pc->equip[OFF] = itmptr; //XXX Point both hands to the same item.
+                            done_with_sub = true;
+
+                        } else { /* Canceled */
+                            snprintf( buf, BUFFER_SIZE, "Canceled:"
+                                " %s not equipped.", itmptr->name );
+                            say(buf);
+                        }/* End Canceled Else */
+
+
+                    }/* End OFF Case */ break;
+
+                    default: /* This should be dead code: */
+                        ERROR( "Invalid item",
+                               "verify datafile not corrupted!",slot_of_itmptr);
+                        assert( slot_of_itmptr == MAX_SLOTS ); /* Should Pass */
+                        assert( slot_of_itmptr != MAX_SLOTS ); /* Force Fail  */
                 }/* end slot switch */
             }/* end EQUIPMENT sub cmd */ break;
 

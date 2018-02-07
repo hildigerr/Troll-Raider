@@ -27,9 +27,11 @@ void set_empty_item( ITEM * itm );
 
 
 /******************************************************************************
- * FUNCTION:    slot_of
- * ARGUMENTS:   ITEM* ptr
- * RETURNS:     int
+ * FUNCTION:    slot_of         -- What is the equipment slot for the item?   *
+ * ARGUMENTS:   ITEM * ptr      -- The item in question.                      *
+ * RETURNS:     int             -- A slot or MAX_SLOTS if not equipable.      *
+ * NOTE: Valid euipments slots are WEP, OFF, ARM, and HAT.                    *
+ *       WEP items may be used in the OFF hand. OFF items are two handed.     *
  ******************************************************************************/
 int slot_of( const ITEM* ptr );
 

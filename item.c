@@ -112,23 +112,21 @@ void set_empty_item( ITEM* itm )
 
 
 /******************************************************************************
- * FUNCTION:    slot_of
- * ARGUMENTS:   ITEM* ptr
- * RETURNS:     int
+ * FUNCTION:    slot_of         -- What is the equipment slot for the item?   *
+ * ARGUMENTS:   ITEM * ptr      -- The item in question.                      *
+ * RETURNS:     int             -- A slot or MAX_SLOTS if not equipable.      *
+ * NOTE: Valid euipments slots are WEP, OFF, ARM, and HAT.                    *
+ *       WEP items may be used in the OFF hand. OFF items are two handed.     *
  ******************************************************************************/
-int slot_of( const ITEM* ptr )
+int slot_of( const ITEM * ptr )
 {
-    switch( ptr->type )
-    {
-        case MELEE: return WEP;//melee
-        case REACH: return OFF;//reach
-        case RANGE1: return WEP;//range//was off
-        case RANGE2: return OFF;
-        case SHIELD: return WEP;//shields//was off
-        case TYPHAT: return HAT;//hats
-        case TYPARM: return ARM;//body
-        default: return WEP;//TODO figure out safe way to handle exceptions//was BAD_SLOT
-    }
+    switch( ptr->type ) {
+        case MELEE: case SHIELD: case RANGE1:   return WEP;
+        case REACH: case RANGE2:                return OFF;
+        case TYPARM:                            return ARM;
+        case TYPHAT:                            return HAT;
+        default:                                return MAX_SLOTS;
+    }/* End type Switch */
 }/* end slot_of func */
 
 
