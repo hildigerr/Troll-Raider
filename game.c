@@ -400,15 +400,25 @@ static int get_subi_cmd( void )
                 do{ say("Destroy which item? "); }
                 while( (cmd = get_u_slot()) == NOT_PLACED );
 
-                if( cmd == CANCEL ) say("Canceled. Nothing was destroyed.");
+                if( cmd == CANCEL ) {
+                    say("Canceled. Nothing was destroyed.");
+                    continue;
+                }/* End Cancel If */
 
-                else if( cmd < MAX_HOLD )/* User Selects Item */ {
+                if( cmd < MAX_HOLD )/* User Selects Item */ {
                     /* Check for item existence @ slot location */
                     if( pc->inventory[cmd].is_ == false )
                         say("You have no item in that slot.");
-                    else /* There is a real item there */ {
+                    else if( pc->inventory[cmd].is_equipped ) {
+                        for( i = 0; i < MAX_SLOTS; i++ ) {
+                            if( pc->equip[i] == &(pc->inventory[cmd]) ) {
+                                cmd = i+10; break;
+                            }/* End Find Equip Slot If */
+                        }/* End MAX_SLOTS For */
+                    } else { /* There is a real and unequpped item there */
                         /* confirm destruction -- last chance */
-                        say("Last chance: Are you sure you want to destroy that item? ");
+                        say("Last chance: "
+                            "Are you sure you want to destroy that item? ");
                         if( toupper(getch()) == 'Y' ) {
                             /* destroy item */
                             set_empty_item(&(pc->inventory[cmd]));
@@ -419,14 +429,15 @@ static int get_subi_cmd( void )
                     }/* end real item else */
                 }/* end item selection if */
 
-                else if( cmd < (MAX_SLOTS+10) )/* User Selects Equip */ {
+                if( cmd < (MAX_SLOTS+10) )/* User Selects Equip */ {
                     cmd -= 10;
                     /* Check for item existence @ slot location */
                     if( pc->equip[cmd] == NULL )
                         say("You have no item equipped in that slot.");
                     else /* item exists */ {
                         /* confirm destruction -- last chance */
-                        say("Last chance: Are you sure you want to destroy that item? ");
+                        say("Last chance: "
+                            "Are you sure you want to destroy that item? ");
                         if( toupper(getch()) == 'Y' ) {
                             /* destroy item */
                             set_empty_item(pc->equip[cmd]);
@@ -437,8 +448,6 @@ static int get_subi_cmd( void )
                             say("Canceled. Nothing was destroyed.");
                     }/* end item exists else */
                 }/* end equip select if */
-                else/* Handle Impossible Errors */
-                    Barf( "You broke it!", FAIL );
             }/* end DESTROY_ITEM case */ break;
 
             case DROP_ITEM: {
