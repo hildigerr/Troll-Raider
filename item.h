@@ -1,6 +1,7 @@
-/* $Id: item.h,v 1.3 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
- * item -- item Utility Functions.                                            *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
+ * item .h -- item Utility Functions.                                         *
  ******************************************************************************/
 #pragma once
 
@@ -9,14 +10,14 @@
 
 
 /******************************************************************************
- * FUNCTION:    getp_item   -- Get Particular Item                            *
- * ARGUMENTS:   ITEM* itm   -- The Item Being Generated                       *
- *              int t       -- The Item Type                                  *
- *              int m       -- The Item Index                                 *
+ * FUNCTION:    getp_item      -- Get Particular Item                         *
+ * ARGUMENTS:   ITEM * itm     -- The Item Being Generated                    *
+ *              int    t       -- The Item Type                               *
+ *              int    m       -- The Item Index                              *
  * RETURNS:     bool                                                          *
  * WARNING: Data line validity is not verified.                               *
  ******************************************************************************/
-bool getp_item( ITEM* itm, int t, int m );
+bool getp_item( ITEM * itm, int t, int m );
 
 
 /******************************************************************************
@@ -33,35 +34,35 @@ void set_empty_item( ITEM * itm );
  * NOTE: Valid euipments slots are WEP, OFF, ARM, and HAT.                    *
  *       WEP items may be used in the OFF hand. OFF items are two handed.     *
  ******************************************************************************/
-int slot_of( const ITEM* ptr );
+int slot_of( const ITEM * ptr );
 
 
 /******************************************************************************
  * FUNCTION:    is_equipable
- * ARGUMENTS:   ITEM* im
+ * ARGUMENTS:   ITEM * im
  * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool is_equipable( ITEM* im );
+bool is_equipable( ITEM * im );
 
 /******************************************************************************
  * FUNCTION:    swap_item
- * ARGUMENTS:   ITEM* itmi
+ * ARGUMENTS:   ITEM * itmi
  * WARNING:
  * NOTE:
  ******************************************************************************/
-void swap_item( ITEM* itmi, ITEM* itmj );
+void swap_item( ITEM * itmi, ITEM * itmj );
 
 
 /******************************************************************************
  * FUNCTION:    pick_up
- * ARGUMENTS:   ITEM* itm_ol
- *              ITEM* itm_nu
+ * ARGUMENTS:   ITEM * itm_ol
+ *              ITEM * itm_nu
  * WARNING:
  * NOTE:        XXX UNUSED XXX
  ******************************************************************************/
-void pick_up( ITEM* itm_ol, ITEM* itm_nu );
+void pick_up( ITEM * itm_ol, ITEM * itm_nu );
 
 
 

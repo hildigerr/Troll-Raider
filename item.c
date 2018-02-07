@@ -1,6 +1,6 @@
-/* $Id: item.c,v 1.6 2014/01/13 06:26:02 moonsdad Exp $ */
 /******************************************************************************
- * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
  * item.c -- item Utility Functions.                                          *
  ******************************************************************************/
 
@@ -13,14 +13,14 @@
 static DATA * data = NULL;
 
 /******************************************************************************
- * FUNCTION:    getp_item   -- Get Particular Item                            *
- * ARGUMENTS:   ITEM* itm   -- The Item Being Generated                       *
- *              int t       -- The Item Type                                  *
- *              int m       -- The Item Index                                 *
+ * FUNCTION:    getp_item      -- Get Particular Item                         *
+ * ARGUMENTS:   ITEM * itm     -- The Item Being Generated                    *
+ *              int    t       -- The Item Type                               *
+ *              int    m       -- The Item Index                              *
  * RETURNS:     bool                                                          *
  * WARNING: Data line validity is not verified.                               *
  ******************************************************************************/
-bool getp_item( ITEM* itm, int t, int m )
+bool getp_item( ITEM * itm, int t, int m )
 {
     int i, j, ix[ITEM_DATA_ELEMENT_QT];
     char ** s, * cptr;
@@ -94,7 +94,7 @@ bool getp_item( ITEM* itm, int t, int m )
  * FUNCTION:    set_empty_item                                                *
  * ARGUMENTS:   ITEM *   itm                                                  *
  ******************************************************************************/
-void set_empty_item( ITEM* itm )
+void set_empty_item( ITEM * itm )
 {
     int i;
 
@@ -132,12 +132,12 @@ int slot_of( const ITEM * ptr )
 
 /******************************************************************************
  * FUNCTION:    is_equipable
- * ARGUMENTS:   ITEM* im
+ * ARGUMENTS:   ITEM * im
  * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool is_equipable( ITEM* im )//Will change as more types of items are added
+bool is_equipable( ITEM * im )//Will change as more types of items are added
 {
     if(( im->type > 0 )&&(im->type < MAX_ITEM_TYPES))
         return true;
@@ -148,11 +148,11 @@ bool is_equipable( ITEM* im )//Will change as more types of items are added
 
 /******************************************************************************
  * FUNCTION:    swap_item
- * ARGUMENTS:   ITEM* itmi
+ * ARGUMENTS:   ITEM * itmi
  * WARNING:
  * NOTE:
  ******************************************************************************/
-void swap_item( ITEM* itmi, ITEM* itmj )
+void swap_item( ITEM * itmi, ITEM * itmj )
 {
     ITEM tmp;
     int i;
@@ -198,13 +198,13 @@ void swap_item( ITEM* itmi, ITEM* itmj )
 
 /******************************************************************************
  * FUNCTION:    pick_up
- * ARGUMENTS:   ITEM* itm_ol
- *              ITEM* itm_nu
+ * ARGUMENTS:   ITEM * itm_ol
+ *              ITEM * itm_nu
  * RETURNS:     bool
  * WARNING:
  * NOTE:        XXX UNUSED XXX
  ******************************************************************************/
-void pick_up( ITEM* itm_ol, ITEM* itm_nu )
+void pick_up( ITEM * itm_ol, ITEM * itm_nu )
 {
     int i;
 

@@ -1,7 +1,7 @@
-/* $Id: calc.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
- * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
- * calc -- My Math Functions.                                                 *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
+ * calc.h -- My Math Functions.                                               *
  ******************************************************************************/
 #pragma once
 

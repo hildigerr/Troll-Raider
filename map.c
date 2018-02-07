@@ -1,6 +1,6 @@
-/* $Id: map.c,v 1.7 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
- * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
  * map.c -- Map Utility Functions.                                            *
  ******************************************************************************/
 
@@ -22,13 +22,13 @@ static double dist( COORD a, COORD b )
 
 /******************************************************************************
  * FUNCTION:    set_loc
- * ARGUMENTS:   char t
- *              LOC* s
+ * ARGUMENTS:   char  t
+ *              LOC * s
  * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool set_loc( char t, LOC* s )//type spot
+bool set_loc( char t, LOC * s )//type spot
 {
     switch(t) {
         case 'w': case 'W': case '#'://WALL
@@ -71,15 +71,15 @@ bool set_loc( char t, LOC* s )//type spot
 
 /******************************************************************************
  * FUNCTION:    fill
- * ARGUMENTS:   char    t
- *              LEVEL*  l
- *              COORD   d
- *              COORD   c
+ * ARGUMENTS:   char     t
+ *              LEVEL *  l
+ *              COORD    d
+ *              COORD    c
  * RETURNS:     bool
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-bool fill( char t, LEVEL* l, COORD d, COORD c )
+bool fill( char t, LEVEL * l, COORD d, COORD c )
 {
     int i, j, s = smallest(d.colx,c.colx),
         b[2] = { biggest(d.rowy,c.rowy), biggest(d.colx,c.colx) };
@@ -97,7 +97,7 @@ bool fill( char t, LEVEL* l, COORD d, COORD c )
 /******************************************************************************
  * FUNCTION:    init_lv
  * ARGUMENTS:   LEVEL *  l
- *              short   t
+ *              short    t
  * WARNING:
  * NOTE:
  ******************************************************************************/
@@ -134,30 +134,30 @@ void init_lv( LEVEL * l, short t )
  * WARNING:
  * NOTE:
  ******************************************************************************/
-char get_map_icon(LOC here)
+char get_map_icon( LOC here )
 {
-    if( here.is_visible != true ) return ' ';
-    else if( here.is_wall == true ) return '#';
+    if( here.is_visible != true )       return ' ';
+    else if( here.is_wall == true )     return '#';
     else if( here.is_occupied == true ) return 'o';//tempfortest
-    else if( here.litter.is_ == true ) return '&';//tempfortest
-    else if( here.is_floor == true ) return '.';
-    else if( here.is_door == true ) return '+';
-    else if( here.is_ustair == true ) return '>';
-    else if( here.is_dstair == true ) return '<';
-    else if( here.is_trap == true ) return 'x';//tempfortest
-    else return '&';//DEBUG SYMBOL
+    else if( here.litter.is_ == true )  return '&';//tempfortest
+    else if( here.is_floor == true )    return '.';
+    else if( here.is_door == true )     return '+';
+    else if( here.is_ustair == true )   return '>';
+    else if( here.is_dstair == true )   return '<';
+    else if( here.is_trap == true )     return 'x';//tempfortest
+    else                                return '&';//DEBUG SYMBOL
 }/* end get_map_icon func */
 
 
 /******************************************************************************
  * FUNCTION:    buildgen
- * ARGUMENTS:   LEVEL*  outside
- *              LEVEL*  inside
+ * ARGUMENTS:   LEVEL *  outside
+ *              LEVEL *  inside
  * RETURNS:     int
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool buildgen( LEVEL* outside, LEVEL* inside )
+bool buildgen( LEVEL * outside, LEVEL * inside )
 {
     int r, c, i, j;
     bool found_first;
@@ -199,7 +199,8 @@ bool buildgen( LEVEL* outside, LEVEL* inside )
                             }/* end place exit door else */
                         }/* end is_wall if */
             }/* end is_trap if */
-/* TODO: Generate sub buildings attached to main buildings with tunnels */
+
+    /* TODO: Generate sub buildings attached to main buildings with tunnels */
 
     return true;//warning always succeeds
 }/* end buildgen */

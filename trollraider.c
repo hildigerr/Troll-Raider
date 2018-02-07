@@ -1,15 +1,14 @@
-/* $Id: trollraider.c,v 1.5 2014/01/13 08:50:50 moonsdad Exp $ */
-
 /******************************************************************************
  *                             Troll Raider                                   *
- * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
+ * Created by:      Roberto Morrel HildigerR Vergaray                         *
  ******************************************************************************/
+
+#define VERSION "0.4.1"
 
 /* System Headers */
 #include <time.h>
 
 /* Local Headers */
-#include "trollraider.h"
 #include "game.h"
 #include "player.h"
 #include "item.h"
@@ -241,7 +240,7 @@ int main( int argc, char* argv[] )
             }/* end cmd in MOVING range if */
 
             /* Inventory and Equipment Managment */
-            else if( ( cmd >= INVENTORY )&&( cmd <= DESTROY_ITEM) ) {
+            else if( ( cmd >= INVENTORY )&&( cmd <= DESTROY_ITEM ) ) {
                 /* Create Data Display Windows */
                 cmd_list[0] = newwin((MAX_ROW - BTM_SUB_ROWS ),(BTM_SUB_COLS - RT_SUB_COLS),0,0);
                 if( cmd_list[0] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 0); }

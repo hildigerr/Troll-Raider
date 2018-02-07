@@ -1,6 +1,6 @@
 /******************************************************************************
  *                             rmhv_stdlib.h                                  *
- * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
+ * Created by:      Roberto Morrel HildigerR Vergaray                         *
  *                                                                            *
  *    Includes memory allocation macros from the book                         *
  *      "Advanced C Techniques & Applications"                                *
@@ -57,9 +57,9 @@
 #define CALLOC(n,x) ((x*)calloc(n,sizeof(x)))
 
 /* Prototypes */
-int _ERROR( const char* who, const char* barf, int status, bool debug );
-size_t stricpy( char* dest, const char* src, size_t n );
-void mypause ( int );
+int _ERROR( const char * who, const char * barf, int status, bool debug );
+size_t stricpy( char * dest, const char * src, size_t n );
+void mypause( bool display_prompt );
 
 
 /************************************EOF***************************************/

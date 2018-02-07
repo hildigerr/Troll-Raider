@@ -1,7 +1,7 @@
 /******************************************************************************
- *  Troll Raider
- *      by Roberto Morrel HildigerR Vergaray
- * dat.c -- Load Data from Files
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
+ * dat.c -- Load Data from Files                                              *
  ******************************************************************************/
 
 #include "rmhv_stdlib.h"
@@ -11,7 +11,12 @@
 
 #define BUFFER_SIZE 80
 
-
+/******************************************************************************
+ * FUNCTION:    load_data               -- Load data from a file.             *
+ * ARGUMENTS:   const char * file       -- The name of the data file.         *
+ * RETURNS:     DATA *                  -- Newly allocated data from file.    *
+ * WARNING: Data contents must be freed before freeing the DATA item itself.  *
+ ******************************************************************************/
 DATA * load_data( const char * file )
 {
     FILE * datafile = fopen( file, READ_ONLY );
@@ -120,7 +125,7 @@ int main ()
 {
     int i,j;
     char * title[] = {  "money", "melee", "reach", "range",
-                        "2hrange", "shield", "hat", "body"}, ** cptr;
+                        "2hrange", "shield", "hat", "body"  }, ** cptr;
     DATA * data = load_data( "dat/item.dat" );
     cptr = data->lines;
 

@@ -1,6 +1,7 @@
-/* $Id: player.h,v 1.4 2014/01/13 08:50:50 moonsdad Exp $ */
 /******************************************************************************
- * player -- Player Character Utility Functions.                              *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
+ * player.h -- Player Character Utility Functions.                            *
  ******************************************************************************/
 #pragma once
 
@@ -34,7 +35,7 @@
  * NOTE: NPC_TTROLL[0] is the Player.                                         *
  * TODO: Perhaps do rng(data->qt[QT_LINES]) and remove lines for uniques.     *
  ******************************************************************************/
- bool init_mon( PLAYER* who, int t );
+ bool init_mon( PLAYER * who, int t );
 
 
 

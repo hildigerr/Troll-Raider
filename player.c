@@ -1,6 +1,6 @@
-/* $Id: player.c,v 1.6 2014/01/13 08:50:50 moonsdad Exp $ */
 /******************************************************************************
- * 7drl0 :  _ Troll Raider _   by Roberto Morrel HildigerR Vergaray           *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
  * player.c -- Player Character Utility Functions.                            *
  ******************************************************************************/
 
@@ -27,7 +27,7 @@ static DATA * data = NULL;
 /******************************************************************************
  * FUNCTION:    equip_me      -- Select starting equipment for a characater.  *
  * ARGUMENTS:   PLAYER * who  -- The character to equip.                      *
- *              char * line   -- The string describing how to allocate gear.  *
+ *              char   * line -- The string describing how to allocate gear.  *
  * NOTE:  line format is ":I:Q:N:T:M:...:@Name:"                              *
  *   where  I = Type Number                                                   *
  *          Q = Max Qt of Starting Equipment                                  *

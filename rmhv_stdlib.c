@@ -1,6 +1,6 @@
 /******************************************************************************
  *                             rmhv_stdlib.c                                  *
- * Created by:      Roberto Morrel HildigerR Vergaray <moonsdad@gmail.com>    *
+ * Created by:      Roberto Morrel HildigerR Vergaray                         *
  ******************************************************************************/
 
 #include "rmhv_stdlib.h"
@@ -23,12 +23,12 @@
  * Suggested Usage:                                                           *
  *      exit( ERROR( who, "Your error message", status ) );                   *
  ******************************************************************************/
-int _ERROR( const char* who, const char* barf, int status, bool debug )
+int _ERROR( const char * who, const char * barf, int status, bool debug )
 {
     fprintf( stderr, "\n%s",  (debug)? "":"ERROR: ");
-    if( who ) fprintf( stderr, "%s: ", who );
+    if( who )  fprintf( stderr, "%s: ", who );
     if( barf ) fprintf( stderr, "%s ", barf );
-    (status)? fprintf( stderr, "[%d]\n\n", status ): fprintf( stderr, "\n\n" );
+    (status)?  fprintf( stderr, "[%d]\n\n", status ): fprintf( stderr, "\n\n" );
     return status;
 }/* end _ERROR func */
 
@@ -44,7 +44,7 @@ int _ERROR( const char* who, const char* barf, int status, bool debug )
  * checking, and only assign one null string terminator.                      *
  * WARNING: If dest is completely filled it will not be null terminated.      *
  ******************************************************************************/
-size_t stricpy( char* dest, const char* src, size_t n )
+size_t stricpy( char * dest, const char * src, size_t n )
 {
     size_t i; /* Itteration Counter */
 
@@ -61,10 +61,9 @@ size_t stricpy( char* dest, const char* src, size_t n )
 /******************************************************************************
  * FUNCTION:    mypause                                                       *
  ******************************************************************************/
-void mypause( int display_prompt )
+void mypause( bool display_prompt )
 {
-    if( display_prompt )
-        printf( "Press [Enter] to continue . . ." );
+    if( display_prompt ) printf( "Press [Enter] to continue . . ." );
     fflush( stdout );
 //    fpurge( stdin );
     getchar();

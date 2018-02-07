@@ -1,6 +1,7 @@
-/* $Id: map.h,v 1.4 2014/01/13 08:50:49 moonsdad Exp $ */
 /******************************************************************************
- * map -- Map Utility Functions.                                              *
+ *  Troll Raider                                                              *
+ *      by Roberto Morrel HildigerR Vergaray                                  *
+ * map.h -- Map Utility Functions.                                            *
  ******************************************************************************/
  #pragma once
 
@@ -13,33 +14,33 @@
 
 /******************************************************************************
  * FUNCTION:    set_loc
- * ARGUMENTS:   char t
- *              LOC* s
+ * ARGUMENTS:   char  t
+ *              LOC * s
  * RETURNS:     int
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool set_loc( char t, LOC* s );
+bool set_loc( char t, LOC * s );
 
 
 /******************************************************************************
  * FUNCTION:    fill
- * ARGUMENTS:   char    t
- *              LEVEL*  l
- *              COORD   d
- *              COORD   c
+ * ARGUMENTS:   char     t
+ *              LEVEL *  l
+ *              COORD    d
+ *              COORD    c
  * RETURNS:     int
  * WARNING:
  * NOTE://map, door row, door col, corner row, corner column
  ******************************************************************************/
-bool fill( char t, LEVEL* l, COORD d, COORD c );
+bool fill( char t, LEVEL * l, COORD d, COORD c );
 #define fill_wall(x,y,z) fill('w', x,y,z)
 #define fill_floor(x,y,z) fill('.', x,y,z)
 
 /******************************************************************************
  * FUNCTION:    init_lv
- * ARGUMENTS:   LEVEL*  l
- *              short   t
+ * ARGUMENTS:   LEVEL *  l
+ *              short    t
  * WARNING:
  * NOTE:
  ******************************************************************************/
@@ -57,13 +58,13 @@ char get_map_icon(LOC here);
 
 /******************************************************************************
  * FUNCTION:    buildgen
- * ARGUMENTS:   LEVEL*  outside
- *              LEVEL*  inside
+ * ARGUMENTS:   LEVEL *  outside
+ *              LEVEL *  inside
  * RETURNS:     int
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool buildgen( LEVEL* outside, LEVEL* inside );
+bool buildgen( LEVEL * outside, LEVEL * inside );
 
 /******************************************************************************
  * FUNCTION:
@@ -72,7 +73,7 @@ bool buildgen( LEVEL* outside, LEVEL* inside );
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool towngen( LEVEL* l, unsigned short n );
+bool towngen( LEVEL * l, unsigned short n );
 
 
 
