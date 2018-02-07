@@ -74,7 +74,7 @@ static int get_subi_cmd( void )
 {
     int input = getch();
     switch ( input ) {
-        case KEY_ESC: case ' ': case 'q': case 'Q': return CANCEL;
+        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
         case '1': case '2': case '3': case '4': case '5': case '6': case '7':
         case '8': case '9': case '0': return input - '0';
         default: return NOT_PLACED;
@@ -225,12 +225,15 @@ static int get_subi_cmd( void )
             }/* end REMOVE_ITM case */ break;
 
             case EQUIPMENT: /* Equip Item */ {
+                int slot_of_itmptr;
                 /* Which Item? */
                 do{ say("Equip which item? "); }
                 while(( cmd = get_i_slot()) == NOT_PLACED );
 
                 if( cmd == CANCEL ) { say("Equip Item Canceled."); continue; }
-                else itmptr = &(pc->inventory[cmd]);
+
+                itmptr = &(pc->inventory[cmd]);
+                slot_of_itmptr = slot_of(itmptr);
 
                 /* Verify Equipability */
                 if( !is_equipable(itmptr) )
@@ -239,24 +242,38 @@ static int get_subi_cmd( void )
                     say("That item is already equipped.");
 
                 /* Check item type and slot if needed */
-                else switch( slot_of(itmptr) ) {
+                else switch( slot_of_itmptr ) {
 
                     case HAT: /* must equip to HAT slot */
-                    case ARM: /* must equip to ARM slot *///TODO:NEEDS TESTING, Use item Name
-                        if( pc->equip[slot_of(itmptr)] != NULL ) {
-                            say("Are you sure you want to replace the item you currently have equipped? ");//TODO Takes 2 turns//make skip turn flag
+                    case ARM: /* must equip to ARM slot */
+                        if( pc->equip[slot_of_itmptr] != NULL ) {
+                            snprintf( buf, BUFFER_SIZE,
+                                "Are you sure you want to replace the %s "
+                                "you currently have equipped? ",
+                                    pc->equip[slot_of_itmptr]->name );
+                            say(buf);
                             if( toupper(getch()) == 'Y' ) {
                                 /* Unequip old item */
-                                pc->equip[slot_of(itmptr)]->is_equipped = false;
-                                say("Equipment swapped!");
+                                pc->equip[slot_of_itmptr]->is_equipped = false;
+                                snprintf( buf, BUFFER_SIZE, "%s removed!",
+                                    pc->equip[slot_of_itmptr]->name );
+                                say(buf);
+                                //TODO Takes 2 turns//use skip turn flag
+                                //  or force user to perform remove command
+                                //  -- Maybe set via opt or difficulty lv?
                             } else /* assume no */ {
-                                say("Canceled. You did not replace your equipped item.");
+                                snprintf( buf, BUFFER_SIZE, "Canceled."
+                                    " You did not replace your %s.",
+                                        pc->equip[slot_of_itmptr]->name );
+                                say(buf);
                                 cmd = NO_ACTION;/* Reset cmd for next loop */
                                 continue;
                             }/* End Y/N If-Else */
-                        } else /* slot is empty */ say("Item equipped!");
+                        }/* End !empty Slot If */
+                        snprintf(buf,BUFFER_SIZE, "%s equipped!", itmptr->name);
+                        say(buf);
                         itmptr->is_equipped = true;
-                        pc->equip[slot_of(itmptr)] = itmptr;
+                        pc->equip[slot_of_itmptr] = itmptr;
                         done_with_sub = true;
                         break;
 
@@ -267,22 +284,31 @@ static int get_subi_cmd( void )
                         if( pc->equip[WEP] == NULL ) slot = WEP;
                         /* else arm in offhand without hesitation if possible */
                         else if( pc->equip[OFF] == NULL ) slot = OFF;
-                        if( slot != NOT_PLACED ) say("Item equipped!");
-                        else { /* else ask if want to replace 1st or 2nd */
-                            do{say("Replace which item?");}
-                            while( ( slot = get_hand() ) == NOT_PLACED );
+                        if( slot == NOT_PLACED ) {
+                            /* Ask if want to replace 1st or 2nd Slot */
+                            say("Replace which item?");
+                            slot = get_hand();
                             if( ( slot == WEP )||( slot == OFF ) ) {
                                 pc->equip[slot]->is_equipped = false;
-                                say("Equipment swapped!");
-                            }/* En Swapped If */
+                                snprintf( buf, BUFFER_SIZE,
+                                    "%s removed!", pc->equip[slot]->name );
+                                say(buf);
+                            }/* En Swapped If *//* Else Assume Canceled */
                         }/* End ask for slot Else */
 
                         /* Equip Selection */
                         if( ( slot == WEP )||( slot == OFF ) ) {
+                            snprintf( buf, BUFFER_SIZE,
+                                "%s equipped!", itmptr->name );
+                            say(buf);
                             itmptr->is_equipped = true;
                             pc->equip[slot] = itmptr;
                             done_with_sub = true;
-                        } else say("Canceled: nothing equipped.");
+                        } else { /* Canceled */
+                            snprintf( buf, BUFFER_SIZE, "Canceled:"
+                                " %s not equipped.", itmptr->name );
+                            say(buf);
+                        }/* End Canceled Else */
                     } /* End WEP Case */ break;
 
                     case OFF: /* These are all 2handed weapons *///TODO
