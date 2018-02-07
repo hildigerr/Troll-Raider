@@ -25,6 +25,76 @@ static DATA * data = NULL;
 
 
 /******************************************************************************
+ * FUNCTION:    equip_me      -- Select starting equipment for a characater.  *
+ * ARGUMENTS:   PLAYER * who  -- The character to equip.                      *
+ *              char * line   -- The string describing how to allocate gear.  *
+ * NOTE:  line format is ":I:Q:N:T:M:...:@Name:"                              *
+ *   where  I = Type Number                                                   *
+ *          Q = Max Qt of Starting Equipment                                  *
+ *          N = The number of T:M pairs which follow.                         *
+ *        T:M = Equipment Reference Values                                    *
+ *          M = Maximum index of T type, or -1 if any.                        *
+ * WARNING: XXX The line will have all ':' chars replaced with '\0'.          *
+ ******************************************************************************/
+ static bool equip_me( PLAYER * who,  char * line )
+{
+    int i, qt, option_qt;
+    char * cptr, * end = cptr = &line[3]; //XXX Skip Type -- Unchecked
+
+    /* Find Max Qt of Starting Equipment */
+    while( *end != ':' ) ++end; *end = '\0';
+    qt = atoi( cptr );
+    if( qt < 0 ) qt = 0; else if( qt > MAX_HOLD ) qt = MAX_HOLD;
+
+    /* Determine Starting Equipment Options */
+    cptr = ++end; while( *end != ':' ) ++end; *end = '\0';
+    option_qt = atoi( cptr );
+    if( option_qt < 0 ) option_qt = 0;
+
+    if( qt && option_qt ) { /* Character Gets Starting Equipment */
+        int * itmt = NULL, * itmm = NULL;
+        if( !(itmt = CALLOC( option_qt, int )) ) {
+            ERROR( "equip_me", "Failed to allocate itmt array", __LINE__ );
+            return false;
+        }/* End !CALLOC If */
+        if( !(itmm = CALLOC( option_qt, int )) ) {
+            free( itmt );
+            ERROR( "equip_me", "Failed to allocate itmm array", __LINE__ );
+            return false;
+        }/* End !CALLOC If */
+
+        /* Parse Equipment Reference Values */
+        for( i = 0; i < option_qt; i++ ) {
+            cptr = ++end;
+            while( *end != ':' ) ++end; *end = '\0';
+            itmt[i] = atoi( cptr );
+            cptr = ++end;
+            while( *end != ':' ) ++end; *end = '\0';
+            itmm[i] = atoi( cptr );
+        }/* End option_qt For */
+
+        /* Retrieve Equipment */
+        for( qt = rng( qt ), i=0; qt > 0; --qt,i++ ) {
+            int selection = rng(option_qt)-1;
+            if( !getp_item( &(who->inventory[i]), itmt[selection],
+                                                  itmm[selection] ) ) {
+                ERROR( "equip_player", "Failed to retrieve Equipment.", qt );
+                free( itmt ); free( itmm );
+                return false;
+            }/* End getp_item If */
+        }/* End qt For */
+
+        //TODO: Equip items, convert coins to who->money
+
+        /* Clean Up */
+        free( itmt ); free( itmm );
+    }/* End Starting Equipment If */
+
+    return true;
+}/* End equip_me Func */
+
+
+/******************************************************************************
  * FUNCTION:    init_player                                                   *
  * ARGUMENTS:   PLAYER * p                                                    *
  * RETURNS:     bool                                                          *
@@ -33,6 +103,12 @@ static DATA * data = NULL;
  bool init_player( PLAYER * p )
 {
     int i = 0;
+
+    /* Load Item Data */
+    if( !data && !(data = load_data( MON_DAT )) ) {
+        ERROR( "init_player", "Unable to load data", (int)false );
+        return false;
+    }/* End Load Data If */
 
     for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = rng(MAX_STAT_VAL);
     for( i = 0; i < MAX_HOLD; i++ )
@@ -54,7 +130,7 @@ static DATA * data = NULL;
     p->is_awake = true;
 
     /* GIVE PC A STARTING WEAPON */
-    if( getp_item( &(p->inventory[0]), 1, 0 ) == false )
+    if( !equip_me( p, data->lines[0] ) )
         return((bool) ERROR( NULL, "Failed to get starting equipment", false ));
 
     return true;
@@ -71,7 +147,7 @@ static DATA * data = NULL;
  * TODO: Perhaps do rng(data->qt[QT_LINES]) and remove lines for uniques.     *
  ******************************************************************************/
  #define MAX_LINE_LEN 80
- bool init_mon( PLAYER* who, int t )
+ bool init_mon( PLAYER * who, int t )
 {
     int m, i, j, stat_seed;
     char ** s, * cptr, * end, line[MAX_LINE_LEN];
@@ -137,59 +213,15 @@ static DATA * data = NULL;
         ERROR( "init_mon", strerror(i), i ); //TODO: Test
         return false;
     }/* End Copy Line If */
-    end = cptr = &line[3]; //XXX Skip Type -- Unchecked
 
-    /* Find Max Qt of Starting Equipment */
-    while( *end != ':' ) ++end; *end = '\0';
-    i = atoi( cptr );
-    if( i < 0 ) i = 0; else if( i > MAX_HOLD ) i = MAX_HOLD;
-
-    /* Determine Starting Equipment Options */
-    cptr = ++end;
-    while( *end != ':' ) ++end; *end = '\0';
-    j = atoi( cptr );
-    if( j < 0 ) j = 0;
-    if( j > 0 ) { /* Starting Equipment */
-        int * itmt = NULL, * itmm = NULL;
-        if( !(itmt = CALLOC( j, int )) ) {
-            ERROR( "init_mon", "Failed to allocate itmt array", __LINE__ );
-            return false;
-        }/* End !CALLOC If */
-        if( !(itmm = CALLOC( j, int )) ) {
-            free( itmt );
-            ERROR( "init_mon", "Failed to allocate itmm array", __LINE__ );
-            return false;
-        }/* End !CALLOC If */
-
-        /* Parse Equipment Reference Values */
-        for( m = 0; m < j; m++ ) {
-            cptr = ++end;
-            while( *end != ':' ) ++end; *end = '\0';
-            itmt[m] = atoi( cptr );
-            cptr = ++end;
-            while( *end != ':' ) ++end; *end = '\0';
-            itmm[m] = atoi( cptr );
-        }/* End Equipment For */
-
-        /* Retrieve Equipment */
-        for( i = rng( i ), m=0; i > 0; --i,m++ ) {
-            int selection = ( itmm[i]  < 0 )? -1 :
-                            ( itmm[i] == 0 )?  0 : rng( itmm[i] ) -1;
-            if( !getp_item( &(who->inventory[m]), itmt[i], selection ) ) {
-                ERROR( "init_mon", "Failed to retrieve Equipment.", i );
-                free( itmt ); free( itmm );
-                return false;
-            }/* End getp_item If */
-        }/* End Equipment i For */
-
-        //TODO: Equip items, convert coins to who->money
-
-        /* Clean Up */
-        free( itmt ); free( itmm );
-    }/* End Starting Equipment If */
+    if( !equip_me( who, line ) ) {
+        ERROR( "init_mon", "Failed to equip NPC.", t );
+        return false;
+    }/* End euip_me If */
 
     /* Get NPC Name */
-    end += 2; cptr = end; while( *end != ':' ) ++end; *end = '\0';
+    cptr = line;   while( *cptr != '@' ) ++cptr;
+    end  = ++cptr; while( *end  != ':' ) ++end; *end = '\0';
     if( !stricpy( who->name, cptr, MAX_NAME_LEN+1 ) ) {
         ERROR( "init_mon", "Failed to record NPC Name.", MAX_NAME_LEN );
         return false;
