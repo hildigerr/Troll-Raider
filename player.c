@@ -54,12 +54,12 @@ static DATA * data = NULL;
     if( qt && option_qt ) { /* Character Gets Starting Equipment */
         int * itmt = NULL, * itmm = NULL;
         if( !(itmt = CALLOC( option_qt, int )) ) {
-            ERROR( "equip_me", "Failed to allocate itmt array", __LINE__ );
+            Error( "Failed to allocate itmt array", __LINE__ );
             return false;
         }/* End !CALLOC If */
         if( !(itmm = CALLOC( option_qt, int )) ) {
             free( itmt );
-            ERROR( "equip_me", "Failed to allocate itmm array", __LINE__ );
+            Error( "Failed to allocate itmm array", __LINE__ );
             return false;
         }/* End !CALLOC If */
 
@@ -78,7 +78,7 @@ static DATA * data = NULL;
             int selection = rng(option_qt)-1;
             if( !getp_item( &(who->inventory[i]), itmt[selection],
                                                   itmm[selection] ) ) {
-                ERROR( "equip_player", "Failed to retrieve Equipment.", qt );
+                Error( "Failed to retrieve Equipment.", qt );
                 free( itmt ); free( itmm );
                 return false;
             }/* End getp_item If */
@@ -106,13 +106,12 @@ static DATA * data = NULL;
 
     /* Load Item Data */
     if( !data && !(data = load_data( MON_DAT )) ) {
-        ERROR( "init_player", "Unable to load data", (int)false );
+        Error( "Unable to load data", (int)false );
         return false;
     }/* End Load Data If */
 
     for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = rng(MAX_STAT_VAL);
-    for( i = 0; i < MAX_HOLD; i++ )
-        if( set_empty_item( &p->inventory[i] ) != true ) return false;
+    for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &p->inventory[i] );
 
     for( i = 0; i < MAX_SLOTS; i++ ) p->equip[i] = NULL;
 
@@ -131,7 +130,8 @@ static DATA * data = NULL;
 
     /* GIVE PC A STARTING WEAPON */
     if( !equip_me( p, data->lines[0] ) )
-        return((bool) ERROR( NULL, "Failed to get starting equipment", false ));
+        return (bool)
+            Error( "Failed to get starting equipment", false );
 
     return true;
 }/* end init_player func */
@@ -154,13 +154,13 @@ static DATA * data = NULL;
 
     /* Load Item Data */
     if( !data && !(data = load_data( MON_DAT )) ) {
-        ERROR( "init_mon", "Unable to load data", (int)false );
+        Error( "Unable to load data", (int)false );
         return false;
     } else s = data->lines;
 
     /* Verify t Param */
     if( ( t < 0 )||( t >  data->qt[QT_TYPES] ) ) {
-        ERROR( "getp_item", "Invalid t input parameter", t );
+        Error( "Invalid t input parameter", t );
         //TODO: Suggest possible atafile corruption
         return false;
     }/* End Verify t If */
@@ -178,7 +178,10 @@ static DATA * data = NULL;
     who->is_awake = false;
     who->is_human = !( t == NPC_TTROLL );
     who->money = ( t > HUMAN_INCT )? rng( 10 * t ) : 0;//TODO Make meaningful
+    for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &who->inventory[i] );
+    for( i = 0; i < MAX_SLOTS; i++ ) who->equip[i] = NULL;
 
+    /* Get Character Stats */
     switch( t ) {
         case NPC_TTROLL:
             stat_seed =  ( MAX_STAT_VAL /2 ) +1;
@@ -196,36 +199,24 @@ static DATA * data = NULL;
             stat_seed = MAX_STAT_VAL + ( MAX_STAT_VAL /2 );
             who->explv = 0.15;//TODO Make meaningful, adjust based on dificulty
     }/* End t Switch */
-
     for( i = 0; i < MAX_STATS; i++ ) who->stats[i] = rng(stat_seed);
     who->hp[1] = who->hp[0] = who->stats[CON];
-    for( i = 0; i < MAX_HOLD; i++ ) {
-        if( !set_empty_item( &who->inventory[i] ) ) {
-            ERROR( "init_mon", "Unable to init empty item.", i );
-            return false;
-        }/* End !set_empty_item If */
-    }/* End MAX_HOLD For */
-
-    for( i = 0; i < MAX_SLOTS; i++ ) who->equip[i] = NULL;
 
     /* Slice Line XXX Line validity Unchecked */
     if( (i = snprintf( line, MAX_LINE_LEN, "%s", *s )) < 1 ) {
-        ERROR( "init_mon", strerror(i), i ); //TODO: Test
+        Error( strerror(i), i ); //TODO: Test
         return false;
     }/* End Copy Line If */
 
     if( !equip_me( who, line ) ) {
-        ERROR( "init_mon", "Failed to equip NPC.", t );
+        Error( "Failed to equip NPC.", t );
         return false;
     }/* End euip_me If */
 
     /* Get NPC Name */
     cptr = line;   while( *cptr != '@' ) ++cptr;
     end  = ++cptr; while( *end  != ':' ) ++end; *end = '\0';
-    if( !stricpy( who->name, cptr, MAX_NAME_LEN+1 ) ) {
-        ERROR( "init_mon", "Failed to record NPC Name.", MAX_NAME_LEN );
-        return false;
-    }/* End strncpy Name If */
+    stricpy( who->name, cptr, MAX_NAME_LEN+1 );
 
     return true;
 }/* end init_mon func */

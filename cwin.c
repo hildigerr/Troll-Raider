@@ -20,13 +20,12 @@ void wsay( WINDOW* where, char* string )
 
     /* Move all lines up */
     wmove(where,0,0);
-    if( wdeleteln(where) == ERR )
-        exit( ERROR( "wsay", "wdeleteln err", FAIL ) );
+    if( wdeleteln(where) == ERR ) exit( Error( "wdeleteln err", FAIL ) );
     /* print string at end */
     else while( string[i] != '\0' ) {
-        wmove(where,BTM_SUB_ROWS-1,i);
-        if( winsch(where,string[i++]) == ERR )
-            exit( ERROR( "wsay", "message insert display", string[--i] ));
+        wmove( where, BTM_SUB_ROWS-1, i );
+        if( winsch( where, string[i++] ) == ERR )
+            exit( Error( "message insert display", string[--i] ) );
     }/* End string !terminated While */
 
     wrefresh(where);

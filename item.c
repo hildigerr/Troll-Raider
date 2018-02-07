@@ -27,20 +27,20 @@ bool getp_item( ITEM* itm, int t, int m )
 
     /* Load Item Data */
     if( !data && !(data = load_data( ITEM_DAT )) ) {
-        ERROR( "getp_item", "Unable to load data", t );
+        Error( "Unable to load data", t );
         return false;
     } else s = data->lines;
 
     /* Verify t Param */
     if(( t < 0)||(t > MAX_ITEM_TYPES)) {
-        ERROR( "getp_item", "Invalid t input parameter", t );
+        Error( "Invalid t input parameter", t );
         return false;
     }/* End t in range If */
 
     /* Verify m Param */
     if( m < 0 ) m = rng( data->max[t] ) - 1;
     else if( m > data->max[t] ) {
-        ERROR( "getp_item", "Invalid m input parameter", m );
+        Error( "Invalid m input parameter", m );
         return false;
     }/* end m out of range if */
 
@@ -60,7 +60,7 @@ bool getp_item( ITEM* itm, int t, int m )
     i = atoi( &cptr[1] );
     if( i == t ) itm->type = t;
     else {
-        ERROR( "getp_item", "Wrong item type in datafile", i );
+        Error( "Wrong item type in datafile", i );
         return false;
     }/* End t If */
 
@@ -91,17 +91,14 @@ bool getp_item( ITEM* itm, int t, int m )
 
 
 /******************************************************************************
- * FUNCTION:    set_empty_item
- * ARGUMENTS:   ITEM*   itm
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    set_empty_item                                                *
+ * ARGUMENTS:   ITEM *   itm                                                  *
  ******************************************************************************/
-bool set_empty_item(ITEM* itm)
+void set_empty_item( ITEM* itm )
 {
     int i;
 
-    if( strncpy( itm->name, "empty", MAX_ITEM_NAME_LEN) == NULL ) return false;
+    stricpy( itm->name, "empty", MAX_ITEM_NAME_LEN);
 
     itm->is_ = false;
     itm->is_equipped = false;
@@ -111,8 +108,6 @@ bool set_empty_item(ITEM* itm)
     for(i=0; i < MAX_ITEM_STATS; i++ ) itm->stats[i] = 0;
 
     itm->worth = 0;
-
-    return true;
 }/*end set_empty_item func */
 
 
@@ -165,9 +160,9 @@ void swap_item( ITEM* itmi, ITEM* itmj )
     int i;
 
     /* Swap Names */
-    strncpy( tmp.name,   itmi->name, MAX_ITEM_NAME_LEN );
-    strncpy( itmi->name, itmj->name, MAX_ITEM_NAME_LEN );
-    strncpy( itmj->name, tmp.name,   MAX_ITEM_NAME_LEN );
+    stricpy( tmp.name,   itmi->name, MAX_ITEM_NAME_LEN );
+    stricpy( itmi->name, itmj->name, MAX_ITEM_NAME_LEN );
+    stricpy( itmj->name, tmp.name,   MAX_ITEM_NAME_LEN );
 
     /* Swap Flags */
     tmp.is_   = itmi->is_;
@@ -215,7 +210,7 @@ void pick_up( ITEM* itm_ol, ITEM* itm_nu )
 {
     int i;
 
-    strncpy( itm_nu->name, itm_ol->name, MAX_ITEM_NAME_LEN );
+    stricpy( itm_nu->name, itm_ol->name, MAX_ITEM_NAME_LEN );
 
     itm_nu->is_ = itm_ol->is_;
     itm_nu->is_2handed = itm_ol->is_2handed;

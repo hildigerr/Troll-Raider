@@ -96,13 +96,12 @@ bool fill( char t, LEVEL* l, COORD d, COORD c )
 
 /******************************************************************************
  * FUNCTION:    init_lv
- * ARGUMENTS:   LEVEL*  l
+ * ARGUMENTS:   LEVEL *  l
  *              short   t
- * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool init_lv( LEVEL* l, short t )
+void init_lv( LEVEL * l, short t )
 {
     int r, c;
 
@@ -116,17 +115,15 @@ bool init_lv( LEVEL* l, short t )
         for( c = 0; c < MAX_COL; c++ ) {
             /* Border is always wall */
             if( ( ( r == 0 )||( c == 0 ) )||( ( r == (MAX_ROW-1) )
-                                          ||( c == (MAX_COL-1) ) ) ) {
+                                          ||(   c == (MAX_COL-1) ) ) ) {
                 set_loc( 'w', &l->map[r][c] );
             }/* End border ray check */
-            else set_loc('.',&l->map[r][c]); /* Interior is floors for now */
+            else set_loc( '.', &l->map[r][c] ); /* Interior is floors for now */
 
             /* Initialize Item Locations */
-            if( set_empty_item(&l->map[r][c].litter) != true )
-                return( ERROR( NULL, "Litter Bug!", l->map[r][c].litter.type) );
-        }/* end map RC ffor */
+            set_empty_item( &l->map[r][c].litter );
 
-    return true;
+        }/* end map RC ffor */
 }/*end init_lv func */
 
 
@@ -284,7 +281,7 @@ bool towngen( LEVEL* l, unsigned short n )//n = score.room_qt
 
         /* Fill Building With Wall */
         if( fill_wall( l , room[i].a, room[i].b ) == false )
-            return( ERROR( NULL, "Failed to Fill Building Walls", i) );
+            return( Error( "Failed to Fill Building Walls", i ) );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         /* TODO: Make Enterance Face Fathest Wall? */
@@ -294,7 +291,7 @@ bool towngen( LEVEL* l, unsigned short n )//n = score.room_qt
                 case SOUTH:hutspot[i].rowy = room[i].b.rowy - 1; break;//SOUTH
                 case EAST:hutspot[i].colx = room[i].b.colx - 1; break;//EAST
                 case WEST:hutspot[i].colx = room[i].a.colx; break;//WEST
-                default: exit(ERROR(NULL, "badswitch",FAIL));
+                default: exit( Error( "badswitch", FAIL ) );
             }/* end cardinal direction switch */
 
             /* Set Building Enterance Flags */

@@ -16,11 +16,29 @@
 #include <string.h>
 #include <stdbool.h>
 
-/* Precompiler Constants */
-#ifdef DEBUG
-    #define DEBUG_DISPLAY 1
+//TODO: #define NDEBUG when complete
+//#define NDEBUG
+#include <assert.h>
+
+#ifndef NDEBUG
+    #define DEBUG_BARF
+#endif
+
+/* Allow All-Cap Booleans */
+#ifndef TRUE
+    #define TRUE true
+#endif
+#ifndef FALSE
+    #define FALSE false
+#endif
+
+/* Global Variable Define/Init Helper */
+#ifdef MAIN
+    #define EXTERN
+    #define INIT(x) = x
 #else
-    #define DEBUG_DISPLAY 0
+    #define EXTERN extern
+    #define INIT(x)
 #endif
 
 /* Precompiler Constants */
@@ -29,14 +47,17 @@
 #define READ_ONLY "r"
 
 /* Macros */
-#define ERROR(w,b,s) _ERROR(w,b,s,DEBUG_DISPLAY)
-#define BARF(m,i)    _ERROR("BARF",m,i,1)
+#define ERROR(w,b,s) _ERROR(w,b,s,FALSE)
+#define Error(b,s)   _ERROR(__FUNCTION__,b,s,FALSE)
+#define BARF(b,s)    _ERROR("BARF",b,s,TRUE)
+#define Barf(b,s)    _ERROR(NULL,b,s,TRUE)
+#define WARN(b,s)    _ERROR("WARNING",b,s,TRUE)
 /* From Sobelman & Krekelberg: */
 #define MALLOC(x)   ((x*)malloc(sizeof(x)))
 #define CALLOC(n,x) ((x*)calloc(n,sizeof(x)))
 
 /* Prototypes */
-int _ERROR( const char* who, const char* barf, int status, int boo );
+int _ERROR( const char* who, const char* barf, int status, bool debug );
 size_t stricpy( char* dest, const char* src, size_t n );
 void mypause ( int );
 

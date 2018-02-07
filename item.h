@@ -20,13 +20,10 @@ bool getp_item( ITEM* itm, int t, int m );
 
 
 /******************************************************************************
- * FUNCTION:    set_empty_item
- * ARGUMENTS:   ITEM*   itm
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    set_empty_item                                                *
+ * ARGUMENTS:   ITEM *   itm                                                  *
  ******************************************************************************/
-bool set_empty_item( ITEM* itm );
+void set_empty_item( ITEM * itm );
 
 
 /******************************************************************************

@@ -54,14 +54,12 @@ int main( int argc, char* argv[] )
     init_stat_data( &score );
 
     /* INITIALIZE MAPS */
-    for( i = 0; i < MAX_MAPS; i++ )
-        if( init_lv( &curlv[i], i ) == false )
-            exit( ERROR( NULL, "Failed to initialize level", i ) );
+    for( i = 0; i < MAX_MAPS; i++ ) init_lv( &curlv[i], i );
 
     /* INITIALIZE NPC ARRAY */
     for( i = 0; i < MAX_NPC; i++ )
         if( init_mon( &npc[i], rng(NPC_TYPE_QT)-1 ) == false )
-            return( ERROR( NULL, "init_mon !success", i ) );
+            return( ERROR( NULL, "Failed to initialize NPC", i ) );
 
     /* Generate Dungeon */
     if( towngen(&curlv[HVILLAGE], score.hut_qt) == false )
@@ -76,9 +74,9 @@ int main( int argc, char* argv[] )
     /* INITIALIZE CURSES */
     initscr(); /* Start curses mode *///RETURNS WINDOW*
     atexit( (void(*)(void)) endwin );
-    display_btm = subwin(stdscr,BTM_SUB_ROWS,BTM_SUB_COLS,MAX_ROW,0);
+    display_btm = subwin( stdscr, BTM_SUB_ROWS, BTM_SUB_COLS, MAX_ROW, 0 );
     if( display_btm == NULL ) exit( ERROR( NULL, "btm sub win", FAIL ) );
-    display_right = subwin(stdscr,RT_SUB_ROWS,RT_SUB_COLS,0,MAX_COL);
+    display_right = subwin( stdscr, RT_SUB_ROWS, RT_SUB_COLS, 0, MAX_COL );
     if( display_right == NULL ) exit( ERROR( NULL, "right sub win", FAIL ) );
     raw();     /* Disable input buffering */
     noecho();  /* Disable input echoing */
@@ -89,11 +87,12 @@ int main( int argc, char* argv[] )
 
         /* Set-up/Update RH Display */
         if( init_display_right( display_right, &pc, &score ) == false )
-            exit(ERROR(NULL,"Failed to (re)initialize right hand display",FAIL));
+            exit( ERROR( NULL,
+                "Failed to (re)initialize right hand display", score.turn ) );
 
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
-        if(curlv[pc.maplv].is_new == true) {
+        if( curlv[pc.maplv].is_new == true ) {
             curlv[pc.maplv].is_new = false;
 
             draw_map( &curlv[pc.maplv] );
@@ -181,14 +180,15 @@ int main( int argc, char* argv[] )
                     case NORTH_WEST: { r -= 1; c -= 1; } break;
                     case NORTH     : { r -= 1;         } break;
                     case NORTH_EAST: { r -= 1; c += 1; } break;
-                    default: exit( ERROR( NULL, "Bad Logic MOVING cmd filter", cmd ) );
+                    default:
+                        exit( ERROR(NULL, "Bad Logic MOVING cmd filter", cmd));
                 }/* end cmd switch */
 
                 /* MOVE assess legality */
                 if( ( r > MAX_ROW )||( r < 0 ) )
-                    exit( ERROR(NULL, "Move Out of Vertical Bounds", r ) );
+                    exit( ERROR( NULL, "Move Out of Vertical Bounds", r ) );
                 else if( ( c > MAX_COL )||( c < 0 ) )
-                    exit( ERROR(NULL, "Move Out of Horizontal Bounds", c ) );
+                    exit( ERROR( NULL, "Move Out of Horizontal Bounds", c ) );
                 else if( ACTIVE_LOCATION.is_wall == true ){
                     say("You bumped into a wall!"); }//Currently Takes a Turn
 
@@ -266,7 +266,7 @@ int main( int argc, char* argv[] )
                     else if(i == OFF ) wprintw(cmd_list[2]," fist [0,0] 0", 97+i);
                     else if(i == ARM ) wprintw(cmd_list[2]," bareskin [0,0] 0", 97+i);
                     else if(i == HAT ) wprintw(cmd_list[2]," hairs [0,0] 0", 97+i);
-                    else ERROR(NULL, "Slot machine error!", i );
+                    else ERROR( NULL, "Slot machine error!", i );
                 }/* end MAX_SLOTS for */
                 for( i = 1; i < MAX_ITEM_WINDOWS; i++ )
                 {
@@ -305,7 +305,7 @@ int main( int argc, char* argv[] )
                 }/* end pickup else */
             }/* end PICK_UP if */
 
-            else exit( ERROR(NULL, "cmd processing", cmd) );
+            else exit( ERROR( NULL, "cmd processing", cmd ) );
         } while( need_more_cmd == true );/* end need more cmd do */
 
         //TODO: Enemy actions

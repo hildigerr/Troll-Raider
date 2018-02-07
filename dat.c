@@ -30,7 +30,7 @@ DATA * load_data( const char * file )
         int i = 0; n++;
         while( ( (buf[i++] = fgetc(datafile)) != '\n' )&&( !feof(datafile) ) )
         if( i == BUFFER_SIZE ) {
-            ERROR( "load_data", "Datafile line greater than BUFFER_SIZE", n );
+            Error( "Datafile line greater than BUFFER_SIZE", n );
             fclose(datafile);
             return NULL;
         }/* End Read Line into Buffer While If */
@@ -43,7 +43,7 @@ DATA * load_data( const char * file )
             /* Read In Maximum Items For This Type */
             case '$': {
                 if( data->lines )
-                    ERROR( "Warning","Ignoring extra $-line in data file.", n );
+                    WARN( "Ignoring extra $-line in data file.", n );
                 else {
                     buf[--i] = '\0'; /* Replace Newline */
                     //BARF( buf, i );
@@ -53,7 +53,7 @@ DATA * load_data( const char * file )
                     }/* End : If While */
                     //BARF( "qt_types", data->qt[QT_TYPES] );
                     if( !(data->max = CALLOC(data->qt[QT_TYPES], int) ) ) {
-                        ERROR( "load_data","Cannot allocate data", n );
+                        Error( "Cannot allocate data", n );
                         fclose(datafile);
                         free( data );
                         return NULL;
@@ -66,7 +66,7 @@ DATA * load_data( const char * file )
                     }/* End data->qt[QT_TYPES] For */
                     //BARF( "qt_lines", data->qt[QT_LINES] );
                     if( !(data->lines = CALLOC( data->qt[QT_LINES], char* )) ) {
-                        ERROR( "load_data","Cannot allocate data", n );
+                        Error( "Cannot allocate data", n );
                         fclose(datafile);
                         free( data->max );
                         free( data );
@@ -78,13 +78,13 @@ DATA * load_data( const char * file )
             /* Read In Entries */
             case ':': {
                 if( !data->lines ) {
-                    ERROR( "load_data", "Data entry before $Max spec.", n );
+                    Error( "Data entry before $Max spec.", n );
                     fclose(datafile);
                     free( data );
                     return NULL;
                 }/* End !data->lines If */
                 if( entry >= data->qt[QT_LINES] ) {
-                    ERROR("load_data", "Found more enteries than expected.", n);
+                    Error( "Found more enteries than expected.", n );
                     //XXX Memory not freed -- but this is a fatal error anyway.
                     fclose(datafile);
                     free( data );
@@ -92,7 +92,7 @@ DATA * load_data( const char * file )
                 }/* End too many If */
                 buf[--i] = '\0'; /* Replace Newline */
                 if( !(line = CALLOC( i, char )) ) {
-                    ERROR( "load_data","Cannot allocate new line", n );
+                    Error( "Cannot allocate new line", n );
                     //XXX May leak memory -- but this is a fatal error anyway.
                     fclose(datafile);
                     free( data );
@@ -104,7 +104,7 @@ DATA * load_data( const char * file )
             } break;
 
             default: /* Catch Any Unexpected Input and Report it */
-                ERROR( "load_data", "Unexpected Input From data file", buf[0] );
+                Error( "Unexpected Input From data file", buf[0] );
                 fclose(datafile);
                 free( data );
                 return NULL;

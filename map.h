@@ -40,11 +40,10 @@ bool fill( char t, LEVEL* l, COORD d, COORD c );
  * FUNCTION:    init_lv
  * ARGUMENTS:   LEVEL*  l
  *              short   t
- * RETURNS:     bool
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool init_lv( LEVEL* l, short t );
+void init_lv( LEVEL * l, short t );
 
 /******************************************************************************
  * FUNCTION:    get_map_icon

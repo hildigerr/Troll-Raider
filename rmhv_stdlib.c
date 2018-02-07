@@ -7,32 +7,30 @@
 
 
 /******************************************************************************
- * Function:    ERROR                                                         *
+ * Function:    _ERROR                                                        *
  * Arguments:   const char* who       String descriptor of failed function    *
  *              const char* barf      String message to dump to stderr        *
  *              int         status    Exit status return code                 *
- *              int         boo       boolean: if true display status int     *
+ *              bool        debug     if true display as non-error            *
  * RETURNS:     int                   The value of status input               *
  * Sends a string to stderr in the form:                                      *
  *                  "\nERROR: who: barf [status]\n\n"                         *
- * If boo is set to false then [status] will be ommited from the message.     *
- * If who is NULL then it will be ommited from the message as well. These     *
- * options can be combined as needed.                                         *
+ * If status is 0 then [status] will be ommited from the message.             *
+ * If who is NULL then it will be ommited from the message as well.           *
+ * If debug is true then the form will become: "\nwho: barf [status]\n\n"     *
+ * These options can be combined as needed.                                   *
+ * Some common combinations are provided as macros.                           *
  * Suggested Usage:                                                           *
- *      exit(ERROR( who, "Your error message", status , 1||0 ));              *
+ *      exit( ERROR( who, "Your error message", status ) );                   *
  ******************************************************************************/
-int _ERROR( const char* who, const char* barf, int status, int boo )
+int _ERROR( const char* who, const char* barf, int status, bool debug )
 {
-    if( who ) {
-        if( boo )
-            fprintf( stderr, "\nERROR: %s: %s [%d]\n\n", who, barf, status );
-        else fprintf( stderr, "\nERROR: %s: %s\n\n", who, barf );
-    } else {
-        if( boo )
-            fprintf( stderr, "\nERROR: %s [%d]\n\n", barf, status );
-        else fprintf( stderr, "\nERROR: %s\n\n", barf );
-    } return status;
-}/* end ERROR func */
+    fprintf( stderr, "\n%s",  (debug)? "":"ERROR: ");
+    if( who ) fprintf( stderr, "%s: ", who );
+    if( barf ) fprintf( stderr, "%s ", barf );
+    (status)? fprintf( stderr, "[%d]\n\n", status ): fprintf( stderr, "\n\n" );
+    return status;
+}/* end _ERROR func */
 
 
 /******************************************************************************
@@ -50,12 +48,13 @@ size_t stricpy( char* dest, const char* src, size_t n )
 {
     size_t i; /* Itteration Counter */
 
-    if( src && dest ) {
-        for( i = 0; ( i < n )&&( src[i] != '\0' ); i++ ) dest[i] = src[i];
-        if( i < n ) dest[i] = '\0';
+    assert( src && dest );
 
-        return i;
-    } else return 0;
+    for( i = 0; ( i < n )&&( src[i] != '\0' ); i++ ) dest[i] = src[i];
+    if( i < n ) dest[i] = '\0';
+
+    return i;
+
 }/* End stricpy Func */
 
 

@@ -286,13 +286,13 @@ static int get_subi_cmd( void )
                     } /* End WEP Case */ break;
 
                     case OFF: /* These are all 2handed weapons *///TODO
-                        if( itmptr->is_2handed == false ) ERROR( NULL,"Strange Item!", itmptr->type );
+                        if( itmptr->is_2handed == false ) Error( "Strange Item!", itmptr->type );
                         //if 2handed confirm unequip if necessary else equip
                         //else not 2handed and...there are no 2handed weapons to return off
                         break;
                     //case MAX_SLOTS://which one to use????
 
-                    default: ERROR(NULL, "Hit switch default!", slot_of(itmptr)); /* ERROR */
+                    default: Error( "Hit switch default!", slot_of(itmptr) );
                 }/* end slot switch */
             }/* end EQUIPMENT sub cmd */ break;
 
@@ -339,7 +339,7 @@ static int get_subi_cmd( void )
                     }/* end item exists else */
                 }/* end equip select if */
                 else/* Handle Impossible Errors */
-                    ERROR(NULL,"You broke it!", FAIL);
+                    Barf( "You broke it!", FAIL );
             }/* end DESTROY_ITEM case */ break;
 
             case DROP_ITEM: {
@@ -386,7 +386,7 @@ static int get_subi_cmd( void )
                     }/* end item exists else */
                 }/* end equip select if */
                 else/* Handle Impossible Errors */
-                    ERROR(NULL,"You broke it!", FAIL);
+                    Barf( "You broke it!", FAIL );
             }/* end DROP_ITEM sub cmd */ break;
 
             default: /* CANCELED */ return true;
