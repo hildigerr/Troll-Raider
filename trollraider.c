@@ -44,20 +44,14 @@ int main( int argc, char* argv[] )
 
     /* Get Player Name */
     printf("\nWhat is the name for your character? ");
-    if( !fgets( pc.name, sizeof(pc.name), stdin ) )
-        exit( ERROR( "fgets", "failed to get string", sizeof(pc.name) ) );
+    if( !fgets( pc.name, MAX_NAME_LEN+1, stdin ) )
+        exit( ERROR( "fgets", "failed to get string", MAX_NAME_LEN ) );
 
     /* INITIALIZE PLAYER */
     if( init_player( &pc ) == false )
         exit( ERROR( NULL, "Failed to initialize player", FAIL ) );
-    if( init_stat_data( &score ) == false )
-        exit( ERROR( NULL, "Failed to initialize scores", FAIL ) );
 
-    /* GIVE PC A STARTING WEAPON */
-    if( getp_item( &pc.inventory[0], 1, 0 ) == false )
-        return( ERROR(NULL, "Failed to get starting equipment",2) );
-
-    score.hut_qt = rng(MAX_HUTS);// score.hut_qt = MAX_HUTS;//TESTING//
+    init_stat_data( &score );
 
     /* INITIALIZE MAPS */
     for( i = 0; i < MAX_MAPS; i++ )
@@ -65,10 +59,8 @@ int main( int argc, char* argv[] )
             exit( ERROR( NULL, "Failed to initialize level", i ) );
 
     /* INITIALIZE NPC ARRAY */
-    r = score.hut_qt * rng(2);//innocent qt
-    c = MAX_MAPS + ( rng(MAX_MAPS) / 2 );//initial hero qt
     for( i = 0; i < MAX_NPC; i++ )
-        if( init_mon( &npc[i], i, r, c ) == false )
+        if( init_mon( &npc[i], rng(NPC_TYPE_QT)-1 ) == false )
             return( ERROR( NULL, "init_mon !success", i ) );
 
     /* Generate Dungeon */

@@ -6,6 +6,7 @@
 
 #include "item.h"
 #include "dat.h"
+#include "calc.h"
 
 #define ITEM_DATA_ELEMENT_QT 5
 
@@ -19,9 +20,9 @@ static DATA * data = NULL;
  * RETURNS:     bool                                                          *
  * WARNING: Data line validity is not verified.                               *
  ******************************************************************************/
-bool getp_item(ITEM* itm, int t, int m )
+bool getp_item( ITEM* itm, int t, int m )
 {
-    int i,j, ix[ITEM_DATA_ELEMENT_QT];
+    int i, j, ix[ITEM_DATA_ELEMENT_QT];
     char ** s, * cptr;
 
     /* Load Item Data */
@@ -37,7 +38,8 @@ bool getp_item(ITEM* itm, int t, int m )
     }/* End t in range If */
 
     /* Verify m Param */
-    if( ( m < 0)||( m > data->max[t] ) ) {
+    if( m < 0 ) m = rng( data->max[t] ) - 1;
+    else if( m > data->max[t] ) {
         ERROR( "getp_item", "Invalid m input parameter", m );
         return false;
     }/* end m out of range if */

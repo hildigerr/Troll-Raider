@@ -64,8 +64,12 @@
 /* NPCs */
 #define MON_DAT "dat/human.dat"
 #define MAX_NAME_LEN 11
-#define MAX_FAM 45
-#define MAX_NPC 45
+#define MAX_NPC      45
+#define NPC_TTROLL    0
+#define HUMAN_INCT    1
+#define HUMAN_COMN    2
+#define HUMAN_HERO    3
+#define NPC_TYPE_QT   4
 
 /* Equipment Slots */
 #define WEP         0 /*Weapon*//* Main Hand */
