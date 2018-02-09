@@ -38,35 +38,44 @@ static DATA * data = NULL;
 
 
 /******************************************************************************
- * FUNCTION:    get_i_slot  -- Get Inventory Slot from user.                  *
- * RETURNS:     int         -- The chosen inventory slot.                     *
+ * FUNCTION:    get_i_slot      -- Get Inventory Slot from user.              *
+ * ARGUMENTS:   char * prompt   -- The input prompt.                          *
+ * RETURNS:     int             -- The chosen inventory slot.                 *
  ******************************************************************************/
- static int get_i_slot( void ) // TODO Move loop into these functions
+ static int get_i_slot( char * prompt )
 {
-    int input = getch();
-    switch ( input ) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
-        case '1': case '2': case '3': case '4': case '5': case '6': case '7':
-        case '8': case '9': case '0': return input - '0';
-        default: return NOT_PLACED;
-    }/* End input Switch */
+    int input;
+    do{ say(prompt); input = getch();
+        switch ( input ) {
+            case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+            case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+            case '8': case '9': case '0': return input - '0';
+            default: input = NOT_PLACED;
+        }/* End input Switch */
+    } while( input == NOT_PLACED );
+    return input;
 }/* End get_i_slot Func */
 
 
 /******************************************************************************
- * FUNCTION:    get_e_slot  -- Get equipment slot from user.                  *
- * RETURNS:     int         -- The chosen equipment slot.                     *
+ * FUNCTION:    get_e_slot      -- Get equipment slot from user.              *
+ * ARGUMENTS:   char * prompt   -- The input prompt.                          *
+ * RETURNS:     int             -- The chosen equipment slot.                 *
  ******************************************************************************/
- static int get_e_slot( void )
+ static int get_e_slot( char * prompt )
 {
-    switch (getch()) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
-        case 'a': case 'A': return 0;
-        case 'b': case 'B': return 1;
-        case 'c': case 'C': return 2;
-        case 'd': case 'D': return 3;
-        default: return NOT_PLACED;
-    }/* End input Switch */
+    int input;
+    do{ say(prompt); input = getch();
+        switch (input) {
+            case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+            case 'a': case 'A': return 0;
+            case 'b': case 'B': return 1;
+            case 'c': case 'C': return 2;
+            case 'd': case 'D': return 3;
+            default:   input = NOT_PLACED; break;
+        }/* End input Switch */
+    } while( input == NOT_PLACED );
+    return input;
 }/* End get_e_slot Func */
 
 
@@ -296,12 +305,11 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
     int slot_of_itmptr;
     bool prompt = ( slot < 0 );
 
-    if( prompt ) { /* Must ask User Which Item? */
-        do{ say("Equip which item? "); }
-        while(( slot = get_i_slot()) == NOT_PLACED );
-
-        if( slot == CANCEL ) { say("Equip Item Canceled."); return false; }
-    }/* End prompt If */
+    /* Must ask User Which Item? */
+    if(( prompt )&&( (slot = get_i_slot("Equip which item? ")) == CANCEL )) {
+        say("Equip Item Canceled.");
+        return false;
+    }/* End prompt and Cancel If */
 
     itmptr = &(who->inventory[slot]);
     slot_of_itmptr = slot_of(itmptr);
@@ -466,8 +474,7 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                 return false;
             }/* End Canceled Else */
         } else { /* Select Slot */
-            do{ say("Remove which item? "); }
-            while( ( slot = get_e_slot() ) == NOT_PLACED );
+            slot = get_e_slot("Remove which item? ");
             if( slot == CANCEL ) {
                 say("Canceled: Items still equipped.");
                 return false;

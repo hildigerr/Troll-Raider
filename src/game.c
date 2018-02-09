@@ -67,24 +67,28 @@ static int get_subi_cmd( void )
 
 
 /******************************************************************************
- * FUNCTION:    get_u_slot    -- Get either inventory or equipment slot       *
- * RETURNS:     int           -- The chosen slot.                             *
+ * FUNCTION:    get_u_slot      -- Get either inventory or equipment slot     *
+ * ARGUMENTS:   char * prompt   -- The input prompt.                          *
+ * RETURNS:     int             -- The chosen slot.                           *
  * NOTE: Treats input 'a' through 'd' as hexidecimal to distinguish between   *
  *       inventory and equipment.                                             *
  ******************************************************************************/
- static int get_u_slot( void )
+ static int get_u_slot( char * prompt )
 {
-    int input = getch();
-    switch ( input ) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
-        case 'a': case 'A': return 10;
-        case 'b': case 'B': return 11;
-        case 'c': case 'C': return 12;
-        case 'd': case 'D': return 13;
-        case '1': case '2': case '3': case '4': case '5': case '6': case '7':
-        case '8': case '9': case '0': return input - '0';
-        default: return NOT_PLACED;
-    }/* End input Switch */
+    int input;
+    do{ say(prompt); input = getch();
+        switch ( input ) {
+            case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+            case 'a': case 'A': return 10;
+            case 'b': case 'B': return 11;
+            case 'c': case 'C': return 12;
+            case 'd': case 'D': return 13;
+            case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+            case '8': case '9': case '0': return input - '0';
+            default: input = NOT_PLACED;
+        }/* End input Switch */
+    } while( input == NOT_PLACED );
+    return input;
 }/* End get_u_slot Func */
 
 
@@ -121,8 +125,7 @@ static int get_subi_cmd( void )
 
             case DESTROY_ITEM: {
                 /* Select Slot */
-                do{ say("Destroy which item? "); }
-                while( (cmd = get_u_slot()) == NOT_PLACED );
+                cmd = get_u_slot("Destroy which item? ");
 
                 if( cmd == CANCEL ) {
                     say("Canceled. Nothing was destroyed.");
@@ -176,8 +179,7 @@ static int get_subi_cmd( void )
 
             case DROP_ITEM: {
                 /* Select Slot */
-                do{ say("Drop which item? "); }
-                while( (cmd = get_u_slot()) == NOT_PLACED );
+                cmd = get_u_slot("Drop which item? ");
 
                 if( cmd == CANCEL ) say("Canceled. Nothing was dropped.");
 
