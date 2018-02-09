@@ -2,8 +2,8 @@
 CC = gcc
 CFLAGS = -g -Wall
 LFLAGS = -lm -lncurses
-SRCS =  rmhv_stdlib.c cwin.c map.c player.c dat.c item.c game.c trollraider.c
-DATA =  item.dat human.dat
+SRCS =  src/rmhv_stdlib.c src/cwin.c src/map.c src/player.c src/dat.c src/item.c src/game.c src/trollraider.c
+DATA =  dat/item.dat dat/human.dat
 
 OBJS = ${SRCS:.c=.o}
 
