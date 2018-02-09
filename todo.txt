@@ -1,0 +1,28 @@
+
+Create '?' about/help command.
+Implement SAVE_GAME ability/command.
+Use item names when communicating about them.
+Some actions take 2 turns.
+
+Adjust Item Based on it's Lv and Whatever?
+
+Generate sub buildings attached to main buildings with tunnels.
+
+Make skill_check more interesting.
+
+Convert coins to money, or else don't have coin items.
+Make money useable -- perhaps by meeting troll caravan shop between towns.
+                   -- get paid for gathered food.
+Implement food and eating!
+
+Adjust experience based on dificulty.
+
+Implement Attacking, shooting, and NPCs--including Enemy actions.
+Implement traps, containers, and item generation.
+
+Make unarmed values based on abilities
+
+Display And Save High Score Report
+
+When town is cleared output qt of family saved, and continue to next town
+Make family types and rank score based on who saved
