@@ -160,7 +160,10 @@ static DATA * data = NULL;
             }/* End getp_item If */
         }/* End max_qt For */
 
-        //TODO: Equip items
+        /* NPCs Equip items */
+        if( t ) for( i = 0; i < max_qt; i++ ) equip_me( who, i, false );
+        //TODO: Maybe: Unequip and equip again if failed, randomly
+        //              and destroy any extra equipment.
 
         /* Clean Up */
         free( itmt ); free( itmm );
@@ -301,7 +304,7 @@ static DATA * data = NULL;
 /******************************************************************************
  * FUNCTION:    equip_me           -- Unequip an equipped item.               *
  * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
- *              int      slot      -- Which item will be removed?             *
+ *              int      slot      -- Which item will be equiped?             *
  *              bool     verbose   -- Should we notify the player on success? *
  * RETURNS:     bool               -- TRUE if the action was performed.       *
  ******************************************************************************/
@@ -310,6 +313,8 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
     ITEM * itmptr;
     int slot_of_itmptr;
     bool prompt = ( slot < 0 );
+
+    assert( (prompt)? (verbose == true) : true );
 
     /* Must ask User Which Item? */
     if(( prompt )&&( (slot = get_i_slot("Equip which item? ")) == CANCEL )) {
@@ -322,9 +327,9 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
 
     /* Verify Equipability */
     if( !is_equipable(itmptr) )
-        vsay( "You cannot equip that %s.", itmptr->name );
+        if( verbose ) vsay( "You cannot equip that %s.", itmptr->name );
     else if( itmptr->is_equipped )
-        vsay("That %s is already equipped.", itmptr->name );
+        if( verbose ) vsay("That %s is already equipped.", itmptr->name );
 
     /* Check item type and slot if needed */
     else switch( slot_of_itmptr ) {
@@ -332,6 +337,7 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
         case HAT: /* must equip to HAT slot */
         case ARM: /* must equip to ARM slot */
             if( who->equip[slot_of_itmptr] != NULL ) {
+                if( !verbose ) return false;
                 vsay( "Are you sure you want to replace the %s "
                       "you currently have equipped? ",
                         who->equip[slot_of_itmptr]->name );
@@ -362,6 +368,7 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
             else if( who->equip[OFF] == NULL ) slot = OFF;
 
             else { /* Otherwise we Have to Ask */
+                if( !verbose ) return false;
                 if( who->equip[OFF]->is_2handed ) {
                     vsay( "Are you sure you want to replace the %s "
                           "you currently have equipped? ",
@@ -388,7 +395,7 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                 who->equip[slot] = itmptr;
                 return true;
             } else /* Canceled */
-                vsay( "Canceled: %s not equipped.", itmptr->name );
+                if(verbose) vsay( "Canceled: %s not equipped.", itmptr->name );
         } /* End WEP Case */ break;
 
         case OFF: { /* Two-handed Weapons */
@@ -405,12 +412,14 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
             assert( itmptr->is_2handed );
 
             if( determinent == DUAL_WIELD ) {
+                if( !verbose ) return false;
                 vsay( "Are you sure you want to replace "
                       "the %s and %s with your %s? ",
                         who->equip[WEP]->name, who->equip[OFF]->name,
                             itmptr->name );
                 yn = toupper(getch());
             } else if( determinent > EMPTY_HANDED ) {
+                if( !verbose ) return false;
                 vsay( "Are you sure you want to replace your %s with your %s? ",
                         (determinent == WEP_ONLY)?
                             who->equip[WEP]->name :
@@ -433,7 +442,7 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                 return true;
 
             } else  /* Canceled */
-                vsay( "Canceled: %s not equipped.", itmptr->name );
+                if(verbose) vsay( "Canceled: %s not equipped.", itmptr->name );
 
         }/* End OFF Case */ break;
 

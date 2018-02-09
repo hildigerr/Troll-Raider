@@ -48,7 +48,7 @@
 /******************************************************************************
  * FUNCTION:    equip_me           -- Unequip an equipped item.               *
  * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
- *              int      slot      -- Which item will be removed?             *
+ *              int      slot      -- Which item will be equiped?             *
  *              bool     verbose   -- Should we notify the player on success? *
  * RETURNS:     bool               -- TRUE if the action was performed.       *
  ******************************************************************************/
