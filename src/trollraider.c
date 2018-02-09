@@ -23,6 +23,7 @@ int main( int argc, char* argv[] )
     PLAYER pc;      /* player's character */
     PLAYER npc[MAX_NPC];   /* non player characters */
     STAT_DAT score;
+    unsigned short hut_qt;
     LEVEL curlv[MAX_MAPS]; /* current levels */
     bool run, need_more_cmd, skip_a_turn;
 //    FILE* indata;   /* saved game file access */
@@ -58,13 +59,13 @@ int main( int argc, char* argv[] )
             return( ERROR( NULL, "Failed to initialize NPC", i ) );
 
     /* Generate Dungeon */
-    if( towngen(&curlv[HVILLAGE], score.hut_qt) == false )
-        exit( _ERROR( NULL, "Failed to create town with n huts : n = ",
-                      score.hut_qt, 1 ) );
-    else if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == false )
+    hut_qt = 1 + rng( MAX_HUTS );
+    if( towngen(&curlv[HVILLAGE], hut_qt) == false )
+        exit( Error( "Failed to create town with n huts : n = ", hut_qt ) );
+    if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == false )
         exit( ERROR( NULL, "Failed to create huts :^(", FAIL ) );
 
-    //Actually displays only after program termination
+    //XXX visible only after program termination:
     printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
 
     /* INITIALIZE CURSES */

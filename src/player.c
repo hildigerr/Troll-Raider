@@ -33,7 +33,6 @@ static DATA * data = NULL;
     d->food   = 0;
     d->turn   = 0;
     d->family = 0;
-    d->hut_qt = 1 + rng( MAX_HUTS );
 }/* end init_stat_data func */
 
 

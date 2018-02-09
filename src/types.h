@@ -134,7 +134,6 @@ typedef struct {
     int food;
     unsigned long turn;
     int family;//TODO: make family types and rank score based on who saved
-    unsigned short hut_qt;
 } STAT_DAT;
 
 typedef struct {
