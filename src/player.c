@@ -4,9 +4,9 @@
  * player.c -- Player Character Utility Functions.                            *
  ******************************************************************************/
 
-#include <curses.h>
 #include "player.h"
 #include "item.h"
+#include "cwin.h"
 #include "dat.h"
 
 static DATA * data = NULL;
@@ -35,6 +35,24 @@ static DATA * data = NULL;
     d->family = 0;
     d->hut_qt = rng( MAX_HUTS );
 }/* end init_stat_data func */
+
+
+
+/******************************************************************************
+ * FUNCTION:    get_e_slot  -- Get equipment slot from user.                  *
+ * RETURNS:     int         -- The chosen equipment slot.                     *
+ ******************************************************************************/
+ static int get_e_slot( void )
+{
+    switch (getch()) {
+        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+        case 'a': case 'A': case '1': return 0;
+        case 'b': case 'B': case '2': return 1;
+        case 'c': case 'C': case '3': return 2;
+        case 'd': case 'D': case '4': return 3;
+        default: return NOT_PLACED;
+    }/* End input Switch */
+}/* End get_e_slot Func */
 
 
 /******************************************************************************
@@ -235,5 +253,65 @@ static DATA * data = NULL;
 }/* end init_mon func */
 
 
+/******************************************************************************
+ * FUNCTION:    unequip_me         -- Unequip an equipped item.               *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              int      slot      -- Which equipment slot will be removed?   *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+ bool unequip_me( PLAYER * who, int slot, bool verbose )
+{
+    ITEM * itmptr = NULL;
+    int i, j, cnt = 0;
+    bool prompt = ( slot < 0 );
+    char buf[BUFFER_SIZE]; //TODO: create vararg say func in for cwin
+
+    if( prompt ) { /* Must ask User which Slot to Unequip */
+        /* count how many items we have equipped */
+        for( i = 0; i < MAX_SLOTS; i++ ) if( who->equip[i] != NULL ) {
+            cnt += 1;
+            /* In case there is only 1 Save reference to it */
+            itmptr = who->equip[i]; j = i;
+        }/* End equip For If */
+
+        if( cnt == 0 ) { /* Nothing Equipped */
+            say("You have nothing equipped.");
+            return false;
+        } else if(( cnt == 1 )|| /* assume unequipping that one */
+                 (( cnt == 2 )&&( itmptr->is_2handed ))) {
+            snprintf( buf, BUFFER_SIZE,
+            "Do you really want to remove your %s?", itmptr->name );
+            say( buf );
+            if( toupper( getch() ) == 'Y' ) slot = j;
+            else { /*  Canceled */
+                snprintf( buf, BUFFER_SIZE,
+                    "Canceled! %s still equipped.", itmptr->name );
+                say( buf );
+                return false;
+            }/* End Canceled Else */
+        } else { /* Select Slot */
+            do{ say("Remove which item? "); }
+            while( ( slot = get_e_slot() ) == NOT_PLACED );
+            if( slot == CANCEL ) {
+                say("Canceled: Items still equipped.");
+                return false;
+            } else if( who->equip[cnt] == NULL ) {
+                say("You have no item equipped for that slot");
+                return false;
+            }/* End Check Slot If-Else */
+        }/* End Select Slot Else */
+    }/* End prompt If */
+
+    /* Unequip the Item */
+    if( verbose ) {
+        snprintf( buf, BUFFER_SIZE, "%s removed", who->equip[slot]->name );
+        say( buf );
+    }/* End Verbose If */
+    who->equip[slot]->is_equipped = false;
+    if( who->equip[slot]->is_2handed ) who->equip[(slot==WEP)?OFF:WEP] = NULL;
+    who->equip[slot] = NULL;
+    return true;
+}/* End unequip_me Func */
 
 /************************************EOF***************************************/

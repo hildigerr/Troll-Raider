@@ -6,10 +6,9 @@
 
 #include "rmhv_stdlib.h"
 
-/* Precompiler Constants */
 #define CANCEL      -1
 #define NOT_PLACED  99
-#define CHECK_FLOAT 99.9
+#define BUFFER_SIZE 80
 
 /* get_cmd return values *//* get_subi_cmd return values */
 #define NO_ACTION    0

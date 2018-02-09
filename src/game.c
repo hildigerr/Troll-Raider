@@ -6,6 +6,7 @@
 
 #include "game.h"
 #include "item.h"
+#include "player.h"
 
 
 /******************************************************************************
@@ -104,23 +105,6 @@ static int get_subi_cmd( void )
 
 
 /******************************************************************************
- * FUNCTION:    get_e_slot  -- Get equipment slot from user.                  *
- * RETURNS:     int         -- The chosen equipment slot.                     *
- ******************************************************************************/
- static int get_e_slot( void )
-{
-    switch (getch()) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
-        case 'a': case 'A': case '1': return 0;
-        case 'b': case 'B': case '2': return 1;
-        case 'c': case 'C': case '3': return 2;
-        case 'd': case 'D': case '4': return 3;
-        default: return NOT_PLACED;
-    }/* End input Switch */
-}/* End get_e_slot Func */
-
-
-/******************************************************************************
  * FUNCTION:    get_hand                                                      *
  * RETURNS:     int         -- see definitions in types.h                     *
  ******************************************************************************/
@@ -148,7 +132,6 @@ static int get_subi_cmd( void )
  *    REMOVE_ITEM  -- Unequip an item, keeping it ininventory.                *
  *    DESTROY_ITEM -- Destroy an item so that it no longer exists.            *
  ******************************************************************************/
- #define BUFFER_SIZE 80
  bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd )
 {
     ITEM * itmptr;
@@ -165,53 +148,7 @@ static int get_subi_cmd( void )
         /* Process sub cmd */
         switch( cmd ) {
 
-            case REMOVE_ITEM: {
-                int j, cnt = 0;
-                /* count how many items we have equipped */
-                for( i = 0; i < MAX_SLOTS; i++ ) if( pc->equip[i] != NULL ) {
-                    cnt += 1;
-                    /* In case there is only 1 Save reference to it */
-                    itmptr = pc->equip[i]; j = i;
-                }/* End equip For If */
-
-                if( cnt == 0 ) say("You have nothing equipped.");
-
-                else if( cnt == 1 ) { /* assume unequipping that one */
-                    snprintf( buf, BUFFER_SIZE,
-                        "Do you really want to remove your %s?", itmptr->name );
-                    say( buf );
-                    if( toupper( getch() ) == 'Y' ) {
-                        pc->equip[j] = NULL;
-                        itmptr->is_equipped = false;
-                        snprintf( buf,BUFFER_SIZE, "%s removed", itmptr->name );
-                        say( buf );
-                        done_with_sub = true;
-                    } else { /* Assume Negative Response */
-                        snprintf( buf, BUFFER_SIZE,
-                            "Canceled! %s still equipped.", itmptr->name );
-                        say( buf );
-                    }/* End Canceled Else */
-                }/* end only one item to unequip if */
-
-                else { /* Select Slot */
-                    do{ say("Remove which item? "); }
-                    while( ( cnt = get_e_slot() ) == NOT_PLACED );
-
-                    if( cnt == CANCEL ) say("Canceled: Items still equipped.");
-                    else if( pc->equip[cnt] == NULL )
-                        say("You have no item equipped for that slot");
-                    else{
-                        snprintf( buf,BUFFER_SIZE,
-                            "%s removed", pc->equip[cnt]->name );
-                        say( buf );
-                        pc->equip[cnt]->is_equipped = false;
-                        if( pc->equip[cnt]->is_2handed )
-                            pc->equip[(cnt==WEP)?OFF:WEP] = NULL;
-                        pc->equip[cnt] = NULL;
-                        done_with_sub = true;
-                    }/* end remove item else */
-                }/* end more than one item to remove else */
-            }/* end REMOVE_ITM case */ break;
+            case REMOVE_ITEM: done_with_sub = unequip( pc ); break;
 
             case EQUIPMENT: /* Equip Item */ {
                 int slot_of_itmptr;
