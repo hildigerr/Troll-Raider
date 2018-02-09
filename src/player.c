@@ -154,7 +154,7 @@ static DATA * data = NULL;
             }/* End getp_item If */
         }/* End qt For */
 
-        //TODO: Equip items, convert coins to who->money
+        //TODO: Equip items
 
         /* Clean Up */
         free( itmt ); free( itmm );
@@ -231,7 +231,7 @@ static DATA * data = NULL;
     /* Verify t Param */
     if( ( t < 0 )||( t >  data->qt[QT_TYPES] ) ) {
         Error( "Invalid t input parameter", t );
-        //TODO: Suggest possible atafile corruption
+        //TODO: Suggest possible datafile corruption
         return false;
     }/* End Verify t If */
 
@@ -247,7 +247,7 @@ static DATA * data = NULL;
     who->is_alive = true;
     who->is_awake = false;
     who->is_human = !( t == NPC_TTROLL );
-    who->money = ( t > HUMAN_INCT )? rng( 10 * t ) : 0;//TODO Make meaningful
+    who->money = ( t > HUMAN_INCT )? rng( 10 * t ) : 0;//TODO Make meaningful, adjust based on class
     for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &who->inventory[i] );
     for( i = 0; i < MAX_SLOTS; i++ ) who->equip[i] = NULL;
 

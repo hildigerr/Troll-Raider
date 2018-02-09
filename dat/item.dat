@@ -4,52 +4,47 @@
 # names should be limited to 10 characaters.
 
 # Max Items Per Type:
-#money:melee:reach:range:2hrange:shield:hat:body
-$4:6:5:3:1:3:4:5
+#melee:reach:range:2hrange:shield:hat:body
+$6:5:3:1:3:4:5
 
-#MONEY
-:0:0:0:5:coin:
-:0:0:0:10:coin:
-:0:0:0:25:gem:
-:0:0:0:50:gem:
 
 #WEAPONS (melee)
-:1:4:3:5:club:
-:1:3:4:10:dagger:
-:1:5:5:15:mace:
-:1:5:6:20:axe:
-:1:5:6:20:sword:
-:1:6:5:15:flail:
+:0:4:3:5:club:
+:0:3:4:10:dagger:
+:0:5:5:15:mace:
+:0:5:6:20:axe:
+:0:5:6:20:sword:
+:0:6:5:15:flail:
 
 #WEAPONS (reach)
-:2:5:5:12:pitchfork:
-:2:6:6:20:scythe:
-:2:7:6:25:spear:
-:2:6:7:25:pike:
-:2:7:7:30:halberd:
+:1:5:5:12:pitchfork:
+:1:6:6:20:scythe:
+:1:7:6:25:spear:
+:1:6:7:25:pike:
+:1:7:7:30:halberd:
 
 #WEAPONS (range)
-:3:2:2:4:sling:
-:3:8:1:2:dart:
-:3:5:3:5:knife:
+:2:2:2:4:sling:
+:2:8:1:2:dart:
+:2:5:3:5:knife:
 
 #WEAPONS (range, 2handed)
-:4:6:5:15:bow:
+:3:6:5:15:bow:
 
 #DEFENSE  (shields)
-:5:4:1:20:sml shield:
-:5:3:3:25:med shield:
-:5:2:5:30:lrg shield:
+:4:4:1:20:sml shield:
+:4:3:3:25:med shield:
+:4:2:5:30:lrg shield:
 
 #DEFENSE  (hats)
-:6:0:1:3:cloth hat:
-:6:1:1:6:leathr hat:
-:6:2:2:20:bronz cap:
-:6:3:3:30:iron helm:
+:5:0:1:3:cloth hat:
+:5:1:1:6:leathr hat:
+:5:2:2:20:bronz cap:
+:5:3:3:30:iron helm:
 
 #DEFENSE  (body)
-:7:1:1:10:cloths:
-:7:2:2:20:hydes:
-:7:3:3:30:leathers:
-:7:3:4:40:chainmail:
-:7:1:7:50:platemail:
+:6:1:1:10:cloths:
+:6:2:2:20:hydes:
+:6:3:3:30:leathers:
+:6:3:4:40:chainmail:
+:6:1:7:50:platemail:

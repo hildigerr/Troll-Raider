@@ -130,18 +130,14 @@ int slot_of( const ITEM * ptr )
 
 
 /******************************************************************************
- * FUNCTION:    is_equipable
- * ARGUMENTS:   ITEM * im
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    is_equipable        -- Is the item equipable?                 *
+ * ARGUMENTS:   ITEM * itm          -- The item in question.                  *
+ * RETURNS:     bool                                                          *
  ******************************************************************************/
-bool is_equipable( ITEM * im )//Will change as more types of items are added
+bool is_equipable( ITEM * itm )
 {
-    if(( im->type > 0 )&&(im->type < MAX_ITEM_TYPES))
-        return true;
-    else
-        return false;
+    if( itm->type < MAX_ITEM_TYPES ) return true;
+    else return false;
 }/* end is_equipable func */
 
 

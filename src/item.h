@@ -37,13 +37,11 @@ int slot_of( const ITEM * ptr );
 
 
 /******************************************************************************
- * FUNCTION:    is_equipable
- * ARGUMENTS:   ITEM * im
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    is_equipable        -- Is the item equipable?                 *
+ * ARGUMENTS:   ITEM * itm          -- The item in question.                  *
+ * RETURNS:     bool                                                          *
  ******************************************************************************/
-bool is_equipable( ITEM * im );
+bool is_equipable( ITEM * itm );
 
 /******************************************************************************
  * FUNCTION:    swap_item

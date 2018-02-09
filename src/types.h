@@ -49,15 +49,14 @@
 #define MAX_LV_ITEM         10
 
 /* Equipment Types */
-#define MONEY           0
-#define MELEE           1
-#define REACH           2
-#define RANGE1          3
-#define RANGE2          4
-#define SHIELD          5
-#define TYPHAT          6
-#define TYPARM          7
-#define MAX_ITEM_TYPES  8
+#define MELEE           0
+#define REACH           1
+#define RANGE1          2
+#define RANGE2          3
+#define SHIELD          4
+#define TYPHAT          5
+#define TYPARM          6
+#define MAX_ITEM_TYPES  7
 
 /* NPCs */
 #define MON_DAT "dat/human.dat"

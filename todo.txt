@@ -2,6 +2,7 @@
 Create '?' about/help command.
 Implement SAVE_GAME ability/command.
 Use item names when communicating about them.
+Refer to equipment slots as body parts.
 Some actions take 2 turns.
 
 Adjust Item Based on it's Lv and Whatever?
@@ -10,7 +11,6 @@ Generate sub buildings attached to main buildings with tunnels.
 
 Make skill_check more interesting.
 
-Convert coins to money, or else don't have coin items.
 Make money useable -- perhaps by meeting troll caravan shop between towns.
                    -- get paid for gathered food.
 Implement food and eating!
