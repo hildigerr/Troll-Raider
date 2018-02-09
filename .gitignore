@@ -1,13 +1,3 @@
-/CVS/*
-*/CVS/*
-.cvsignore
-*/.cvsignore
-
 # Object files
-*.o
-*.ko
-*.obj
-*.elf
+src/*.o
 a.out
-
-workspace*.c
