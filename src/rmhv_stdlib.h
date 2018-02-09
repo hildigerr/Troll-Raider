@@ -59,9 +59,9 @@
 /******************************************************************************
  * FUNCTION:    rng     The Random Number God                                 *
  * ARGUMENTS:   int     max_die_face                                          *
- * RETURNS:     int     random int 1 to max_die_face                          *
+ * RETURNS:     int     random int 0 up to max_die_face                       *
  ******************************************************************************/
-#define rng( max_die_face ) (1 + ( rand() % max_die_face ))
+#define rng( max_die_face ) ( rand() % max_die_face )
 
 /* Prototypes */
 int _ERROR( const char * who, const char * barf, int status, bool debug );

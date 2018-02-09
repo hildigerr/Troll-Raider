@@ -282,8 +282,8 @@ bool towngen( LEVEL * l, unsigned short n )//n = score.room_qt
         done  = false;
         while( done  == false )
         {
-            while( ( hutspot[i].rowy = rng(MAX_ROW) - ( 3 + MIN_HUT_HGT ) ) <2 );//ERROR("r=", hutspot[i].rowy );
-            while( ( hutspot[i].colx = rng(MAX_COL) - ( 3 + MIN_HUT_WID ) ) <2 );//ERROR("c=", hutspot[i].colx );
+            while( ( hutspot[i].rowy = 1 + rng(MAX_ROW) - ( 3 + MIN_HUT_HGT ) ) <2 );//ERROR("r=", hutspot[i].rowy );
+            while( ( hutspot[i].colx = 1 + rng(MAX_COL) - ( 3 + MIN_HUT_WID ) ) <2 );//ERROR("c=", hutspot[i].colx );
             done  = true;
             if( i == 0 ) continue;
             else for( z = 1; z <= i; z++ )
@@ -297,8 +297,8 @@ bool towngen( LEVEL * l, unsigned short n )//n = score.room_qt
         {
             /* create room dimensions */
             do{
-                dvert = rng(MAX_HUT_HGT);
-                dhorz = rng(MAX_HUT_WID);
+                dvert = 1 + rng(MAX_HUT_HGT);
+                dhorz = 1 + rng(MAX_HUT_WID);
 
                 room[i].a.rowy = hutspot[i].rowy - dvert;
                 room[i].a.colx = hutspot[i].colx - dhorz;
@@ -320,7 +320,7 @@ bool towngen( LEVEL * l, unsigned short n )//n = score.room_qt
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         /* TODO: Make Enterance Face Fathest Wall? */
-            switch( rng(4) )//NOW: Face Random DirectionFAIL
+            switch( 1+rng(4) )//NOW: Face Random DirectionFAIL
             {
                 case NORTH:hutspot[i].rowy = room[i].a.rowy; break;//NORTH
                 case SOUTH:hutspot[i].rowy = room[i].b.rowy - 1; break;//SOUTH

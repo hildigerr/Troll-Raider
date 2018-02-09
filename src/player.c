@@ -20,7 +20,7 @@ static DATA * data = NULL;
  ******************************************************************************/
  bool skill_check( int ability, int adjust )//TODO: Make more interesting
 {
-    return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
+    return ( ( 1 + rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
 }/* end skill_check func */
 
 
@@ -33,7 +33,7 @@ static DATA * data = NULL;
     d->food   = 0;
     d->turn   = 0;
     d->family = 0;
-    d->hut_qt = rng( MAX_HUTS );
+    d->hut_qt = 1 + rng( MAX_HUTS );
 }/* end init_stat_data func */
 
 
@@ -124,7 +124,7 @@ static DATA * data = NULL;
 
     /* Find Max Qt of Starting Equipment */
     cptr = ++end; while( *end != '|' ) ++end; *end = '\0';
-    max_qt = atoi( cptr ); if( max_qt ) max_qt = rng( max_qt );
+    max_qt = atoi( cptr ); if( max_qt ) max_qt = 1 + rng( max_qt );
     if(( max_qt < min_qt )||( max_qt > MAX_HOLD )) max_qt = min_qt;
 
     if( max_qt ) { /* Character Gets Starting Equipment */
@@ -151,7 +151,7 @@ static DATA * data = NULL;
 
         /* Retrieve Equipment */
         for( i = 0; i < max_qt; i++ ) {
-            int selection = (itmm[i] < 1)? i : rng(itmm[i])-1;
+            int selection = (itmm[i] < 1)? i : rng(itmm[i]);
             if( !getp_item( &(who->inventory[i]), itmt[selection],
                                                   itmm[selection] ) ) {
                 Error( "Failed to retrieve Equipment.", selection );
@@ -189,7 +189,7 @@ static DATA * data = NULL;
         return false;
     }/* End Load Data If */
 
-    for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = rng(MAX_STAT_VAL);
+    for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = 1 + rng(MAX_STAT_VAL);
     for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &p->inventory[i] );
 
     for( i = 0; i < MAX_SLOTS; i++ ) p->equip[i] = NULL;
@@ -245,7 +245,7 @@ static DATA * data = NULL;
     }/* End Verify t If */
 
     /* Select Random member of NPC Type */
-    do{ m = rng(data->max[t]) - 1; } while( ( t == NPC_TTROLL )&&( m == 0 ) );
+    do{ m = rng( data->max[t] ); } while( ( t == NPC_TTROLL )&&( m == 0 ) );
     for( i=0; i < t; i++ ) for( j=0; j < data->max[i]; j++ ) ++s;
     for( i=0; i < m; i++ ) ++s;
 
@@ -278,7 +278,7 @@ static DATA * data = NULL;
             stat_seed = MAX_STAT_VAL + ( MAX_STAT_VAL /2 );
             who->explv = 0.15;//TODO Make meaningful, adjust based on dificulty
     }/* End t Switch */
-    for( i = 0; i < MAX_STATS; i++ ) who->stats[i] = rng(stat_seed);
+    for( i = 0; i < MAX_STATS; i++ ) who->stats[i] = 1 + rng(stat_seed);
     who->hp[1] = who->hp[0] = who->stats[CON];
 
     /* Slice Line XXX Line validity Unchecked */
@@ -326,10 +326,11 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
     slot_of_itmptr = slot_of(itmptr);
 
     /* Verify Equipability */
-    if( !is_equipable(itmptr) )
+    if( !is_equipable(itmptr) ) {
         if( verbose ) vsay( "You cannot equip that %s.", itmptr->name );
-    else if( itmptr->is_equipped )
+    } else if( itmptr->is_equipped ) {
         if( verbose ) vsay("That %s is already equipped.", itmptr->name );
+    }/* End is_equipped If */
 
     /* Check item type and slot if needed */
     else switch( slot_of_itmptr ) {

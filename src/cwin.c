@@ -90,7 +90,7 @@ bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
     wprintw( d, "\n\n  Food: %d\n  Family Saved: %d ", s->food, s->family );
 
     /* Initialize i for Flavor */
-    i = rng(DFMAX) - 1;
+    i = rng(DFMAX);
 
     switch(p->maplv) {
 //        case TVILLAGE:    wprintw(d,"\n\n Troll Village ");    break;

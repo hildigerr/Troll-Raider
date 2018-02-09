@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
 
     /* INITIALIZE NPC ARRAY */
     for( i = 0; i < MAX_NPC; i++ )
-        if( init_mon( &npc[i], rng(NPC_TYPE_QT)-1 ) == false )
+        if( init_mon( &npc[i], rng(NPC_TYPE_QT) ) == false )
             return( ERROR( NULL, "Failed to initialize NPC", i ) );
 
     /* Generate Dungeon */
@@ -104,19 +104,19 @@ int main( int argc, char* argv[] )
                     " From which direction would you like to attack? ");
                 switch( getch() ) {
                     case 'N': case 'n': case '8': /* NORTH */
-                        while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 );
+                        pc.locc = 1 + rng( MAX_COL - 2 );
                         pc.locr = 1;
                         break;
                     case 'S': case 's': case '2': /* SOUTH */
-                        while( ( pc.locc = rng( MAX_COL - 2 ) ) < 1 );
+                        pc.locc = 1 + rng( MAX_COL - 2 );
                         pc.locr = ( MAX_ROW - 2 );
                         break;
                     case 'E': case 'e': case '6': /* EAST */
-                        while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 );
+                        pc.locr = 1 + rng( MAX_ROW - 2 );
                         pc.locc = ( MAX_COL - 2 );
                         break;
                     case 'W': case 'w': case '4': /* WEST */
-                        while( ( pc.locr = rng( MAX_ROW - 2 ) ) < 1 );
+                        pc.locr = 1 + rng( MAX_ROW - 2 );
                         pc.locc = 1;
                         break;
                     case '9': /* NORTH_EAST */

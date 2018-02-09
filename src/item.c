@@ -37,7 +37,7 @@ bool getp_item( ITEM * itm, int t, int m )
     }/* End t in range If */
 
     /* Verify m Param */
-    if( m < 0 ) m = rng( data->max[t] ) - 1;
+    if( m < 0 ) m = rng( data->max[t] );
     else if( m > data->max[t] ) {
         Error( "Invalid m input parameter", m );
         return false;
