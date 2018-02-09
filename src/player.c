@@ -98,61 +98,67 @@ static DATA * data = NULL;
  * FUNCTION:    outfit_me     -- Select starting equipment for a characater.  *
  * ARGUMENTS:   PLAYER * who  -- The character to equip.                      *
  *              char   * line -- The string describing how to allocate gear.  *
- * NOTE:  line format is ":I:Q:N:T:M:...:@Name:"                              *
- *   where  I = Type Number                                                   *
- *          Q = Max Qt of Starting Equipment                                  *
- *          N = The number of T:M pairs which follow.                         *
- *        T:M = Equipment Reference Values                                    *
- *          M = Maximum index of T type, or -1 if any.                        *
- * WARNING: XXX The line will have all ':' chars replaced with '\0'.          *
+ * NOTE:  line format is ":T:N:M|K:X|...|@Name:"                              *
+ *   where  T = Type Number                                                   *
+ *          N = Min Qt of Starting Equipment                                  *
+ *          M = Max Qt of Starting Equipment                                  *
+ *              The number of K:X pairs which follow.                         *
+ *        K:X = Equipment Reference Values                                    *
+ *          X = Maximum index of K item type, or -1 if any.                   *
+ * WARNING: XXX The line will have some elements replaced with '\0'.          *
+ *          XXX The line is expected to be valid.                             *
  ******************************************************************************/
  static bool outfit_me( PLAYER * who,  char * line )
 {
-    int i, qt, option_qt;
-    char * cptr, * end = cptr = &line[3]; //XXX Skip Type -- Unchecked
+    unsigned int t, i, min_qt, max_qt;
+    char * cptr, * end = cptr = &line[1];
+
+    /* Retrieve Player Type */
+    while( *end != ':' ) ++end; *end = '\0';
+    t = atoi( cptr );
+
+    /* Find Min Qt of Starting Equipment */
+    cptr = ++end; while( *end != ':' ) ++end; *end = '\0';
+    min_qt = atoi( cptr );
+    if( min_qt > MAX_HOLD ) min_qt = 0;
 
     /* Find Max Qt of Starting Equipment */
-    while( *end != ':' ) ++end; *end = '\0';
-    qt = atoi( cptr );
-    if( qt < 0 ) qt = 0; else if( qt > MAX_HOLD ) qt = MAX_HOLD;
+    cptr = ++end; while( *end != '|' ) ++end; *end = '\0';
+    max_qt = atoi( cptr ); if( max_qt ) max_qt = rng( max_qt );
+    if(( max_qt < min_qt )||( max_qt > MAX_HOLD )) max_qt = min_qt;
 
-    /* Determine Starting Equipment Options */
-    cptr = ++end; while( *end != ':' ) ++end; *end = '\0';
-    option_qt = atoi( cptr );
-    if( option_qt < 0 ) option_qt = 0;
-
-    if( qt && option_qt ) { /* Character Gets Starting Equipment */
+    if( max_qt ) { /* Character Gets Starting Equipment */
         int * itmt = NULL, * itmm = NULL;
-        if( !(itmt = CALLOC( option_qt, int )) ) {
-            Error( "Failed to allocate itmt array", __LINE__ );
+        if( !(itmt = CALLOC( max_qt, int )) ) {
+            Error( "Failed to allocate itmt array", max_qt );
             return false;
         }/* End !CALLOC If */
-        if( !(itmm = CALLOC( option_qt, int )) ) {
+        if( !(itmm = CALLOC( max_qt, int )) ) {
             free( itmt );
-            Error( "Failed to allocate itmm array", __LINE__ );
+            Error( "Failed to allocate itmm array", max_qt );
             return false;
         }/* End !CALLOC If */
 
-        /* Parse Equipment Reference Values */
-        for( i = 0; i < option_qt; i++ ) {
+        /* Determine Starting Equipment Options */
+        for( i = 0; i < max_qt; i++ ) {
             cptr = ++end;
             while( *end != ':' ) ++end; *end = '\0';
             itmt[i] = atoi( cptr );
             cptr = ++end;
-            while( *end != ':' ) ++end; *end = '\0';
+            while( *end != '|' ) ++end; *end = '\0';
             itmm[i] = atoi( cptr );
-        }/* End option_qt For */
+        }/* End max_qt For */
 
         /* Retrieve Equipment */
-        for( qt = rng( qt ), i=0; qt > 0; --qt,i++ ) {
-            int selection = rng(option_qt)-1;
+        for( i = 0; i < max_qt; i++ ) {
+            int selection = (itmm[i] < 1)? i : rng(itmm[i])-1;
             if( !getp_item( &(who->inventory[i]), itmt[selection],
                                                   itmm[selection] ) ) {
-                Error( "Failed to retrieve Equipment.", qt );
+                Error( "Failed to retrieve Equipment.", selection );
                 free( itmt ); free( itmm );
                 return false;
             }/* End getp_item If */
-        }/* End qt For */
+        }/* End max_qt For */
 
         //TODO: Equip items
 
