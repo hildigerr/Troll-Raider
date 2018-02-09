@@ -4,14 +4,13 @@
  * game.c -- Game Utility Functions.                                          *
  ******************************************************************************/
 
-/* Local Headers */
 #include "game.h"
 #include "item.h"
 
 
 /******************************************************************************
- * FUNCTION:    get_cmd                                                       *
- * RETURNS:     int         see definitions in types.h                        *
+ * FUNCTION:    get_cmd     -- Get command input.                             *
+ * RETURNS:     int         -- The command input (see definitions in types.h) *
  ******************************************************************************/
  int get_cmd( void )
 {
@@ -40,8 +39,8 @@
 
 
 /******************************************************************************
- * FUNCTION:    get_subi_cmd                                                  *
- * RETURNS:     int         see definitions in types.h                        *
+ * FUNCTION:    get_subi_cmd        -- Get inventory sub command.             *
+ * RETURNS:     int                 -- The command received.                  *
  ******************************************************************************/
 static int get_subi_cmd( void )
 {
@@ -134,18 +133,6 @@ static int get_subi_cmd( void )
         default: return NOT_PLACED;
     }/* End input Switch */
 }/* End get_hand Func */
-
-
-/******************************************************************************
- * FUNCTION:    skill_check                                                   *
- * ARGUMENTS:   int     ability     -- The ability score being tested.        *
- *              int     adjust      -- Adjustment to the test.                *
- * RETURNS:     bool                -- Result of test                         *
- ******************************************************************************/
- bool skill_check( int ability, int adjust )//TODO: Make more interesting
-{
-    return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
-}/* end skill_check func */
 
 
 /******************************************************************************

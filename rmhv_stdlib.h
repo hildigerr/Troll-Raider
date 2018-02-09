@@ -9,7 +9,6 @@
 
 #pragma once
 
-/* Stystem Headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -42,9 +41,10 @@
 #endif
 
 /* Precompiler Constants */
-#define FAIL 1
-#define KEY_ESC 27
-#define READ_ONLY "r"
+#define CANCEL      -1
+#define FAIL         1
+#define KEY_ESC     27
+#define READ_ONLY  "r"
 
 /* Macros */
 #define ERROR(w,b,s) _ERROR(w,b,s,FALSE)
@@ -55,6 +55,13 @@
 /* From Sobelman & Krekelberg: */
 #define MALLOC(x)   ((x*)malloc(sizeof(x)))
 #define CALLOC(n,x) ((x*)calloc(n,sizeof(x)))
+
+/******************************************************************************
+ * FUNCTION:    rng     The Random Number God                                 *
+ * ARGUMENTS:   int     max_die_face                                          *
+ * RETURNS:     int     random int 1 to max_die_face                          *
+ ******************************************************************************/
+#define rng( max_die_face ) (1 + ( rand() % max_die_face ))
 
 /* Prototypes */
 int _ERROR( const char * who, const char * barf, int status, bool debug );

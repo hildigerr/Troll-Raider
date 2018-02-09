@@ -5,9 +5,29 @@
  ******************************************************************************/
 
 #include <math.h>
-
+#include <curses.h>
 #include "map.h"
 #include "item.h"
+
+/* Macro Functions */
+#define squared(x) (x * x)
+
+/******************************************************************************
+ * FUNCTION:    biggest                                                       *
+ * ARGUMENTS:   double  a   -- The first value to compare.                    *
+ *              double  b   -- The second value to compare.                   *
+ * RETURNS:     double      -- The largest of a and b, or zero if the same.   *
+ ******************************************************************************/
+#define biggest( a, b ) (( a == b )? 0.0 : ( a > b )? a : b)
+
+
+/******************************************************************************
+ * FUNCTION:    smallest                                                      *
+ * ARGUMENTS:   int     a   -- The first value to compare.                    *
+ *              int     b   -- The second value to compare.                   *
+ * RETURNS:     int         -- a iff it is smaller than b.                    *
+ ******************************************************************************/
+#define smallest( a, b ) (( a < b )? a : b)
 
 /******************************************************************************
  * FUNCTION:    dist                                                          *
@@ -150,6 +170,20 @@ char get_map_icon( LOC here )
 
 
 /******************************************************************************
+ * FUNCTION:    draw_map                                                      *
+ * ARGUMENTS:   LEVEL* curlv   -- The Level to draw.                          *
+ ******************************************************************************/
+void draw_map( LEVEL * curlv )
+{
+    int r, c;
+    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
+        move(r,c);
+        addch( get_map_icon( curlv->map[r][c] ) );
+    }/* end [r][c] screen initialization */
+}
+
+
+/******************************************************************************
  * FUNCTION:    buildgen
  * ARGUMENTS:   LEVEL *  outside
  *              LEVEL *  inside
@@ -213,7 +247,7 @@ bool buildgen( LEVEL * outside, LEVEL * inside )
  * WARNING:
  * NOTE:
  ******************************************************************************/
-bool towngen( LEVEL* l, unsigned short n )//n = score.room_qt
+bool towngen( LEVEL * l, unsigned short n )//n = score.room_qt
 {
     unsigned short i,z;
     int dvert, dhorz;

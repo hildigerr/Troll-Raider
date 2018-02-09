@@ -5,11 +5,7 @@
  ******************************************************************************/
 #pragma once
 
-/* System Header */
 #include <curses.h>
-
-/* Local Header */
-#include "calc.h"
 #include "types.h"
 
 /* Display Window Definitions */
@@ -26,15 +22,8 @@ extern WINDOW * display_btm;
  * ARGUMENTS:   WINDOW *  where   -- The window to which we will write        *
  *              char   *  string  -- The string which will be written         *
  ******************************************************************************/
-void wsay( WINDOW * where, char * string );
+void wsay( WINDOW * where, const char * string );
 #define say(x) wsay(display_btm,x)
-
-
-/******************************************************************************
- * FUNCTION:    draw_map                                                      *
- * ARGUMENTS:   LEVEL * curlv   -- The Level to draw.                         *
- ******************************************************************************/
-void draw_map( LEVEL * curlv );
 
 
 /******************************************************************************

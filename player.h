@@ -5,9 +5,16 @@
  ******************************************************************************/
 #pragma once
 
-/* Local Header */
-#include "calc.h"
 #include "types.h"
+
+
+ /******************************************************************************
+ * FUNCTION:    skill_check                                                   *
+ * ARGUMENTS:   int     ability     -- The ability score being tested.        *
+ *              int     adjust      -- Adjustment to the test.                *
+ * RETURNS:     bool                -- Result of test                         *
+ ******************************************************************************/
+ bool skill_check( int ability, int adjust );
 
 
 /******************************************************************************

@@ -4,7 +4,6 @@
  ******************************************************************************/
 #pragma once
 
-/* Local Header */
 #include "rmhv_stdlib.h"
 
 /* Precompiler Constants */

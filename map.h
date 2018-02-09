@@ -5,8 +5,6 @@
  ******************************************************************************/
  #pragma once
 
-/* Local Header */
-#include "calc.h"
 #include "types.h"
 
 /* Map Generation Macros */
@@ -53,7 +51,14 @@ void init_lv( LEVEL * l, short t );
  * WARNING:
  * NOTE:
  ******************************************************************************/
-char get_map_icon(LOC here);
+char get_map_icon( LOC here );
+
+
+/******************************************************************************
+ * FUNCTION:    draw_map                                                      *
+ * ARGUMENTS:   LEVEL * curlv   -- The Level to draw.                         *
+ ******************************************************************************/
+void draw_map( LEVEL * curlv );
 
 
 /******************************************************************************

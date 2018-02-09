@@ -4,12 +4,25 @@
  * player.c -- Player Character Utility Functions.                            *
  ******************************************************************************/
 
-/* Local Headers */
+#include <curses.h>
 #include "player.h"
 #include "item.h"
 #include "dat.h"
 
 static DATA * data = NULL;
+
+
+/******************************************************************************
+ * FUNCTION:    skill_check                                                   *
+ * ARGUMENTS:   int     ability     -- The ability score being tested.        *
+ *              int     adjust      -- Adjustment to the test.                *
+ * RETURNS:     bool                -- Result of test                         *
+ ******************************************************************************/
+ bool skill_check( int ability, int adjust )//TODO: Make more interesting
+{
+    return ( ( rng(MAX_STAT_VAL) + adjust ) < ability )? true : false;
+}/* end skill_check func */
+
 
 /******************************************************************************
  * FUNCTION:    init_stat_data                                                *

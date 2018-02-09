@@ -6,7 +6,6 @@
 
 #include "item.h"
 #include "dat.h"
-#include "calc.h"
 
 #define ITEM_DATA_ELEMENT_QT 5
 

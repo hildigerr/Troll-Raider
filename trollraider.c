@@ -5,10 +5,7 @@
 
 #define VERSION "0.4.1"
 
-/* System Headers */
 #include <time.h>
-
-/* Local Headers */
 #include "game.h"
 #include "player.h"
 #include "item.h"

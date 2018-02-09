@@ -5,12 +5,11 @@
  ******************************************************************************/
 #pragma once
 
-/* Local Header */
 #include "cwin.h"
 
 /******************************************************************************
- * FUNCTION:    get_cmd                                                       *
- * RETURNS:     int         see definitions in types.h                        *
+ * FUNCTION:    get_cmd     -- Get command input.                             *
+ * RETURNS:     int         -- The command input (see definitions in types.h) *
  ******************************************************************************/
  int get_cmd( void );
 
@@ -20,15 +19,6 @@
  * RETURNS:     int         -- see definitions in types.h                     *
  ******************************************************************************/
  int get_hand( void );
-
-
-/******************************************************************************
- * FUNCTION:    skill_check                                                   *
- * ARGUMENTS:   int     ability     -- The ability score being tested.        *
- *              int     adjust      -- Adjustment to the test.                *
- * RETURNS:     bool                -- Result of test                         *
- ******************************************************************************/
- bool skill_check( int ability, int adjust );
 
 
 /******************************************************************************
@@ -44,7 +34,7 @@
  *    REMOVE_ITEM  -- Unequip an item, keeping it ininventory.                *
  *    DESTROY_ITEM -- Destroy an item so that it no longer exists.            *
  ******************************************************************************/
- bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd );
+ bool manage_inventory( PLAYER * pc, LOC * active_loc, int cmd );
 
 
 /************************************EOF***************************************/
