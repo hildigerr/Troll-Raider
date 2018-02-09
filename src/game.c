@@ -67,22 +67,6 @@ static int get_subi_cmd( void )
 
 
 /******************************************************************************
- * FUNCTION:    get_i_slot  -- Get Inventory Slot from user.                  *
- * RETURNS:     int         -- The chosen inventory slot.                     *
- ******************************************************************************/
- static int get_i_slot( void )
-{
-    int input = getch();
-    switch ( input ) {
-        case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
-        case '1': case '2': case '3': case '4': case '5': case '6': case '7':
-        case '8': case '9': case '0': return input - '0';
-        default: return NOT_PLACED;
-    }/* End input Switch */
-}/* End get_i_slot Func */
-
-
-/******************************************************************************
  * FUNCTION:    get_u_slot    -- Get either inventory or equipment slot       *
  * RETURNS:     int           -- The chosen slot.                             *
  * NOTE: Treats input 'a' through 'd' as hexidecimal to distinguish between   *
@@ -105,21 +89,6 @@ static int get_subi_cmd( void )
 
 
 /******************************************************************************
- * FUNCTION:    get_hand                                                      *
- * RETURNS:     int         -- see definitions in types.h                     *
- ******************************************************************************/
- int get_hand( void )
-{
-    switch( getch() ) {
-        case '1': case 'r': case 'R': case 'a': case 'A': return WEP;
-        case '2': case 'l': case 'L': case 'b': case 'B': return OFF;
-        case '0': case 'q': case 'Q': case ' ': case KEY_ESC: return CANCEL;
-        default: return NOT_PLACED;
-    }/* End input Switch */
-}/* End get_hand Func */
-
-
-/******************************************************************************
  * FUNCTION:    manage_inventory                                              *
  * ARGUMENTS    PLAYER *  pc          -- The Player's Character               *
  *              LOC    *  active_loc  -- The Player's Location (For Dropping) *
@@ -134,7 +103,6 @@ static int get_subi_cmd( void )
  ******************************************************************************/
  bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd )
 {
-    ITEM * itmptr;
     unsigned int i; /* iterator */
     bool done_with_sub = false;
 
@@ -149,151 +117,7 @@ static int get_subi_cmd( void )
 
             case REMOVE_ITEM: done_with_sub = unequip( pc ); break;
 
-            case EQUIPMENT: /* Equip Item */ {
-                int slot_of_itmptr;
-                /* Which Item? */
-                do{ say("Equip which item? "); }
-                while(( cmd = get_i_slot()) == NOT_PLACED );
-
-                if( cmd == CANCEL ) { say("Equip Item Canceled."); continue; }
-
-                itmptr = &(pc->inventory[cmd]);
-                slot_of_itmptr = slot_of(itmptr);
-
-                /* Verify Equipability */
-                if( !is_equipable(itmptr) )
-                    say("You cannot equip that item."); // TODO use name
-                else if( itmptr->is_equipped )
-                    say("That item is already equipped."); // TODO use name
-
-                /* Check item type and slot if needed */
-                else switch( slot_of_itmptr ) {
-
-                    case HAT: /* must equip to HAT slot */
-                    case ARM: /* must equip to ARM slot */
-                        if( pc->equip[slot_of_itmptr] != NULL ) {
-                            vsay( "Are you sure you want to replace the %s "
-                                  "you currently have equipped? ",
-                                    pc->equip[slot_of_itmptr]->name );
-                            if( toupper(getch()) == 'Y' ) {
-                                /* Unequip old item */
-                                pc->equip[slot_of_itmptr]->is_equipped = false;
-                                vsay( "%s removed!",
-                                    pc->equip[slot_of_itmptr]->name );
-                                //TODO Takes 2 turns//use skip turn flag
-                                //  or force user to perform remove command
-                                //  -- Maybe set via opt or difficulty lv?
-                            } else /* assume no */ {
-                                vsay( "Canceled. You did not replace your %s.",
-                                        pc->equip[slot_of_itmptr]->name );
-                                cmd = NO_ACTION;/* Reset cmd for next loop */
-                                continue;
-                            }/* End Y/N If-Else */
-                        }/* End !empty Slot If */
-                        vsay( "%s equipped!", itmptr->name );
-                        itmptr->is_equipped = true;
-                        pc->equip[slot_of_itmptr] = itmptr;
-                        done_with_sub = true;
-                        break;
-
-                    case WEP: { /* can be in WEP or OFF */
-                        /* Select Weapon Slot */
-                        int slot = NOT_PLACED;
-                        /* if unarmed arm without hesitation in 1st slot */
-                        if( pc->equip[WEP] == NULL ) slot = WEP;
-                        /* else arm in offhand without hesitation if possible */
-                        else if( pc->equip[OFF] == NULL ) slot = OFF;
-
-                        else { /* Otherwise we Have to Ask */
-                            if( pc->equip[OFF]->is_2handed ) {
-                                vsay( "Are you sure you want to replace the %s "
-                                      "you currently have equipped? ",
-                                            pc->equip[OFF]->name );
-                                    if( toupper(getch()) == 'Y' ) {
-                                        /* Begin Unequiping of old item */
-                                        pc->equip[OFF] = NULL;
-                                        slot = WEP;
-                                    }/* End Affirm Swaping If */
-                            } else { /* Dual Wielding */
-                                /* Ask if want to replace 1st or 2nd Slot */
-                                say("Replace which item?");
-                                slot = get_hand();
-                            }/* End Dual Wield Else */
-
-                            /* Complete Unequiping of Old Item  */
-                            if( ( slot == WEP )||( slot == OFF ) ) {
-                                pc->equip[slot]->is_equipped = false;
-                                vsay( "%s removed!", pc->equip[slot]->name );
-                                //TODO: takes extra turn.
-                            }/* End unequiping If */
-                        }/* End Ask Else */
-
-                        /* Equip New Item */
-                        if( ( slot == WEP )||( slot == OFF ) ) {
-                            vsay( "%s equipped!", itmptr->name );
-                            itmptr->is_equipped = true;
-                            pc->equip[slot] = itmptr;
-                            done_with_sub = true;
-                        } else /* Canceled */
-                            vsay( "Canceled: %s not equipped.", itmptr->name );
-                    } /* End WEP Case */ break;
-
-                    case OFF: { /* Two-handed Weapons */
-                        #define EMPTY_HANDED 0
-                        #define WEP_ONLY     1
-                        #define OFF_ONLY     2
-                        #define DUAL_WIELD   3
-                        #define TWO_HANDED   7
-                        int determinent = ( (pc->equip[WEP])? 1 : 0 ) +
-                            ( (pc->equip[OFF])?
-                                ( (pc->equip[OFF]->is_2handed)? 6 : 2 ) : 0 );
-                        char yn = 'A'; /* Ask */
-
-                        assert( itmptr->is_2handed );
-
-                        if( determinent == DUAL_WIELD ) {
-                            vsay( "Are you sure you want to replace "
-                                  "the %s and %s with your %s? ",
-                                    pc->equip[WEP]->name, pc->equip[OFF]->name,
-                                        itmptr->name );
-                            yn = toupper(getch());
-                        } else if( determinent > EMPTY_HANDED ) {
-                            vsay( "Are you sure you want to replace "
-                                  "your %s with your %s? ",
-                                    (determinent == WEP_ONLY)?
-                                        pc->equip[WEP]->name :
-                                        pc->equip[OFF]->name,
-                                        itmptr->name );
-                            yn = toupper(getch());
-                        } else yn = 'Y'; /* EMPTY_HANDED -- Assume Yes */
-
-                        if( yn == 'Y' ) { /* Unequip old and Equip new */
-
-                            /* Uneqip Old Item *///TODO say it's so, take extra turn(s)
-                            if( pc->equip[WEP] )
-                                pc->equip[WEP]->is_equipped = false;
-                            if( pc->equip[OFF] )
-                                pc->equip[OFF]->is_equipped = false;
-
-                            /* Equip New Item */
-                            vsay( "%s equipped!", itmptr->name );
-                            itmptr->is_equipped = true;
-                            pc->equip[WEP] = itmptr; //XXX Is this how I want to do it?
-                            pc->equip[OFF] = itmptr; //XXX Point both hands to the same item.
-                            done_with_sub = true;
-
-                        } else  /* Canceled */
-                            vsay( "Canceled: %s not equipped.", itmptr->name );
-
-                    }/* End OFF Case */ break;
-
-                    default: /* This should be dead code: */
-                        ERROR( "Invalid item",
-                               "verify datafile not corrupted!",slot_of_itmptr);
-                        assert( slot_of_itmptr == MAX_SLOTS ); /* Should Pass */
-                        assert( slot_of_itmptr != MAX_SLOTS ); /* Force Fail  */
-                }/* end slot switch */
-            }/* end EQUIPMENT sub cmd */ break;
+            case EQUIPMENT: done_with_sub = equip_item( pc ); break;
 
             case DESTROY_ITEM: {
                 /* Select Slot */
@@ -318,11 +142,11 @@ static int get_subi_cmd( void )
                     } else { /* There is a real and unequpped item there */
                         /* confirm destruction -- last chance */
                         say("Last chance: "
-                            "Are you sure you want to destroy that item? ");
+                            "Are you sure you want to destroy that item? "); //TODO Use Item name
                         if( toupper(getch()) == 'Y' ) {
                             /* destroy item */
                             set_empty_item(&(pc->inventory[cmd]));
-                            say("Item Destroyed!");
+                            say("Item Destroyed!");//TODO Use Item name
                             done_with_sub = true;
                         } else /* assume no */
                             say("Canceled. Nothing was destroyed.");
@@ -337,12 +161,12 @@ static int get_subi_cmd( void )
                     else /* item exists */ {
                         /* confirm destruction -- last chance */
                         say("Last chance: "
-                            "Are you sure you want to destroy that item? ");
+                            "Are you sure you want to destroy that item? ");//TODO Use Item name
                         if( toupper(getch()) == 'Y' ) {
                             /* destroy item */
                             set_empty_item(pc->equip[cmd]);
                             pc->equip[cmd] = NULL;
-                            say("Item Destroyed!");
+                            say("Item Destroyed!");//TODO Use Item name
                             done_with_sub = true;
                         } else /* assume no */
                             say("Canceled. Nothing was destroyed.");
@@ -367,9 +191,9 @@ static int get_subi_cmd( void )
                         // copy item to floor//remove from player//    set_empty_item();
                         if( active_loc->litter.is_ == false ) {
                             swap_item( &(active_loc->litter), &(pc->inventory[cmd]) );
-                            say("Item Dropped!");
+                            say("Item Dropped!");//TODO Use Item name
                         }/* end empty floor location */
-                        else say("You can't drop that here.");//TODO
+                        else say("You can't drop that here.");//TODO implement heap of junk container?//TODO Use Item name
                         done_with_sub = true;
                     }/* end real item else */
                 }/* end item selection if */
@@ -386,10 +210,10 @@ static int get_subi_cmd( void )
                             pc->equip[cmd]->is_equipped = false;
                             swap_item( &(active_loc->litter), pc->equip[cmd] );
                             pc->equip[cmd] = NULL;
-                            say("Item dropped!");
+                            say("Item dropped!");//TODO Use Item name
                             if( slot_of( &(active_loc->litter) ) != ARM ) return true;//equipped items that are non Armor are free to drop
                         }/* end empty floor location */
-                        else say("You can't drop that here.");//TODO
+                        else say("You can't drop that here.");//TODO implement heap of junk container?//TODO Use Item name
                         done_with_sub = true;
                     }/* end item exists else */
                 }/* end equip select if */

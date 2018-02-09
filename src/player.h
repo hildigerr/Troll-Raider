@@ -46,6 +46,17 @@
 
 
 /******************************************************************************
+ * FUNCTION:    equip_me           -- Unequip an equipped item.               *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              int      slot      -- Which item will be removed?             *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+bool equip_me( PLAYER * pc, int slot, bool verbose );
+#define equip_item(x) equip_me(x,-1,true)
+
+
+/******************************************************************************
  * FUNCTION:    unequip_me         -- Unequip an equipped item.               *
  * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
  *              int      slot      -- Which equipment slot will be removed?   *
