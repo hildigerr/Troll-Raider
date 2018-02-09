@@ -6,6 +6,7 @@
 #pragma once
 
 #include <curses.h>
+#include <stdarg.h>
 #include "types.h"
 
 /* Display Window Definitions */
@@ -27,6 +28,15 @@ void wsay( WINDOW * where, const char * string );
 
 
 /******************************************************************************
+ * FUNCTION:    vsay                                                          *
+ * ARGUMENTS:   const char * fmt  -- The format string.                       *
+ *              ...               -- A variable quantity of arguments.        *
+ * Writes a formatted string to the bottom display.                           *
+ ******************************************************************************/
+void vsay( const char * fmt, ... );
+
+
+/******************************************************************************
  * FUNCTION:    init_display_right                                            *
  * ARGUMENTS:   WINDOW   *   d      -- Reference to the window to initialize  *
  *              PLAYER   *   p      -- The player whose statistics to display *
@@ -35,7 +45,6 @@ void wsay( WINDOW * where, const char * string );
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
 bool init_display_right( WINDOW * d, PLAYER * p, STAT_DAT * s );
-
 
 
 /************************************EOF***************************************/

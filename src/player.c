@@ -265,7 +265,6 @@ static DATA * data = NULL;
     ITEM * itmptr = NULL;
     int i, j, cnt = 0;
     bool prompt = ( slot < 0 );
-    char buf[BUFFER_SIZE]; //TODO: create vararg say func in for cwin
 
     if( prompt ) { /* Must ask User which Slot to Unequip */
         /* count how many items we have equipped */
@@ -280,14 +279,10 @@ static DATA * data = NULL;
             return false;
         } else if(( cnt == 1 )|| /* assume unequipping that one */
                  (( cnt == 2 )&&( itmptr->is_2handed ))) {
-            snprintf( buf, BUFFER_SIZE,
-            "Do you really want to remove your %s?", itmptr->name );
-            say( buf );
+            vsay( "Do you really want to remove your %s?", itmptr->name );
             if( toupper( getch() ) == 'Y' ) slot = j;
             else { /*  Canceled */
-                snprintf( buf, BUFFER_SIZE,
-                    "Canceled! %s still equipped.", itmptr->name );
-                say( buf );
+                vsay( "Canceled! %s still equipped.", itmptr->name );
                 return false;
             }/* End Canceled Else */
         } else { /* Select Slot */
@@ -304,10 +299,7 @@ static DATA * data = NULL;
     }/* End prompt If */
 
     /* Unequip the Item */
-    if( verbose ) {
-        snprintf( buf, BUFFER_SIZE, "%s removed", who->equip[slot]->name );
-        say( buf );
-    }/* End Verbose If */
+    if( verbose ) vsay( "%s removed", who->equip[slot]->name );
     who->equip[slot]->is_equipped = false;
     if( who->equip[slot]->is_2handed ) who->equip[(slot==WEP)?OFF:WEP] = NULL;
     who->equip[slot] = NULL;

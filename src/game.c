@@ -137,7 +137,6 @@ static int get_subi_cmd( void )
     ITEM * itmptr;
     unsigned int i; /* iterator */
     bool done_with_sub = false;
-    char buf[BUFFER_SIZE];
 
     while( done_with_sub == false) {
 
@@ -173,31 +172,25 @@ static int get_subi_cmd( void )
                     case HAT: /* must equip to HAT slot */
                     case ARM: /* must equip to ARM slot */
                         if( pc->equip[slot_of_itmptr] != NULL ) {
-                            snprintf( buf, BUFFER_SIZE,
-                                "Are you sure you want to replace the %s "
-                                "you currently have equipped? ",
+                            vsay( "Are you sure you want to replace the %s "
+                                  "you currently have equipped? ",
                                     pc->equip[slot_of_itmptr]->name );
-                            say(buf);
                             if( toupper(getch()) == 'Y' ) {
                                 /* Unequip old item */
                                 pc->equip[slot_of_itmptr]->is_equipped = false;
-                                snprintf( buf, BUFFER_SIZE, "%s removed!",
+                                vsay( "%s removed!",
                                     pc->equip[slot_of_itmptr]->name );
-                                say(buf);
                                 //TODO Takes 2 turns//use skip turn flag
                                 //  or force user to perform remove command
                                 //  -- Maybe set via opt or difficulty lv?
                             } else /* assume no */ {
-                                snprintf( buf, BUFFER_SIZE, "Canceled."
-                                    " You did not replace your %s.",
+                                vsay( "Canceled. You did not replace your %s.",
                                         pc->equip[slot_of_itmptr]->name );
-                                say(buf);
                                 cmd = NO_ACTION;/* Reset cmd for next loop */
                                 continue;
                             }/* End Y/N If-Else */
                         }/* End !empty Slot If */
-                        snprintf(buf,BUFFER_SIZE, "%s equipped!", itmptr->name);
-                        say(buf);
+                        vsay( "%s equipped!", itmptr->name );
                         itmptr->is_equipped = true;
                         pc->equip[slot_of_itmptr] = itmptr;
                         done_with_sub = true;
@@ -213,11 +206,9 @@ static int get_subi_cmd( void )
 
                         else { /* Otherwise we Have to Ask */
                             if( pc->equip[OFF]->is_2handed ) {
-                                    snprintf( buf, BUFFER_SIZE,
-                                        "Are you sure you want to replace the %s "
-                                        "you currently have equipped? ",
+                                vsay( "Are you sure you want to replace the %s "
+                                      "you currently have equipped? ",
                                             pc->equip[OFF]->name );
-                                    say(buf);
                                     if( toupper(getch()) == 'Y' ) {
                                         /* Begin Unequiping of old item */
                                         pc->equip[OFF] = NULL;
@@ -232,26 +223,19 @@ static int get_subi_cmd( void )
                             /* Complete Unequiping of Old Item  */
                             if( ( slot == WEP )||( slot == OFF ) ) {
                                 pc->equip[slot]->is_equipped = false;
-                                snprintf( buf, BUFFER_SIZE,
-                                    "%s removed!", pc->equip[slot]->name );
-                                say(buf);
+                                vsay( "%s removed!", pc->equip[slot]->name );
                                 //TODO: takes extra turn.
                             }/* End unequiping If */
                         }/* End Ask Else */
 
                         /* Equip New Item */
                         if( ( slot == WEP )||( slot == OFF ) ) {
-                            snprintf( buf, BUFFER_SIZE,
-                                "%s equipped!", itmptr->name );
-                            say(buf);
+                            vsay( "%s equipped!", itmptr->name );
                             itmptr->is_equipped = true;
                             pc->equip[slot] = itmptr;
                             done_with_sub = true;
-                        } else { /* Canceled */
-                            snprintf( buf, BUFFER_SIZE, "Canceled:"
-                                " %s not equipped.", itmptr->name );
-                            say(buf);
-                        }/* End Canceled Else */
+                        } else /* Canceled */
+                            vsay( "Canceled: %s not equipped.", itmptr->name );
                     } /* End WEP Case */ break;
 
                     case OFF: { /* Two-handed Weapons */
@@ -267,23 +251,21 @@ static int get_subi_cmd( void )
 
                         assert( itmptr->is_2handed );
 
-                        if( determinent == DUAL_WIELD )
-                            snprintf( buf, BUFFER_SIZE,
-                                "Are you sure you want to replace "
-                                "the %s and %s with your %s? ",
+                        if( determinent == DUAL_WIELD ) {
+                            vsay( "Are you sure you want to replace "
+                                  "the %s and %s with your %s? ",
                                     pc->equip[WEP]->name, pc->equip[OFF]->name,
                                         itmptr->name );
-                        else if( determinent > EMPTY_HANDED )
-                            snprintf( buf, BUFFER_SIZE,
-                                "Are you sure you want to replace "
-                                "your %s with your %s? ",
+                            yn = toupper(getch());
+                        } else if( determinent > EMPTY_HANDED ) {
+                            vsay( "Are you sure you want to replace "
+                                  "your %s with your %s? ",
                                     (determinent == WEP_ONLY)?
                                         pc->equip[WEP]->name :
                                         pc->equip[OFF]->name,
                                         itmptr->name );
-                        else yn = 'Y'; /* EMPTY_HANDED -- Assume Yes */
-
-                        if( yn != 'Y' ) { say(buf); yn = toupper(getch()); }
+                            yn = toupper(getch());
+                        } else yn = 'Y'; /* EMPTY_HANDED -- Assume Yes */
 
                         if( yn == 'Y' ) { /* Unequip old and Equip new */
 
@@ -294,20 +276,14 @@ static int get_subi_cmd( void )
                                 pc->equip[OFF]->is_equipped = false;
 
                             /* Equip New Item */
-                            snprintf( buf, BUFFER_SIZE,
-                                "%s equipped!", itmptr->name );
-                            say(buf);
+                            vsay( "%s equipped!", itmptr->name );
                             itmptr->is_equipped = true;
                             pc->equip[WEP] = itmptr; //XXX Is this how I want to do it?
                             pc->equip[OFF] = itmptr; //XXX Point both hands to the same item.
                             done_with_sub = true;
 
-                        } else { /* Canceled */
-                            snprintf( buf, BUFFER_SIZE, "Canceled:"
-                                " %s not equipped.", itmptr->name );
-                            say(buf);
-                        }/* End Canceled Else */
-
+                        } else  /* Canceled */
+                            vsay( "Canceled: %s not equipped.", itmptr->name );
 
                     }/* End OFF Case */ break;
 

@@ -8,7 +8,6 @@
 
 #define CANCEL      -1
 #define NOT_PLACED  99
-#define BUFFER_SIZE 80
 
 /* get_cmd return values *//* get_subi_cmd return values */
 #define NO_ACTION    0

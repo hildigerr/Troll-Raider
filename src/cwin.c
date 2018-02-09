@@ -9,6 +9,8 @@
 
 WINDOW  * display_btm;
 
+
+
 /******************************************************************************
  * FUNCTION:    wsay                                                          *
  * ARGUMENTS:   WINDOW * where   -- The window to which we will write         *
@@ -30,6 +32,26 @@ void wsay( WINDOW * where, const char * string )
 
     wrefresh(where);
 }/* End wsay Func */
+
+
+/******************************************************************************
+ * FUNCTION:    vsay                                                          *
+ * ARGUMENTS:   const char * fmt  -- The format string.                       *
+ *              ...               -- A variable quantity of arguments.        *
+ * Writes a formatted string to the bottom display.                           *
+ ******************************************************************************/
+ #define BUFFER_SIZE 80
+void vsay( const char * fmt, ... )
+{
+    char buf[BUFFER_SIZE];
+    va_list valist;
+
+    va_start(valist, fmt);
+    vsnprintf( buf, BUFFER_SIZE, fmt, valist );
+    va_end(valist);
+    wsay( display_btm, buf );
+
+}/* End vsay Func */
 
 
 /******************************************************************************
