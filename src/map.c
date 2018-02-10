@@ -241,103 +241,92 @@ bool buildgen( LEVEL * outside, LEVEL * inside )
 
 
 /******************************************************************************
- * FUNCTION:
- * ARGUMENTS:
- * RETURNS:
- * WARNING:
- * NOTE:
+ * FUNCTION:    towngen             -- Generate the town level.               *
+ * ARGUMENTS:   LEVEL * l           -- The level.                             *
+ *              unsigned short n    -- qt of buildings to generate.           *
+ * RETURNS:     bool                -- Generation successfull                 *
+ * Attempts to generate buildings MIN_HUT_DIST appart, however they may still *
+ * overlap effectively generating less than n buildings. This makes them more *
+ * interesting though, so it is permitted.                                    *
  ******************************************************************************/
-bool towngen( LEVEL * l, unsigned short n )//n = score.room_qt
+bool towngen( LEVEL * l, unsigned short n )
 {
-    unsigned short i,z;
+    unsigned short i, j, z;
     int dvert, dhorz;
     COORD hutspot[MAX_HUTS];
     RECT room[MAX_HUTS];
-    bool done;
 
-    if(( n < 1 )||( n > MAX_HUTS )) return false;
+    assert( n > 0 );
+    assert( n <= MAX_HUTS );
 
-    /* initialize rooms */
-    for( i = 0; i < MAX_HUTS; i++ )
-    {
-        if( i <= n )
-        {
-            room[i].a.rowy = 2;
-            room[i].a.colx = 2;
-            room[i].b.rowy = MAX_ROW - 2;
-            room[i].b.colx    = MAX_COL - 2;
-        }else//unused
-        {
-            room[i].a.rowy = NOT_PLACED;
-            room[i].a.colx = NOT_PLACED;
-            room[i].b.rowy = NOT_PLACED;
-            room[i].b.colx    = NOT_PLACED;
-        }/*end unused else */
-    }/* end MAX_HUTS for */
+    /* Create n Huts */
+    for( i = 0; i < n; i++ ) {
 
-    /* Create n Huts and 1 Castle *///n+1 huts for now
-    for( i = 0; i < (n+1); i++ )
-    {
-        /* Find centers of Buildings */
-        done  = false;
-        while( done  == false )
-        {
-            while( ( hutspot[i].rowy = 1 + rng(MAX_ROW) - ( 3 + MIN_HUT_HGT ) ) <2 );//ERROR("r=", hutspot[i].rowy );
-            while( ( hutspot[i].colx = 1 + rng(MAX_COL) - ( 3 + MIN_HUT_WID ) ) <2 );//ERROR("c=", hutspot[i].colx );
-            done  = true;
-            if( i == 0 ) continue;
-            else for( z = 1; z <= i; z++ )
-                if( dist( hutspot[z-1], hutspot[z] ) < MIN_HUT_DIST )
-                    done  = false;
-        }/* end done  while */
+        while( true ) {
+            /* Find centers of Buildings */
+            hutspot[i].rowy =  ( 2 + MIN_HUT_HGT ) + rng( MAX_ROW - ( 2 + MIN_HUT_HGT ) );
+            hutspot[i].colx =  ( 2 + MIN_HUT_WID ) + rng( MAX_COL - ( 2 + MIN_HUT_WID ) );
+            if( i > 0 ) for( z = 0; z < i; z++ )
+                if( dist( hutspot[z], hutspot[i] ) < MIN_HUT_DIST ) continue;
 
-        /* Expand Building Dimensions */
-        done  = false;
-        while( done  == false )
-        {
-            /* create room dimensions */
-            do{
-                dvert = 1 + rng(MAX_HUT_HGT);
-                dhorz = 1 + rng(MAX_HUT_WID);
+            /* Expand Building Dimensions */
+            dvert = MIN_HUT_HGT + rng(MAX_HUT_HGT);
+            dhorz = MIN_HUT_WID + rng(MAX_HUT_WID);
 
-                room[i].a.rowy = hutspot[i].rowy - dvert;
-                room[i].a.colx = hutspot[i].colx - dhorz;
-                room[i].b.rowy = hutspot[i].rowy + dvert;
-                room[i].b.colx = hutspot[i].colx + dhorz;
-            }while( ( ( room[i].a.rowy < 2  )||( room[i].a.colx < 2 ) )||( ( room[i].b.rowy > ( MAX_ROW - 2 ) )||( room[i].b.colx > ( MAX_COL - 2 ) ) ) );
+            room[i].a.rowy = hutspot[i].rowy - dvert;
+            room[i].a.colx = hutspot[i].colx - dhorz;
+            room[i].b.rowy = hutspot[i].rowy + dvert;
+            room[i].b.colx = hutspot[i].colx + dhorz;
 
-            /* check for conflicts with other rooms */
-            if( l->map[room[i].a.rowy][room[i].a.colx].is_wall == true );//top-left
-            else if(l->map[room[i].a.rowy][room[i].b.colx].is_wall == true );//top-right
-            else if(l->map[room[i].b.rowy][room[i].a.colx].is_wall == true );//btm-left
-            else if(l->map[room[i].b.rowy][room[i].b.colx].is_wall == true );//btm-right
-            else done  = true;
-        }/*end done  while */
+            /* Don't Bump the Outer Wall */
+            if( ( room[i].a.rowy < 2  )||( room[i].a.colx < 2 ) ) continue;
+            if( room[i].b.rowy > ( MAX_ROW - 2 ) ) continue;
+            if( room[i].b.colx > ( MAX_COL - 2 ) ) continue;
+
+            break;
+        }/*end !done while */
 
         /* Fill Building With Wall */
         if( fill_wall( l , room[i].a, room[i].b ) == false )
             return( Error( "Failed to Fill Building Walls", i ) );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
-        /* TODO: Make Enterance Face Fathest Wall? */
-            switch( 1+rng(4) )//NOW: Face Random DirectionFAIL
-            {
-                case NORTH:hutspot[i].rowy = room[i].a.rowy; break;//NORTH
-                case SOUTH:hutspot[i].rowy = room[i].b.rowy - 1; break;//SOUTH
-                case EAST:hutspot[i].colx = room[i].b.colx - 1; break;//EAST
-                case WEST:hutspot[i].colx = room[i].a.colx; break;//WEST
-                default: exit( Error( "badswitch", FAIL ) );
-            }/* end cardinal direction switch */
+        for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
+            if( ++z > WEST ) z = NORTH;
+            switch( z ) {
+                case NORTH:
+                    hutspot[i].rowy = room[i].a.rowy;
+                    if( l->map[hutspot[i].rowy-1][hutspot[i].colx].is_wall )
+                        continue;
+                    break;
+                case SOUTH:
+                    hutspot[i].rowy = room[i].b.rowy - 1;
+                    if( l->map[room[i].b.rowy][hutspot[i].colx].is_wall )
+                        continue;
+                    break;
+                case EAST:
+                    hutspot[i].colx = room[i].b.colx - 1;
+                    if( l->map[hutspot[i].rowy-1][room[i].b.colx].is_wall )
+                        continue;
+                    break;
+                case WEST:
+                    hutspot[i].colx = room[i].a.colx;
+                    if( l->map[hutspot[i].rowy][hutspot[i].colx-1].is_wall )
+                        continue;
+                    break;
+            }/* End cardinal direction Switch */
 
             /* Set Building Enterance Flags */
-            set_loc( '+', &l->map[hutspot[i].rowy][hutspot[i].colx] );
-    }/* end i for */
+            set_loc( '+', &l->map[hutspot[i].rowy][hutspot[i].colx] );//TODO: make map symbols configable
+            break;
+        }/* End NSEW For */
+    }/* End n For */
 
-    /* Place NPCs */
+    /* TODO: Place NPCs */
 
 
     return true;
-}/* end towngen func */
+}/* End towngen Func */
 
 
 

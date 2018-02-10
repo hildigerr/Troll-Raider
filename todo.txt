@@ -1,3 +1,4 @@
+getopt input parameters: seed maybe, mapgen settings, ...
 Create '?' about/help command.
 Implement SAVE_GAME ability/command.
 Use item names when communicating about them.
@@ -8,6 +9,7 @@ Magic, potions, ...
 Adjust Item Based on it's Lv and Whatever?
 
 Generate sub buildings attached to main buildings with tunnels.
+Make map symbols configable.
 
 Make skill_check more interesting.
 

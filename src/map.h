@@ -10,6 +10,7 @@
 /* Map Generation Macros */
 #define ACTIVE_LOCATION    curlv[pc.maplv].map[r][c]
 
+
 /******************************************************************************
  * FUNCTION:    set_loc
  * ARGUMENTS:   char  t
@@ -34,6 +35,7 @@ bool set_loc( char t, LOC * s );
 bool fill( char t, LEVEL * l, COORD d, COORD c );
 #define fill_wall(x,y,z) fill('w', x,y,z)
 #define fill_floor(x,y,z) fill('.', x,y,z)
+
 
 /******************************************************************************
  * FUNCTION:    init_lv
@@ -71,12 +73,15 @@ void draw_map( LEVEL * curlv );
  ******************************************************************************/
 bool buildgen( LEVEL * outside, LEVEL * inside );
 
+
 /******************************************************************************
- * FUNCTION:
- * ARGUMENTS:
- * RETURNS:
- * WARNING:
- * NOTE:
+ * FUNCTION:    towngen             -- Generate the town level.               *
+ * ARGUMENTS:   LEVEL * l           -- The level.                             *
+ *              unsigned short n    -- qt of buildings to generate.           *
+ * RETURNS:     bool                -- Generation successfull                 *
+ * Attempts to generate buildings MIN_HUT_DIST appart, however they may still *
+ * overlap effectively generating less than n buildings. This makes them more *
+ * interesting though, so it is permitted.                                    *
  ******************************************************************************/
 bool towngen( LEVEL * l, unsigned short n );
 
