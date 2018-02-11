@@ -110,6 +110,7 @@ static DATA * data = NULL;
  static bool outfit_me( PLAYER * who,  char * line )
 {
     unsigned int t, i, min_qt, max_qt;
+    int itmt, itmm;
     char * cptr, * end = cptr = &line[1];
 
     /* Retrieve Player Type */
@@ -126,47 +127,30 @@ static DATA * data = NULL;
     max_qt = atoi( cptr ); if( max_qt ) max_qt = 1 + rng( max_qt );
     if(( max_qt < min_qt )||( max_qt > MAX_HOLD )) max_qt = min_qt;
 
-    if( max_qt ) { /* Character Gets Starting Equipment */
-        int * itmt = NULL, * itmm = NULL;
-        if( !(itmt = CALLOC( max_qt, int )) ) {
-            Error( "Failed to allocate itmt array", max_qt );
-            return false;
-        }/* End !CALLOC If */
-        if( !(itmm = CALLOC( max_qt, int )) ) {
-            free( itmt );
-            Error( "Failed to allocate itmm array", max_qt );
-            return false;
-        }/* End !CALLOC If */
-
-        /* Determine Starting Equipment Options */
-        for( i = 0; i < max_qt; i++ ) {
-            cptr = ++end;
-            while( *end != ':' ) ++end; *end = '\0';
-            itmt[i] = atoi( cptr );
-            cptr = ++end;
-            while( *end != '|' ) ++end; *end = '\0';
-            itmm[i] = atoi( cptr );
-        }/* End max_qt For */
+    /* Give Starting Equipment */
+    for( i = 0; i < max_qt; i++ ) {
+        /* Determine Options */
+        cptr = ++end;
+        while( *end != ':' ) ++end; *end = '\0';
+        itmt = atoi( cptr );
+        cptr = ++end;
+        while( *end != '|' ) ++end; *end = '\0';
+        itmm = atoi( cptr );
+        if( itmm > 0 ) itmm = rng( itmm ); /* Pehaps get item lower in list */
 
         /* Retrieve Equipment */
-        for( i = 0; i < max_qt; i++ ) {
-            int selection = (itmm[i] < 1)? i : rng(itmm[i]);
-            if( !getp_item( &(who->inventory[i]), itmt[selection],
-                                                  itmm[selection] ) ) {
-                Error( "Failed to retrieve Equipment.", selection );
-                free( itmt ); free( itmm );
-                return false;
-            }/* End getp_item If */
-        }/* End max_qt For */
+        if( !(who->inventory[i] = getp_item( itmt, itmm )) ) {
+            Error( "Failed to retrieve Equipment.", t );
+            return false;
+        }/* End getp_item If */
 
         /* NPCs Equip items */
-        if( t ) for( i = 0; i < max_qt; i++ ) equip_me( who, i, false );
+        if( !who->is_main ) equip_me( who, i, false );
         //TODO: Maybe: Unequip and equip again if failed, randomly
         //              and destroy any extra equipment.
+    }/* End Starting Equipment For */
 
-        /* Clean Up */
-        free( itmt ); free( itmm );
-    }/* End Starting Equipment If */
+    for(; i < MAX_HOLD; i++ ) who->inventory[i] = NULL;
 
     return true;
 }/* End outfit_me Func */
@@ -189,8 +173,6 @@ static DATA * data = NULL;
     }/* End Load Data If */
 
     for( i = 0; i < MAX_STATS; i++ ) p->stats[i] = 1 + rng(MAX_STAT_VAL);
-    for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &p->inventory[i] );
-
     for( i = 0; i < MAX_SLOTS; i++ ) p->equip[i] = NULL;
 
     p->hp[0] = p->stats[CON];
@@ -256,7 +238,6 @@ static DATA * data = NULL;
     who->is_awake = false;
     who->is_human = !( t == NPC_TTROLL );
     who->money = ( t > HUMAN_INCT )? rng( 10 * t ) : 0;//TODO Make meaningful, adjust based on class
-    for( i = 0; i < MAX_HOLD; i++ ) set_empty_item( &who->inventory[i] );
     for( i = 0; i < MAX_SLOTS; i++ ) who->equip[i] = NULL;
 
     /* Get Character Stats */
@@ -291,6 +272,8 @@ static DATA * data = NULL;
         return false;
     }/* End euip_me If */
 
+    //TODO Re-sort inventory: bring nulls to end of list
+
     /* Get NPC Name */
     cptr = line;   while( *cptr != '@' ) ++cptr;
     end  = ++cptr; while( *end  != ':' ) ++end; *end = '\0';
@@ -310,7 +293,7 @@ static DATA * data = NULL;
 bool equip_me( PLAYER * who, int slot, bool verbose )
 {
     ITEM * itmptr;
-    int slot_of_itmptr;
+    int i, slot_of_itmptr;
     bool prompt = ( slot < 0 );
 
     assert( (prompt)? (verbose == true) : true );
@@ -321,18 +304,22 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
         return false;
     }/* End prompt and Cancel If */
 
-    itmptr = &(who->inventory[slot]);
-    slot_of_itmptr = slot_of(itmptr);
+    itmptr = who->inventory[slot];
 
     /* Verify Equipability */
+    if( !itmptr ) {
+        if( verbose ) say( "You don't have that many items." );
+        return false;
+    }/* End !exists if */
     if( !is_equipable(itmptr) ) {
         if( verbose ) vsay( "You cannot equip that %s.", itmptr->name );
-    } else if( itmptr->is_equipped ) {
-        if( verbose ) vsay("That %s is already equipped.", itmptr->name );
-    }/* End is_equipped If */
+        return false;
+    }/* End !equipable If */
+
+    slot_of_itmptr = slot_of(itmptr);
 
     /* Check item type and slot if needed */
-    else switch( slot_of_itmptr ) {
+    switch( slot_of_itmptr ) {
 
         case HAT: /* must equip to HAT slot */
         case ARM: /* must equip to ARM slot */
@@ -353,19 +340,21 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                     return false;
                 }/* End Y/N If-Else */
             }/* End !empty Slot If */
-            if( verbose ) vsay( "%s equipped!", itmptr->name );
-            itmptr->is_equipped = true;
+            if( verbose ) vsay( "%s equipped!", itmptr->name ); //TODO describe better based on body part
             who->equip[slot_of_itmptr] = itmptr;
+            for( i = slot; i < MAX_HOLD-1; i++ )
+                who->inventory[i] = who->inventory[i+1];
+            who->inventory[i] = NULL;
             return true;
             break;
 
         case WEP: { /* can be in WEP or OFF */
             /* Select Weapon Slot */
-            slot = NOT_PLACED;
+            int target = NOT_PLACED;
             /* if unarmed arm without hesitation in 1st slot */
-            if( who->equip[WEP] == NULL ) slot = WEP;
+            if( who->equip[WEP] == NULL ) target = WEP;
             /* else arm in offhand without hesitation if possible */
-            else if( who->equip[OFF] == NULL ) slot = OFF;
+            else if( who->equip[OFF] == NULL ) target = OFF;
 
             else { /* Otherwise we Have to Ask */
                 if( !verbose ) return false;
@@ -373,26 +362,28 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                     vsay( "Are you sure you want to replace the %s "
                           "you currently have equipped? ",
                                 who->equip[OFF]->name );
-                    if( toupper(getch()) == 'Y' ) slot = WEP;
+                    if( toupper(getch()) == 'Y' ) target = WEP;
 
                 } else { /* Dual Wielding */
                     /* Ask if want to replace 1st or 2nd Slot */
                     say("Replace which item?");
-                    slot = get_hand();
+                    target = get_hand();
                 }/* End Dual Wield Else */
 
                 /* Unequip Old Item  */
-                if( ( slot == WEP )||( slot == OFF ) ) {
-                    unequip_me( who, slot, verbose );
+                if( ( target == WEP )||( target == OFF ) ) {
+                    unequip_me( who, target, verbose );//TODO Handle Overflow XXX
                     //TODO: takes extra turn.
                 }/* End unequiping If */
             }/* End Ask Else */
 
             /* Equip New Item */
-            if( ( slot == WEP )||( slot == OFF ) ) {
+            if( ( target == WEP )||( target == OFF ) ) {
                 if( verbose ) vsay( "%s equipped!", itmptr->name );
-                itmptr->is_equipped = true;
-                who->equip[slot] = itmptr;
+                who->equip[target] = itmptr;
+                for( i = slot; i < MAX_HOLD-1; i++ )
+                    who->inventory[i] = who->inventory[i+1];
+                who->inventory[i] = NULL;
                 return true;
             } else /* Canceled */
                 if(verbose) vsay( "Canceled: %s not equipped.", itmptr->name );
@@ -433,12 +424,16 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                 /* Uneqip Old Item *///TODO take extra turn(s)
                 if( who->equip[WEP] ) unequip_me( who, WEP, verbose );
                 if( who->equip[OFF] ) unequip_me( who, OFF, verbose );
+                //TODO: handle overflow XXX
 
                 /* Equip New Item */
                 if( verbose ) vsay( "%s equipped!", itmptr->name );
-                itmptr->is_equipped = true;
                 who->equip[WEP] = itmptr; //XXX Is this how I want to do it?
                 who->equip[OFF] = itmptr; //XXX Point both hands to the same item.
+                for( i = slot; i < MAX_HOLD-1; i++ )
+                    who->inventory[i] = who->inventory[i+1];
+                who->inventory[i] = NULL;
+
                 return true;
 
             } else  /* Canceled */
@@ -494,15 +489,20 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
                 say("Canceled: Items still equipped.");
                 return false;
             } else if( who->equip[slot] == NULL ) {
-                say("You have no item equipped for that slot");
+                say("You have no item equipped for that slot");//TODO: describe bodypart
                 return false;
             }/* End Check Slot If-Else */
         }/* End Select Slot Else */
     }/* End prompt If */
 
+    /* Find a Place for it */
+    for( i = 0; i < MAX_HOLD; i++ ) if( !who->inventory[i] ) break;
+    if( i == MAX_HOLD )
+        return (bool) WARN( "Inventory Full", false );//XXX TODO: handle overflow
+
     /* Unequip the Item */
-    if( verbose ) vsay( "%s removed", who->equip[slot]->name );
-    who->equip[slot]->is_equipped = false;
+    who->inventory[i] = who->equip[slot];
+    if( verbose ) vsay( "%s removed", who->inventory[i]->name );
     if( who->equip[slot]->is_2handed ) who->equip[(slot==WEP)?OFF:WEP] = NULL;
     who->equip[slot] = NULL;
     return true;

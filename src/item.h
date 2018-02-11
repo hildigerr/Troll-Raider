@@ -10,20 +10,12 @@
 
 /******************************************************************************
  * FUNCTION:    getp_item      -- Get Particular Item                         *
- * ARGUMENTS:   ITEM * itm     -- The Item Being Generated                    *
- *              int    t       -- The Item Type                               *
+ * ARGUMENTS:   int    t       -- The Item Type                               *
  *              int    m       -- The Item Index                              *
- * RETURNS:     bool                                                          *
- * WARNING: Data line validity is not verified.                               *
+ * RETURNS:     ITEM *         -- The Item Generated                          *
+ * WARNING: XXX Data line validity is not verified.                           *
  ******************************************************************************/
-bool getp_item( ITEM * itm, int t, int m );
-
-
-/******************************************************************************
- * FUNCTION:    set_empty_item                                                *
- * ARGUMENTS:   ITEM *   itm                                                  *
- ******************************************************************************/
-void set_empty_item( ITEM * itm );
+ITEM * getp_item( int t, int m );
 
 
 /******************************************************************************
@@ -42,24 +34,6 @@ int slot_of( const ITEM * ptr );
  * RETURNS:     bool                                                          *
  ******************************************************************************/
 bool is_equipable( ITEM * itm );
-
-/******************************************************************************
- * FUNCTION:    swap_item
- * ARGUMENTS:   ITEM * itmi
- * WARNING:
- * NOTE:
- ******************************************************************************/
-void swap_item( ITEM * itmi, ITEM * itmj );
-
-
-/******************************************************************************
- * FUNCTION:    pick_up
- * ARGUMENTS:   ITEM * itm_ol
- *              ITEM * itm_nu
- * WARNING:
- * NOTE:        XXX UNUSED XXX
- ******************************************************************************/
-void pick_up( ITEM * itm_ol, ITEM * itm_nu );
 
 
 

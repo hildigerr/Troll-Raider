@@ -109,20 +109,17 @@ typedef struct {
     char name[MAX_ITEM_NAME_LEN + 1];
     int stats[MAX_ITEM_STATS];
     int worth;
-    unsigned is_ : 1;
-    unsigned is_equipped :1;
-    unsigned is_2handed : 1;
-    unsigned is_XXX : 1; /* unused */
+    bool is_2handed;
     unsigned short int type;
 } ITEM;
 
 typedef struct {
     char name[MAX_NAME_LEN+1];
     int stats[MAX_STATS];
-    ITEM inventory[MAX_HOLD];
-    ITEM* equip[MAX_SLOTS];
-    int hp[2];//[0]MAX//[1]CUR
-    float explv; /*lv is int val, xp is decimal*/
+    ITEM * inventory[MAX_HOLD];
+    ITEM * equip[MAX_SLOTS];
+    int hp[2]; /* [0]MAX [1]CUR */
+    float explv; /* lv is int, exp is decimal */
     int money;
     int locr, locc, maplv;
     unsigned is_main  : 1;
@@ -148,7 +145,7 @@ typedef struct {
 } RECT;
 
 typedef struct {
-    ITEM litter; /* TODO: make ptr, malloc as needed */
+    ITEM * litter;
     unsigned is_floor : 1;
     unsigned is_occupied : 1;
     unsigned is_visible : 1;

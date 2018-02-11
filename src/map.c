@@ -131,7 +131,7 @@ void init_lv( LEVEL * l, short t )
     l->is_new = true; /* Initially Unexplored */
 
     /* Set All map flags Initially in Case Some Slip Through */
-    for( r = 0; r < MAX_ROW; r++ )
+    for( r = 0; r < MAX_ROW; r++ ) {
         for( c = 0; c < MAX_COL; c++ ) {
             /* Border is always wall */
             if( ( ( r == 0 )||( c == 0 ) )||( ( r == (MAX_ROW-1) )
@@ -141,9 +141,10 @@ void init_lv( LEVEL * l, short t )
             else set_loc( '.', &l->map[r][c] ); /* Interior is floors for now */
 
             /* Initialize Item Locations */
-            set_empty_item( &l->map[r][c].litter );
+            l->map[r][c].litter = NULL;
 
-        }/* end map RC ffor */
+        }/* End map C For */
+    }/* End map R For */
 }/*end init_lv func */
 
 
@@ -159,7 +160,7 @@ char get_map_icon( LOC here )
     if( here.is_visible != true )       return ' ';
     else if( here.is_wall == true )     return '#';
     else if( here.is_occupied == true ) return 'o';//tempfortest
-    else if( here.litter.is_ == true )  return '&';//tempfortest
+    else if( here.litter != NULL )      return '&';//tempfortest
     else if( here.is_floor == true )    return '.';
     else if( here.is_door == true )     return '+';
     else if( here.is_ustair == true )   return '>';

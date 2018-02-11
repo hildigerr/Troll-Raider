@@ -227,7 +227,7 @@ int main( int argc, char* argv[] )
                         say("You found some descending stairs!");
                     else if( ACTIVE_LOCATION.is_trap == true ) {
                         say("You have stepped into a trap!"); //TODO
-                    } else if( ACTIVE_LOCATION.litter.is_ == true ) {
+                    } else if( ACTIVE_LOCATION.litter != NULL ) {
                         say("You have found an item!"); //TODO
                     }/* end something there if*/
                     move(pc.locr,pc.locc);
@@ -248,21 +248,21 @@ int main( int argc, char* argv[] )
                 if( cmd_list[2] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 2); }
                 /* Display Data on New Window */
                 /* Inventory *//* LHS */
-                wprintw(cmd_list[1],"\n # Inventory [Hit,Dam] $");
+                wprintw(cmd_list[1],"\n # Inventory   [Hit,Dam] $");
                 for(i=0; i < MAX_HOLD; i++)
-                    if( pc.inventory[i].is_equipped == false )
-                        wprintw(cmd_list[1],"\n %d. %s [%d,%d] %d",i,pc.inventory[i].name,pc.inventory[i].stats[0],pc.inventory[i].stats[1], pc.inventory[i].worth);
+                    if( pc.inventory[i] != NULL )
+                        wprintw(cmd_list[1],"\n %d. %-10s [%3d,%3d] %3d",i,pc.inventory[i]->name,pc.inventory[i]->stats[0],pc.inventory[i]->stats[1], pc.inventory[i]->worth);
                 /* Equipment *//* RHS */
-                wprintw(cmd_list[2],"\n # Equipment [Hit,Dam] $");
+                wprintw(cmd_list[2],"\n # Equipment   [Hit,Dam] $");
                 for(i=0; i < MAX_SLOTS; i++ )
                 {
                     wprintw(cmd_list[2],"\n %c.", 97+i);
                     if( pc.equip[i] != NULL )
-                        wprintw(cmd_list[2]," %s [%d,%d] %d",pc.equip[i]->name,pc.equip[i]->stats[0],pc.equip[i]->stats[1], pc.equip[i]->worth);
-                    else if(i == WEP ) wprintw(cmd_list[2]," fist [0,0] 0", 97+i);//TODO: Make unarmed values based on abilities
-                    else if(i == OFF ) wprintw(cmd_list[2]," fist [0,0] 0", 97+i);
-                    else if(i == ARM ) wprintw(cmd_list[2]," bareskin [0,0] 0", 97+i);
-                    else if(i == HAT ) wprintw(cmd_list[2]," hairs [0,0] 0", 97+i);
+                        wprintw(cmd_list[2]," %-10s [%3d,%3d] %3d",pc.equip[i]->name,pc.equip[i]->stats[0],pc.equip[i]->stats[1], pc.equip[i]->worth);
+                    else if(i == WEP ) wprintw(cmd_list[2]," fist       [  0,  0]   0", 97+i);//TODO: Make unarmed values based on abilities
+                    else if(i == OFF ) wprintw(cmd_list[2]," fist       [  0,  0]   0", 97+i);
+                    else if(i == ARM ) wprintw(cmd_list[2]," bareskin   [  0,  0]   0", 97+i);
+                    else if(i == HAT ) wprintw(cmd_list[2]," hairs      [  0,  0]   0", 97+i);
                     else ERROR( NULL, "Slot machine error!", i );
                 }/* end MAX_SLOTS for */
                 for( i = 1; i < MAX_ITEM_WINDOWS; i++ )
@@ -286,19 +286,19 @@ int main( int argc, char* argv[] )
 
             else if( cmd == PICK_UP ) {
                 need_more_cmd = true; /* Assume Nothing Happens */
-                if( ACTIVE_LOCATION.litter.is_ == false )
+                if( !ACTIVE_LOCATION.litter )
                     say("There is nothing to pick up.");
-                else if( pc.inventory[MAX_SLOTS-1].is_ != false )
-                    say("You're inventory is full!");
                 else {
-                    for(i = 0; i < MAX_SLOTS; i++ ) {
-                        if( pc.inventory[i].is_ == false ) {
-                            swap_item(&ACTIVE_LOCATION.litter, &pc.inventory[i]);
-                            say("Item picked up!");
+                    for(i = 0; i < MAX_HOLD; i++ ) {
+                        if( !pc.inventory[i] ) {
+                            pc.inventory[i] = ACTIVE_LOCATION.litter;
+                            ACTIVE_LOCATION.litter = NULL;
+                            vsay("You picked up the %s!",pc.inventory[i]->name);
                             need_more_cmd = false;
                             break;
                         }/* end got empty slot if */
                     }/* end MAX_SLOTS for */
+                    if( i == MAX_SLOTS ) say("You're inventory is full!");
                 }/* end pickup else */
             }/* end PICK_UP if */
 

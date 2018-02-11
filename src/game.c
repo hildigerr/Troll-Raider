@@ -125,97 +125,99 @@ static int get_subi_cmd( void )
 
             case DESTROY_ITEM: {
                 /* Select Slot */
-                cmd = get_u_slot("Destroy which item? ");
+                int slot = get_u_slot( "Destroy which item? " );
 
-                if( cmd == CANCEL ) {
+                if( slot == CANCEL ) {
                     say("Canceled. Nothing was destroyed.");
                     continue;
                 }/* End Cancel If */
 
-                if( cmd < MAX_HOLD )/* User Selects Item */ {
+                if( slot < MAX_HOLD ) { /* User Selects Inventory Item */
                     /* Check for item existence @ slot location */
-                    if( pc->inventory[cmd].is_ == false )
-                        say("You have no item in that slot.");
-                    else if( pc->inventory[cmd].is_equipped ) {
-                        for( i = 0; i < MAX_SLOTS; i++ ) {
-                            if( pc->equip[i] == &(pc->inventory[cmd]) ) {
-                                cmd = i+10; break;
-                            }/* End Find Equip Slot If */
-                        }/* End MAX_SLOTS For */
-                    } else { /* There is a real and unequpped item there */
-                        /* confirm destruction -- last chance */
-                        say("Last chance: "
-                            "Are you sure you want to destroy that item? "); //TODO Use Item name
-                        if( toupper(getch()) == 'Y' ) {
-                            /* destroy item */
-                            set_empty_item(&(pc->inventory[cmd]));
-                            say("Item Destroyed!");//TODO Use Item name
-                            done_with_sub = true;
-                        } else /* assume no */
-                            say("Canceled. Nothing was destroyed.");
-                    }/* end real item else */
-                }/* end item selection if */
+                    if( !pc->inventory[slot] )
+                        say( "You don't have that many items" );
+                    else { /* There is an item there */
+                    /* confirm destruction -- last chance */
+                    vsay( "Last chance: "
+                          "Are you sure you want to destroy that %s? ",
+                            pc->inventory[slot]->name );
+                    if( toupper(getch()) == 'Y' ) {
+                        /* destroy item */
+                        vsay( "The %s is Destroyed!", pc->inventory[slot]->name );
+                        free( pc->inventory[slot] );
+                        for( i = slot; i < MAX_HOLD-1; i++ )
+                            pc->inventory[i] = pc->inventory[i+1];
+                        pc->inventory[i] = NULL;
+                        done_with_sub = true;
+                    } else /* assume no */
+                        say( "Canceled. Nothing was destroyed." );
+                }/* end real item else */
 
-                if( cmd < (MAX_SLOTS+10) )/* User Selects Equip */ {
-                    cmd -= 10;
+                } else if( slot < (MAX_SLOTS+10) ) { /* User Selects Equip */
+                    slot -= 10;
                     /* Check for item existence @ slot location */
-                    if( pc->equip[cmd] == NULL )
-                        say("You have no item equipped in that slot.");
-                    else /* item exists */ {
+                    if( !pc->equip[slot] )
+                        say( "You have no item equipped in that slot." );//TODO: use bodypart name
+                    else { /* There is an item there */
                         /* confirm destruction -- last chance */
-                        say("Last chance: "
-                            "Are you sure you want to destroy that item? ");//TODO Use Item name
+                        vsay( "Last chance: "
+                              "Are you sure you want to destroy that %s? ",
+                                pc->equip[slot]->name );
                         if( toupper(getch()) == 'Y' ) {
                             /* destroy item */
-                            set_empty_item(pc->equip[cmd]);
-                            pc->equip[cmd] = NULL;
-                            say("Item Destroyed!");//TODO Use Item name
+                            vsay( "The %s is Destroyed!", pc->equip[slot]->name );
+                            if( pc->equip[slot]->is_2handed )
+                                pc->equip[(slot==WEP)?OFF:WEP] = NULL;
+                            free( pc->equip[slot] );
+                            pc->equip[slot] = NULL;
                             done_with_sub = true;
                         } else /* assume no */
-                            say("Canceled. Nothing was destroyed.");
-                    }/* end item exists else */
+                            say( "Canceled. Nothing was destroyed." );
+                    }/* end real item else */
                 }/* end equip select if */
             }/* end DESTROY_ITEM case */ break;
 
             case DROP_ITEM: {
                 /* Select Slot */
-                cmd = get_u_slot("Drop which item? ");
+                cmd = get_u_slot( "Drop which item? " );
 
-                if( cmd == CANCEL ) say("Canceled. Nothing was dropped.");
+                if( cmd == CANCEL ) say( "Canceled. Nothing was dropped." );
 
-                else if( cmd < MAX_HOLD )/* User Selects Item */ {
+                else if( cmd < MAX_HOLD ) { /* User Selects Item */
                     /* Check for item existence @ slot location */
-                    if( pc->inventory[cmd].is_ == false )
-                        say("You have no item in that slot.");
+                    if( !pc->inventory[cmd] )
+                        say( "You have no item in that slot." );
 
                     else/* There is a real item there */ {
                         /* Drop item */
-                        // copy item to floor//remove from player//    set_empty_item();
-                        if( active_loc->litter.is_ == false ) {
-                            swap_item( &(active_loc->litter), &(pc->inventory[cmd]) );
-                            say("Item Dropped!");//TODO Use Item name
+                        // copy item to floor//remove from player//
+                        if( !active_loc->litter ) {
+                            active_loc->litter = pc->inventory[cmd];
+                            for( i = cmd; i < MAX_HOLD-1; i++ )
+                                pc->inventory[i] = pc->inventory[i+1];
+                            pc->inventory[i] = NULL;
+                            vsay( "You dropped the %s!", active_loc->litter->name );
+                            done_with_sub = true;
                         }/* end empty floor location */
-                        else say("You can't drop that here.");//TODO implement heap of junk container?//TODO Use Item name
-                        done_with_sub = true;
+                        else say("You can't drop that here.");//TODO implement heap of junk container?
                     }/* end real item else */
                 }/* end item selection if */
 
                 else if( cmd < (MAX_SLOTS+10) )/* User Selects Equip */ {
                     cmd -= 10;
                     /* Check for item existence @ slot location */
-                    if( pc->equip[cmd] == NULL )
+                    if( !pc->equip[cmd] )
                         say("You have no item equipped in that slot.");
                     else /* item exists */ {
                         /* Drop item */
-                        // copy item to floor// remove from player //    set_empty_item(pc->equip[cmd]);
-                        if( active_loc->litter.is_ == false ) {
-                            pc->equip[cmd]->is_equipped = false;
-                            swap_item( &(active_loc->litter), pc->equip[cmd] );
+                        // copy item to floor// remove from player //
+                        if( !active_loc->litter ) {
+                            active_loc->litter = pc->equip[cmd];
                             pc->equip[cmd] = NULL;
-                            say("Item dropped!");//TODO Use Item name
-                            if( slot_of( &(active_loc->litter) ) != ARM ) return true;//equipped items that are non Armor are free to drop
+                            vsay( "You dropped the %s!", active_loc->litter->name );
+                            if( slot_of( active_loc->litter ) != ARM ) return true;//equipped items that are non Armor are free to drop//XXX?
                         }/* end empty floor location */
-                        else say("You can't drop that here.");//TODO implement heap of junk container?//TODO Use Item name
+                        else say("You can't drop that here.");//TODO implement heap of junk container?
                         done_with_sub = true;
                     }/* end item exists else */
                 }/* end equip select if */
