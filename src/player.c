@@ -79,6 +79,32 @@ static DATA * data = NULL;
 
 
 /******************************************************************************
+ * FUNCTION:    get_u_slot      -- Get either inventory or equipment slot     *
+ * ARGUMENTS:   char * prompt   -- The input prompt.                          *
+ * RETURNS:     int             -- The chosen slot.                           *
+ * NOTE: Treats input 'a' through 'd' as hexidecimal to distinguish between   *
+ *       inventory and equipment.                                             *
+ ******************************************************************************/
+ static int get_u_slot( char * prompt )
+{
+    int input;
+    do{ say(prompt); input = getch();
+        switch ( input ) {
+            case KEY_ESC: case ' ': case 'q': case 'Q':     return CANCEL;
+            case 'a': case 'A': return 10;
+            case 'b': case 'B': return 11;
+            case 'c': case 'C': return 12;
+            case 'd': case 'D': return 13;
+            case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+            case '8': case '9': case '0': return input - '0';
+            default: input = NOT_PLACED;
+        }/* End input Switch */
+    } while( input == NOT_PLACED );
+    return input;
+}/* End get_u_slot Func */
+
+
+/******************************************************************************
  * FUNCTION:    get_hand                                                      *
  * RETURNS:     int         -- see definitions in types.h                     *
  ******************************************************************************/
@@ -507,6 +533,144 @@ bool equip_me( PLAYER * who, int slot, bool verbose )
     who->equip[slot] = NULL;
     return true;
 }/* End unequip_me Func */
+
+
+/******************************************************************************
+ * FUNCTION:    destroy_my_item    -- Destroy an item.                        *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              int      slot      -- Which slot contains the item?           *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+bool destroy_my_item( PLAYER * who, int slot, bool verbose )
+{
+    int i;
+    bool prompt = ( slot < 0 );
+
+    /* Select Slot */
+    if( prompt ) slot = get_u_slot( "Destroy which item? " );
+
+    if( slot == CANCEL ) {
+        say("Canceled. Nothing was destroyed.");
+        return false;
+    }/* End Cancel If */
+
+    if( slot < MAX_HOLD ) { /* User Selects Inventory Item */
+        /* Check for item existence @ slot location */
+        if( !who->inventory[slot] ) {
+            if( verbose ) say( "You don't have that many items" );
+            return false;
+        }/* End no item there If */
+        /* confirm destruction -- last chance */
+        if( verbose ) vsay( "Last chance: "
+            "Are you sure you want to destroy that %s? ",
+                who->inventory[slot]->name );
+        if( !verbose ||( toupper(getch()) == 'Y' ) ) {
+            /* destroy item */
+            if( verbose )
+                vsay( "The %s is Destroyed!", who->inventory[slot]->name );
+            free( who->inventory[slot] );
+            for( i = slot; i < MAX_HOLD-1; i++ )
+                who->inventory[i] = who->inventory[i+1];
+            who->inventory[i] = NULL;
+            return true;
+        }/* End Confirm Destroy If */
+    }/* End Inventory If */
+
+    else if( slot < (MAX_SLOTS+10) ) { /* User Selects Equip */
+        slot -= 10;
+        /* Check for item existence @ slot location */
+        if( !who->equip[slot] ) {
+            if( verbose )
+                say( "You have no item equipped in that slot." );//TODO: use bodypart name
+            return false;
+        }/* End no item there If */
+        /* confirm destruction -- last chance */
+        if( verbose ) vsay( "Last chance: "
+            "Are you sure you want to destroy that %s? ",
+                who->equip[slot]->name );
+        if( !verbose ||( toupper(getch()) == 'Y' ) ) {
+            /* destroy item */
+            if( verbose )
+                vsay( "The %s is Destroyed!", who->equip[slot]->name );
+            if( who->equip[slot]->is_2handed )
+                who->equip[(slot==WEP)?OFF:WEP] = NULL;
+            free( who->equip[slot] );
+            who->equip[slot] = NULL;
+            return true;
+        }/* End Confirm Destroy If */
+    }/* end equip select if */
+
+    if( verbose ) say( "Canceled. Nothing was destroyed." );
+    return false;
+}/* End destroy_my_item Func */
+
+
+/******************************************************************************
+ * FUNCTION:    drop_my_item       -- Drop an item.                           *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              LOC    * where     -- Where will the item be dropped?         *
+ *              int      slot      -- Which slot contains the item?           *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+bool drop_my_item( PLAYER * who, LOC * where, int slot, bool verbose )
+{
+    int i;
+    bool prompt = ( slot < 0 );
+
+    /* Select Slot */
+    if( prompt ) slot = get_u_slot( "Drop which item? " );
+
+    if( slot == CANCEL ) {
+        say( "Canceled. Nothing was dropped." );
+        return false;
+    }/* End Cancel If */
+
+    if( slot < MAX_HOLD ) { /* User Selects Item */
+        /* Check for item existence @ slot location */
+        if( !who->inventory[slot] ) {
+            if( verbose ) say( "You have no item in that slot." );
+            return false;
+        }/* End no item there if */
+        /* Drop item */
+        if( !where->litter ) {
+            where->litter = who->inventory[slot];
+            for( i = slot; i < MAX_HOLD-1; i++ )
+                who->inventory[i] = who->inventory[i+1];
+            who->inventory[i] = NULL;
+        } else { /* Active Location is Occupied */
+            if( verbose ) say("You can't drop that here.");
+            //TODO implement heap of junk container?
+            return false;
+        }/* End Occupied Loc Else */
+    }/* end item selection if */
+
+    else if( slot < (MAX_SLOTS+10) )/* User Selects Equip */ {
+        slot -= 10;
+        /* Check for item existence @ slot location */
+        if( !who->equip[slot] ) {
+            say("You have no item equipped in that slot.");
+            return false;
+        }/* End no item there If */
+        /* Drop item */
+        if( !where->litter ) {
+            where->litter = who->equip[slot];
+            who->equip[slot] = NULL;
+            //vsay( "You dropped the %s!", where->litter->name );
+            //if( slot_of( where->litter ) != ARM ) return true;
+            //else return false;//equipped items that are non Armor are free to drop//XXX?TODO Decide
+        } else { /* Active Location is Occupied */
+            say("You can't drop that here.");
+            //TODO implement heap of junk container?
+            return false;
+        }/* End Occupied Loc Else */
+    }/* end equip select if */
+
+    if( verbose ) vsay( "You dropped the %s!", where->litter->name );
+    return true;
+}/* End drop_my_item Func */
+
 
 
 /************************************EOF***************************************/

@@ -52,7 +52,7 @@
  *              bool     verbose   -- Should we notify the player on success? *
  * RETURNS:     bool               -- TRUE if the action was performed.       *
  ******************************************************************************/
-bool equip_me( PLAYER * pc, int slot, bool verbose );
+bool equip_me( PLAYER * who, int slot, bool verbose );
 #define equip_item(x) equip_me(x,-1,true)
 
 
@@ -63,8 +63,31 @@ bool equip_me( PLAYER * pc, int slot, bool verbose );
  *              bool     verbose   -- Should we notify the player on success? *
  * RETURNS:     bool               -- TRUE if the action was performed.       *
  ******************************************************************************/
-bool unequip_me( PLAYER * pc, int slot, bool verbose );
+bool unequip_me( PLAYER * who, int slot, bool verbose );
 #define unequip(p) unequip_me(p,-1,true)
+
+
+/******************************************************************************
+ * FUNCTION:    destroy_my_item    -- Destroy an item.                        *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              int      slot      -- Which slot contains the item?           *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+bool destroy_my_item( PLAYER * who, int slot, bool verbose );
+#define destroy_item(p) destroy_my_item(p,-1,true)
+
+
+/******************************************************************************
+ * FUNCTION:    drop_my_item       -- Drop an item.                           *
+ * ARGUMENTS:   PLAYER * who       -- Who will perform the action?            *
+ *              LOC    * where     -- Where will the item be dropped?         *
+ *              int      slot      -- Which slot contains the item?           *
+ *              bool     verbose   -- Should we notify the player on success? *
+ * RETURNS:     bool               -- TRUE if the action was performed.       *
+ ******************************************************************************/
+bool drop_my_item( PLAYER * who, LOC * where, int slot, bool verbose );
+#define drop_item(p,a) drop_my_item(p,a,-1,true)
 
 
 /************************************EOF***************************************/
