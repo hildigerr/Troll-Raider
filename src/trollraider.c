@@ -11,16 +11,12 @@
 #include "item.h"
 #include "map.h"
 
-/* Defined Constants */
-#define MAX_ITEM_WINDOWS 3
-#define MAX_ADITIONAL_WINDOW_POINTERS_NEEDED 3
-
 
 /******************************************************************************
  * FUNCTION:    get_cmd     -- Get command input.                             *
  * RETURNS:     int         -- The command input (see definitions in types.h) *
  ******************************************************************************/
-static int get_cmd( void )
+static int get_cmd( void ) // TODO Make command controls configable.
 {
     switch( getch() ) {
         case '8': case KEY_UP:          return NORTH;
@@ -86,7 +82,7 @@ static int get_subi_cmd( void )
  *    REMOVE_ITEM  -- Unequip an item, keeping it ininventory.                *
  *    DESTROY_ITEM -- Destroy an item so that it no longer exists.            *
  ******************************************************************************/
-static bool manage_inventory( PLAYER* pc, LOC* active_loc, int cmd )
+static bool manage_inventory( PLAYER * pc, LOC * active_loc, int cmd )
 {
     bool done_with_sub = false;
 
@@ -129,8 +125,8 @@ int main( int argc, char* argv[] )
     LEVEL curlv[MAX_MAPS]; /* current levels */
     bool run, need_more_cmd, skip_a_turn;
 //    FILE* indata;   /* saved game file access */
-    WINDOW  /**display_btm,*/ *display_right,
-            *cmd_list[MAX_ADITIONAL_WINDOW_POINTERS_NEEDED];
+    WINDOW  * display_right,
+            * sub_win_root, * sub_win_lhs, * sub_win_rhs;
 
     srand(time(NULL));        /* use clock value as starting seed */
 
@@ -177,6 +173,13 @@ int main( int argc, char* argv[] )
     if( display_btm == NULL ) exit( ERROR( NULL, "btm sub win", FAIL ) );
     display_right = subwin( stdscr, RT_SUB_ROWS, RT_SUB_COLS, 0, MAX_COL );
     if( display_right == NULL ) exit( ERROR( NULL, "right sub win", FAIL ) );
+    /* Create Data Display sub-Windows */
+    sub_win_root = newwin((MAX_ROW - BTM_SUB_ROWS ),(BTM_SUB_COLS - RT_SUB_COLS),0,0);
+    if( sub_win_root == NULL ) return ERROR(NULL, "No Cmd List Window!", 0);
+    sub_win_lhs = subwin(sub_win_root,(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,0);
+    if( sub_win_lhs == NULL ) return ERROR(NULL, "No Cmd List Window!", 1);
+    sub_win_rhs = subwin(sub_win_root,(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,((BTM_SUB_COLS - RT_SUB_COLS)/2));
+    if( sub_win_rhs == NULL ) return ERROR(NULL, "No Cmd List Window!", 2);
     raw();     /* Disable input buffering */
     noecho();  /* Disable input echoing */
     keypad(stdscr, TRUE); /* enable arrowkeys and such */
@@ -243,15 +246,14 @@ int main( int argc, char* argv[] )
         }/* end is_new if */
 
         /* UPDATE PLAYER LOCATION */
-        move(pc.locr,pc.locc);
-        addch('@');
+        mvaddch( pc.locr, pc.locc, '@' );
 
         /* UPDATE SCREEN */
         refresh();
         wrefresh(display_btm);
         wrefresh(display_right);
 
-        if( skip_a_turn == true ) skip_a_turn = false;
+        if( skip_a_turn == true ) skip_a_turn = false; //TODO: use pc.is_awake?
         else /* TAKE TURN */ do {
 
             /* GET CMD INPUT */
@@ -265,6 +267,7 @@ int main( int argc, char* argv[] )
                 say("Are you sure you want to quit? ");
                 if( toupper(getch()) == 'Y' ) run = false;
 //                else say("Oh ok, then we wont kick you out of here.");
+                continue;
             }/* end QUIT */
 
             /* MOVING */
@@ -288,8 +291,8 @@ int main( int argc, char* argv[] )
                     exit( ERROR( NULL, "Move Out of Vertical Bounds", r ) );
                 else if( ( c > MAX_COL )||( c < 0 ) )
                     exit( ERROR( NULL, "Move Out of Horizontal Bounds", c ) );
-                else if( ACTIVE_LOCATION.is_wall == true ){
-                    say("You bumped into a wall!"); }//Currently Takes a Turn
+                else if( ACTIVE_LOCATION.is_wall == true )
+                    say("You bumped into a wall!"); //Currently Takes a Turn
 
                 /* Attacking */
                 else if( ACTIVE_LOCATION.is_occupied == true ) {
@@ -341,49 +344,53 @@ int main( int argc, char* argv[] )
 
             /* Inventory and Equipment Managment */
             else if( ( cmd >= INVENTORY )&&( cmd <= DESTROY_ITEM ) ) {
-                /* Create Data Display Windows */
-                cmd_list[0] = newwin((MAX_ROW - BTM_SUB_ROWS ),(BTM_SUB_COLS - RT_SUB_COLS),0,0);
-                if( cmd_list[0] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 0); }
-                cmd_list[1] = subwin(cmd_list[0],(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,0);
-                if( cmd_list[1] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 1); }
-                cmd_list[2] = subwin(cmd_list[0],(MAX_ROW - BTM_SUB_ROWS ),((BTM_SUB_COLS - RT_SUB_COLS)/2),0,((BTM_SUB_COLS - RT_SUB_COLS)/2));
-                if( cmd_list[2] == NULL ){ return ERROR(NULL, "No Cmd List Window!", 2); }
-                /* Display Data on New Window */
-                /* Inventory *//* LHS */
-                wprintw(cmd_list[1],"\n # Inventory   [Hit,Dam] $");
+
+                /* Display Inventory in LHS Subwindow */
+                wprintw(sub_win_lhs,"\n # Inventory   [Hit,Dam] $");
                 for(i=0; i < MAX_HOLD; i++)
                     if( pc.inventory[i] != NULL )
-                        wprintw(cmd_list[1],"\n %d. %-10s [%3d,%3d] %3d",i,pc.inventory[i]->name,pc.inventory[i]->stats[0],pc.inventory[i]->stats[1], pc.inventory[i]->worth);
-                /* Equipment *//* RHS */
-                wprintw(cmd_list[2],"\n # Equipment   [Hit,Dam] $");
-                for(i=0; i < MAX_SLOTS; i++ )
-                {
-                    wprintw(cmd_list[2],"\n %c.", 97+i);
+                        wprintw(sub_win_lhs,"\n %d. %-10s [%3d,%3d] %3d", i,
+                            pc.inventory[i]->name,
+                            pc.inventory[i]->stats[0],
+                            pc.inventory[i]->stats[1],
+                            pc.inventory[i]->worth );
+                box(sub_win_lhs,'|','+');
+
+                /* Display Equipment in RHS Subwindow */
+                wprintw(sub_win_rhs,"\n # Equipment   [Hit,Dam] $");
+                for(i=0; i < MAX_SLOTS; i++ ) {
+                    wprintw(sub_win_rhs,"\n %c.", 97+i);
                     if( pc.equip[i] != NULL )
-                        wprintw(cmd_list[2]," %-10s [%3d,%3d] %3d",pc.equip[i]->name,pc.equip[i]->stats[0],pc.equip[i]->stats[1], pc.equip[i]->worth);
-                    else if(i == WEP ) wprintw(cmd_list[2]," fist       [  0,  0]   0", 97+i);//TODO: Make unarmed values based on abilities
-                    else if(i == OFF ) wprintw(cmd_list[2]," fist       [  0,  0]   0", 97+i);
-                    else if(i == ARM ) wprintw(cmd_list[2]," bareskin   [  0,  0]   0", 97+i);
-                    else if(i == HAT ) wprintw(cmd_list[2]," hairs      [  0,  0]   0", 97+i);
+                        wprintw(sub_win_rhs," %-10s [%3d,%3d] %3d",
+                            pc.equip[i]->name,
+                            pc.equip[i]->stats[0],
+                            pc.equip[i]->stats[1],
+                            pc.equip[i]->worth );
+                    else if( i == WEP )
+                        wprintw(sub_win_rhs," fist       [  0,  0]   0", 97+i);//TODO: Make unarmed values based on abilities
+                    else if( i == OFF )
+                        wprintw(sub_win_rhs," fist       [  0,  0]   0", 97+i);
+                    else if( i == ARM )
+                        wprintw(sub_win_rhs," bareskin   [  0,  0]   0", 97+i);
+                    else if( i == HAT )
+                        wprintw(sub_win_rhs," hairs      [  0,  0]   0", 97+i);
                     else ERROR( NULL, "Slot machine error!", i );
                 }/* end MAX_SLOTS for */
-                for( i = 1; i < MAX_ITEM_WINDOWS; i++ )
-                {
-                    box(cmd_list[i],'|','+');
-                    overwrite(cmd_list[i],stdscr);
-                    wrefresh(cmd_list[i]);
-                }/* end MAX_ITEM_WINDOWS for */
+                box(sub_win_rhs,'|','+');
+
+                /* Display The Subwindows */
+                overwrite(sub_win_root,stdscr); wrefresh(sub_win_root);
 
                 /* SUB CMD */
                 need_more_cmd = manage_inventory( &pc, &ACTIVE_LOCATION, cmd );
 
                 /* Replace Map */
-                draw_map( &curlv[pc.maplv] );
-                move(pc.locr,pc.locc); addch('@');
+                draw_map( &curlv[pc.maplv] ); mvaddch( pc.locr, pc.locc, '@' );
 
                 /* Clean Up */
-                for( i = MAX_ITEM_WINDOWS-1; i <= 0; i-- ) delwin(cmd_list[i]);
-                touchwin(stdscr);
+                werase( sub_win_root );
+                wmove( sub_win_lhs, 0, 0 ); wmove( sub_win_rhs, 0, 0 );
+                touchwin( stdscr );
             }/* end INVENTORY cmd */
 
             else if( cmd == PICK_UP ) {
