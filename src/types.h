@@ -120,19 +120,13 @@ typedef struct {
     ITEM * equip[MAX_SLOTS];
     int hp[2]; /* [0]MAX [1]CUR */
     float explv; /* lv is int, exp is decimal */
-    int money;
+    int money, food;
     int locr, locc, maplv;
     unsigned is_main  : 1;
     unsigned is_alive : 1;
     unsigned is_human : 1;
     unsigned is_awake : 1;
 } PLAYER;
-
-typedef struct {
-    int food;
-    unsigned long turn;
-    int family;//TODO: make family types and rank score based on who saved
-} STAT_DAT;
 
 typedef struct {
     int colx;

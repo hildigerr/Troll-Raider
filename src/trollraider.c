@@ -120,7 +120,7 @@ int main( int argc, char* argv[] )
     unsigned int i; /* iterator */
     PLAYER pc;      /* player's character */
     PLAYER npc[MAX_NPC];   /* non player characters */
-    STAT_DAT score;
+    unsigned long turn = 0;
     unsigned short hut_qt;
     LEVEL curlv[MAX_MAPS]; /* current levels */
     bool run, need_more_cmd, skip_a_turn;
@@ -145,8 +145,6 @@ int main( int argc, char* argv[] )
     /* INITIALIZE PLAYER */
     if( init_player( &pc ) == false )
         exit( ERROR( NULL, "Failed to initialize player", FAIL ) );
-
-    init_stat_data( &score );
 
     /* INITIALIZE MAPS */
     for( i = 0; i < MAX_MAPS; i++ ) init_lv( &curlv[i], i );
@@ -188,9 +186,9 @@ int main( int argc, char* argv[] )
     while( run == true ) {
 
         /* Set-up/Update RH Display */
-        if( init_display_right( display_right, &pc, &score ) == false )
+        if( init_display_right( display_right, &pc, turn ) == false )
             exit( ERROR( NULL,
-                "Failed to (re)initialize right hand display", score.turn ) );
+                "Failed to (re)initialize right hand display", turn ) );
 
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
@@ -199,7 +197,7 @@ int main( int argc, char* argv[] )
 
             draw_map( &curlv[pc.maplv] );
 
-            if( score.turn == 0 ) {
+            if( turn == 0 ) {
                 refresh();
 
                 /* Get Race and Class */
@@ -416,7 +414,7 @@ int main( int argc, char* argv[] )
 
         //TODO: Enemy actions
 
-        score.turn += 1;
+        turn++;
     }/* end run while */
 
     /* TODO: Display And Save High Score Report */

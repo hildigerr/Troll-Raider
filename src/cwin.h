@@ -38,13 +38,13 @@ void vsay( const char * fmt, ... );
 
 /******************************************************************************
  * FUNCTION:    init_display_right                                            *
- * ARGUMENTS:   WINDOW   *   d      -- Reference to the window to initialize  *
- *              PLAYER   *   p      -- The player whose statistics to display *
- *              STAT_DAT *   s      -- Game statistics to display             *
+ * ARGUMENTS:   WINDOW   *     d    -- Reference to the window to initialize  *
+ *              PLAYER   *     p    -- The player whose statistics to display *
+ *              unsigned long  turn    -- What Turn is it?                    *
  * RETURNS:     bool                                                          *
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
-bool init_display_right( WINDOW * d, PLAYER * p, STAT_DAT * s );
+bool init_display_right( WINDOW * d, PLAYER * p, unsigned long turn );
 
 
 /************************************EOF***************************************/

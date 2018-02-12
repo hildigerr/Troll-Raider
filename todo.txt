@@ -1,7 +1,7 @@
 getopt input parameters: seed maybe, mapgen settings, ...
 Create '?' about/help command.
 Implement SAVE_GAME ability/command.
-
+Make command controls configable.
 Refer to equipment slots as body parts.
 Some actions take 2 turns.
 Magic, potions, ...
@@ -27,4 +27,4 @@ Make unarmed values based on abilities
 Display And Save High Score Report
 
 When town is cleared output qt of family saved, and continue to next town
-Make family types and rank score based on who saved
+Track family saved for score

@@ -56,13 +56,13 @@ void vsay( const char * fmt, ... )
 
 /******************************************************************************
  * FUNCTION:    init_display_right                                            *
- * ARGUMENTS:   WINDOW*     d       -- Reference to the window to initialize  *
- *              PLAYER*     p       -- The player whose statistics to display *
- *              STAT_DAT*   s       -- Game statistics to display             *
+ * ARGUMENTS:   WINDOW   *     d    -- Reference to the window to initialize  *
+ *              PLAYER   *     p    -- The player whose statistics to display *
+ *              unsigned long  turn    -- What Turn is it?                    *
  * RETURNS:     bool                                                          *
  * NOTE:        d expects the right window.                                   *
  ******************************************************************************/
-bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
+bool init_display_right( WINDOW * d, PLAYER * p, unsigned long turn )
 {
     int i;
     char* dflav[DFMAX] = { /* for each dungeon lv an arbitrary 5 letter name */
@@ -87,7 +87,7 @@ bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
         }/* End i Switch */
         wprintw( d, "%d", p->stats[i] );
     }/* End MAX_STATS i For */
-    wprintw( d, "\n\n  Food: %d\n  Family Saved: %d ", s->food, s->family );
+    wprintw( d, "\n\n  Food: %d\n  Family Saved: %d ", p->food, 0 ); //TODO: s->family );
 
     /* Initialize i for Flavor */
     i = rng(DFMAX);
@@ -104,7 +104,7 @@ bool init_display_right( WINDOW* d, PLAYER* p, STAT_DAT* s )
             wprintw(d,"\n\n Dungeon %s ", dflav[i] );       break;
         default:        wprintw(d,"\n\n ERROR ");           break;
     }/*end switch*/
-    wprintw( d, "\n  Turn: %d\n", s->turn );
+    wprintw( d, "\n  Turn: %d\n", turn );
     box(d,'|','-');//
     return true;
 }/* end init_display_right func*/

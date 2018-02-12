@@ -25,18 +25,6 @@ static DATA * data = NULL;
 
 
 /******************************************************************************
- * FUNCTION:    init_stat_data                                                *
- * ARGUMENTS:   STAT_DAT * d                                                  *
- ******************************************************************************/
- void init_stat_data( STAT_DAT * d )
-{
-    d->food   = 0;
-    d->turn   = 0;
-    d->family = 0;
-}/* end init_stat_data func */
-
-
-/******************************************************************************
  * FUNCTION:    get_i_slot      -- Get Inventory Slot from user.              *
  * ARGUMENTS:   char * prompt   -- The input prompt.                          *
  * RETURNS:     int             -- The chosen inventory slot.                 *
@@ -205,6 +193,7 @@ static DATA * data = NULL;
     p->hp[1] = p->hp[0];
     p->explv = 0.0;
     p->money = 0;
+    p->food   = 0;
     p->locr = NOT_PLACED;
     p->locc = NOT_PLACED;
     p->maplv = HVILLAGE;
@@ -264,6 +253,7 @@ static DATA * data = NULL;
     who->is_awake = false;
     who->is_human = !( t == NPC_TTROLL );
     who->money = ( t > HUMAN_INCT )? rng( 10 * t ) : 0;//TODO Make meaningful, adjust based on class
+    who->food = ( t == NPC_TTROLL )? 0 : rng( NPC_TYPE_QT - t );//TODO make meaningful
     for( i = 0; i < MAX_SLOTS; i++ ) who->equip[i] = NULL;
 
     /* Get Character Stats */
