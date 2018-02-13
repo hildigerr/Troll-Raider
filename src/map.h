@@ -10,48 +10,45 @@
 /* Map Generation Macros */
 #define ACTIVE_LOCATION    curlv[pc.maplv].map[r][c]
 
+extern const char WALL;
+extern const char FLOOR;
+extern const char DOOR;
+extern const char USTAIR;
+extern const char DSTAIR;
 
 /******************************************************************************
- * FUNCTION:    set_loc
- * ARGUMENTS:   char  t
- *              LOC * s
- * RETURNS:     int
- * WARNING:
- * NOTE:
+ * FUNCTION:    set_loc             Initialize a location's type              *
+ * ARGUMENTS:   LOC * spot          -- The spot to initialize                 *
+ *              char  type          -- The type for this spot                 *
  ******************************************************************************/
-bool set_loc( char t, LOC * s );
+void set_loc( LOC * spot, char type  );
 
 
 /******************************************************************************
- * FUNCTION:    fill
- * ARGUMENTS:   char     t
- *              LEVEL *  l
- *              COORD    d
- *              COORD    c
- * RETURNS:     int
- * WARNING:
- * NOTE://map, door row, door col, corner row, corner column
+ * FUNCTION:    fill                Fill an area with a certain LOC type      *
+ * ARGUMENTS:   LEVEL *  l          -- The level with an area to fill         *
+ *              char     t          -- The LOC type                           *
+ *              COORD    d,c        -- Two opposite corners defining the area *
+ * RETURNS:     bool                Fails if area exeeds bounds of a map.     *
+ * NOTE: XXX d and c use to stand for door and corner.                        *
  ******************************************************************************/
-bool fill( char t, LEVEL * l, COORD d, COORD c );
-#define fill_wall(x,y,z) fill('w', x,y,z)
-#define fill_floor(x,y,z) fill('.', x,y,z)
+bool fill( LEVEL * l, char t, COORD d, COORD c );
+#define fill_wall(x,y,z) fill(x,WALL,y,z)
+#define fill_floor(x,y,z) fill(x,FLOOR,y,z)
 
 
 /******************************************************************************
- * FUNCTION:    init_lv
- * ARGUMENTS:   LEVEL *  l
- *              short    t
- * WARNING:
- * NOTE:
+ * FUNCTION:    init_lv                    Initialize Level                   *
+ * ARGUMENTS:   LEVEL *  l          -- The level being initialized            *
+ *              short    t          -- the type of level                      *
  ******************************************************************************/
 void init_lv( LEVEL * l, short t );
 
+
 /******************************************************************************
- * FUNCTION:    get_map_icon
- * ARGUMENTS:   LOC here
- * RETURNS:     char
- * WARNING:
- * NOTE:
+ * FUNCTION:    get_map_icon         Get the map icon to display for a LOC    *
+ * ARGUMENTS:   LOC     here      -- The location in question.                *
+ * RETURNS:     char              -- The symobl to display for this location. *
  ******************************************************************************/
 char get_map_icon( LOC here );
 
@@ -64,14 +61,11 @@ void draw_map( LEVEL * curlv );
 
 
 /******************************************************************************
- * FUNCTION:    buildgen
- * ARGUMENTS:   LEVEL *  outside
- *              LEVEL *  inside
- * RETURNS:     int
- * WARNING:
- * NOTE:
+ * FUNCTION:    buildgen                -- Generate building interiors        *
+ * ARGUMENTS:   LEVEL *  outside        -- The exterior level                 *
+ *              LEVEL *  inside         -- The generated interior level       *
  ******************************************************************************/
-bool buildgen( LEVEL * outside, LEVEL * inside );
+void buildgen( LEVEL * outside, LEVEL * inside );
 
 
 /******************************************************************************

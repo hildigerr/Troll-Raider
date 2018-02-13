@@ -158,8 +158,7 @@ int main( int argc, char* argv[] )
     hut_qt = 1 + rng( MAX_HUTS );
     if( towngen(&curlv[HVILLAGE], hut_qt) == false )
         exit( Error( "Failed to create town with n huts : n = ", hut_qt ) );
-    if( buildgen(&curlv[HVILLAGE],&curlv[IN_HHUTS]) == false )
-        exit( ERROR( NULL, "Failed to create huts :^(", FAIL ) );
+    buildgen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
 
     //XXX visible only after program termination:
     printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
@@ -289,16 +288,16 @@ int main( int argc, char* argv[] )
                     exit( ERROR( NULL, "Move Out of Vertical Bounds", r ) );
                 else if( ( c > MAX_COL )||( c < 0 ) )
                     exit( ERROR( NULL, "Move Out of Horizontal Bounds", c ) );
-                else if( ACTIVE_LOCATION.is_wall == true )
+                else if( ACTIVE_LOCATION.icon == WALL )
                     say("You bumped into a wall!"); //Currently Takes a Turn
 
                 /* Attacking */
-                else if( ACTIVE_LOCATION.is_occupied == true ) {
+                else if( ACTIVE_LOCATION.mon != NULL ) {
                     say("Attack!"); //TODO
                 }/* end Attack if */
 
                 /* Door Interaction */
-                else if( ACTIVE_LOCATION.is_door == true ) {
+                else if( ACTIVE_LOCATION.icon == DOOR ) {
                     if( pc.maplv == HVILLAGE ) {
                         say("Do you want to enter the building? ");
                         if( toupper( getch() ) == 'N' ) need_more_cmd = true;
@@ -309,8 +308,7 @@ int main( int argc, char* argv[] )
                             pc.locc = c;
                         }/* End !N Else */
                     }/* end HVILLAGE if */
-                    else if(( pc.maplv == IN_HHUTS )
-                         &&( ACTIVE_LOCATION.is_dstair == true )) {
+                    else if( pc.maplv == IN_HHUTS ) { //XXX Doors lead back to village
                             say("Do you want to exit the building? ");
                             if( toupper( getch() ) == 'N' ) need_more_cmd = true;
                             else { /* Exit Human Huts Level */
@@ -324,9 +322,9 @@ int main( int argc, char* argv[] )
                         //TODO open door, move char, etc...
 
                 }/* end door if */ else /* Move Normally */ {
-                    if( ACTIVE_LOCATION.is_ustair == true )
+                    if( ACTIVE_LOCATION.icon == USTAIR )
                         say("You found some ascending stairs!");
-                    else if( ACTIVE_LOCATION.is_dstair == true )
+                    else if( ACTIVE_LOCATION.icon == DSTAIR )
                         say("You found some descending stairs!");
                     else if( ACTIVE_LOCATION.is_trap == true ) {
                         say("You have stepped into a trap!"); //TODO
@@ -365,13 +363,13 @@ int main( int argc, char* argv[] )
                             pc.equip[i]->stats[1],
                             pc.equip[i]->worth );
                     else if( i == WEP )
-                        wprintw(sub_win_rhs," fist       [  0,  0]   0", 97+i);//TODO: Make unarmed values based on abilities
+                        wprintw( sub_win_rhs," fist       [  0,  0]   0" );//TODO: Make unarmed values based on abilities
                     else if( i == OFF )
-                        wprintw(sub_win_rhs," fist       [  0,  0]   0", 97+i);
+                        wprintw( sub_win_rhs," fist       [  0,  0]   0" );
                     else if( i == ARM )
-                        wprintw(sub_win_rhs," bareskin   [  0,  0]   0", 97+i);
+                        wprintw( sub_win_rhs," bareskin   [  0,  0]   0" );
                     else if( i == HAT )
-                        wprintw(sub_win_rhs," hairs      [  0,  0]   0", 97+i);
+                        wprintw( sub_win_rhs," hairs      [  0,  0]   0" );
                     else ERROR( NULL, "Slot machine error!", i );
                 }/* end MAX_SLOTS for */
                 box(sub_win_rhs,'|','+');

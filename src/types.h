@@ -140,18 +140,13 @@ typedef struct {
 
 typedef struct {
     ITEM * litter;
-    unsigned is_floor : 1;
-    unsigned is_occupied : 1;
-    unsigned is_visible : 1;
-    unsigned is_wall : 1;
-    unsigned is_door : 1;
-    unsigned is_ustair : 1;
-    unsigned is_dstair : 1;
-    unsigned is_trap : 1;
+    PLAYER * mon;
+    char icon;
+    bool is_trap;
 } LOC;
 
 typedef struct level_struct {
     LOC map[MAX_ROW][MAX_COL];
-    int type; /* Current Level Array Access */
-    unsigned is_new : 1; /* Unexplored */
-}LEVEL;
+    int type; /* Current Level Array Index */
+    bool is_new; /* Unexplored */
+} LEVEL;

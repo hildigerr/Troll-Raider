@@ -9,8 +9,16 @@
 #include "map.h"
 #include "item.h"
 
+//TODO: make map symbols configable
+const char WALL   = '#';
+const char FLOOR  = '.';
+const char DOOR   = '+';
+const char USTAIR = '>';
+const char DSTAIR = '<';
+
 /* Macro Functions */
 #define squared(x) (x * x)
+
 
 /******************************************************************************
  * FUNCTION:    biggest                                                       *
@@ -29,6 +37,7 @@
  ******************************************************************************/
 #define smallest( a, b ) (( a < b )? a : b)
 
+
 /******************************************************************************
  * FUNCTION:    dist                                                          *
  * ARGUMENTS:   COORD     a  -- First Point                                   *
@@ -40,86 +49,47 @@ static double dist( COORD a, COORD b )
     return sqrt( squared( a.rowy - b.rowy ) + squared( a.colx - b.colx ) );
 }/* End dist Func */
 
+
 /******************************************************************************
- * FUNCTION:    set_loc
- * ARGUMENTS:   char  t
- *              LOC * s
- * RETURNS:     bool
- * WARNING:
- * NOTE:
+ * FUNCTION:    set_loc             Initialize a location's type              *
+ * ARGUMENTS:   LOC * spot          -- The spot to initialize                 *
+ *              char  type          -- The type for this spot                 *
  ******************************************************************************/
-bool set_loc( char t, LOC * s )//type spot
+void set_loc( LOC * spot, char type  )
 {
-    switch(t) {
-        case 'w': case 'W': case '#'://WALL
-            s->is_floor = false;
-            s->is_occupied = false;
-            s->is_visible = true;
-            s->is_wall = true;
-            s->is_door = false;
-            s->is_ustair = false;
-            s->is_dstair = false;
-            s->is_trap = false;
-            break;
-        case 'f': case 'F': case '.'://FLOOR
-            s->is_floor = true;
-            s->is_occupied = false;
-            s->is_visible = true;
-            s->is_wall = false;
-            s->is_door = false;
-            s->is_ustair = false;
-            s->is_dstair = false;
-            s->is_trap = false;
-            break;
-        case 'b': case 'B': case '+'://DOOR
-            s->is_floor = false;
-            s->is_occupied = false;
-            s->is_visible = true;
-            s->is_wall = false;
-            s->is_door = true;
-            s->is_ustair = false;
-            s->is_dstair = false;
-            s->is_trap = false;
-            break;
-        default:
-            if( t != 0 )return t;
-            else return false;
-    }/* End type Switch */
-    return true;
+    spot->litter = NULL;
+    spot->mon = NULL;
+    spot->icon = type;
+    spot->is_trap = false;
 }/* End set_loc Func */
 
 
 /******************************************************************************
- * FUNCTION:    fill
- * ARGUMENTS:   char     t
- *              LEVEL *  l
- *              COORD    d
- *              COORD    c
- * RETURNS:     bool
- * WARNING:
- * NOTE://map, door row, door col, corner row, corner column
+ * FUNCTION:    fill                Fill an area with a certain LOC type      *
+ * ARGUMENTS:   LEVEL *  l          -- The level with an area to fill         *
+ *              char     t          -- The LOC type                           *
+ *              COORD    d,c        -- Two opposite corners defining the area *
+ * RETURNS:     bool                Fails if area exeeds bounds of a map.     *
+ * NOTE: XXX d and c use to stand for door and corner.                        *
  ******************************************************************************/
-bool fill( char t, LEVEL * l, COORD d, COORD c )
+bool fill( LEVEL * l, char t, COORD d, COORD c )
 {
-    int i, j, s = smallest(d.colx,c.colx),
-        b[2] = { biggest(d.rowy,c.rowy), biggest(d.colx,c.colx) };
+    int i, j, s = smallest( d.colx, c.colx ),
+        b[2] = { biggest( d.rowy, c.rowy ), biggest( d.colx, c.colx ) };
     /* NOTE: Biggest returns zero if it's arguments are the same. */
 
-    for( i = smallest(d.rowy,c.rowy); i < b[0]; i++ )
-        for( j = s; j < b[1]; j++ ) {
+    for( i = smallest( d.rowy, c.rowy ); i < b[0]; i++ )
+        for( j = s; j < b[1]; j++ )
             if( ( i > MAX_ROW )||( j > MAX_COL ) ) return false;
-            else set_loc(t,&l->map[i][j]);
-        }/* End ij ffor */
+            else set_loc( &l->map[i][j], t );
     return true;
 }/* End fill Func */
 
 
 /******************************************************************************
- * FUNCTION:    init_lv
- * ARGUMENTS:   LEVEL *  l
- *              short    t
- * WARNING:
- * NOTE:
+ * FUNCTION:    init_lv                    Initialize Level                   *
+ * ARGUMENTS:   LEVEL *  l          -- The level being initialized            *
+ *              short    t          -- the type of level                      *
  ******************************************************************************/
 void init_lv( LEVEL * l, short t )
 {
@@ -131,113 +101,80 @@ void init_lv( LEVEL * l, short t )
     l->is_new = true; /* Initially Unexplored */
 
     /* Set All map flags Initially in Case Some Slip Through */
-    for( r = 0; r < MAX_ROW; r++ ) {
-        for( c = 0; c < MAX_COL; c++ ) {
-            /* Border is always wall */
-            if( ( ( r == 0 )||( c == 0 ) )||( ( r == (MAX_ROW-1) )
-                                          ||(   c == (MAX_COL-1) ) ) ) {
-                set_loc( 'w', &l->map[r][c] );
-            }/* End border ray check */
-            else set_loc( '.', &l->map[r][c] ); /* Interior is floors for now */
-
-            /* Initialize Item Locations */
-            l->map[r][c].litter = NULL;
-
-        }/* End map C For */
-    }/* End map R For */
-}/*end init_lv func */
+    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ )
+        /* Border is always wall *///TODO: This could be done much more efficiently
+        if( ( r == 0 )||( r == (MAX_ROW-1) )
+          ||( c == 0 )||( c == (MAX_COL-1) ) )
+            set_loc( &l->map[r][c], WALL );
+        else /* Interior is floors for now */
+            set_loc( &l->map[r][c], FLOOR );
+}/* End init_lv Func */
 
 
 /******************************************************************************
- * FUNCTION:    get_map_icon
- * ARGUMENTS:   LOC here
- * RETURNS:     char
- * WARNING:
- * NOTE:
+ * FUNCTION:    get_map_icon         Get the map icon to display for a LOC    *
+ * ARGUMENTS:   LOC     here      -- The location in question.                *
+ * RETURNS:     char              -- The symobl to display for this location. *
  ******************************************************************************/
 char get_map_icon( LOC here )
 {
-    if( here.is_visible != true )       return ' ';
-    else if( here.is_wall == true )     return '#';
-    else if( here.is_occupied == true ) return 'o';//tempfortest
-    else if( here.litter != NULL )      return '&';//tempfortest
-    else if( here.is_floor == true )    return '.';
-    else if( here.is_door == true )     return '+';
-    else if( here.is_ustair == true )   return '>';
-    else if( here.is_dstair == true )   return '<';
-    else if( here.is_trap == true )     return 'x';//tempfortest
-    else                                return '&';//DEBUG SYMBOL
+
+    if( here.litter != NULL ) return '&';//tempfortest
+    if( here.mon != NULL )    return 'o';//tempfortest
+                              return here.icon;
 }/* end get_map_icon func */
 
 
 /******************************************************************************
  * FUNCTION:    draw_map                                                      *
- * ARGUMENTS:   LEVEL* curlv   -- The Level to draw.                          *
+ * ARGUMENTS:   LEVEL * curlv   -- The Level to draw.                         *
  ******************************************************************************/
 void draw_map( LEVEL * curlv )
 {
     int r, c;
-    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ ) {
-        move(r,c);
-        addch( get_map_icon( curlv->map[r][c] ) );
-    }/* end [r][c] screen initialization */
-}
+    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ )
+        mvaddch( r,c, get_map_icon( curlv->map[r][c] ) );
+}/* End draw_map Func */
 
 
 /******************************************************************************
- * FUNCTION:    buildgen
- * ARGUMENTS:   LEVEL *  outside
- *              LEVEL *  inside
- * RETURNS:     int
- * WARNING:
- * NOTE:
+ * FUNCTION:    buildgen                -- Generate building interiors        *
+ * ARGUMENTS:   LEVEL *  outside        -- The exterior level                 *
+ *              LEVEL *  inside         -- The generated interior level       *
  ******************************************************************************/
-bool buildgen( LEVEL * outside, LEVEL * inside )
+void buildgen( LEVEL * outside, LEVEL * inside )
 {
     int r, c, i, j;
     bool found_first;
     bool done;
 
     /* copy/invert ouside map to inside map */
-    for( r = 1; r < (MAX_ROW -1); r++ )
-        for( c = 1; c < (MAX_COL -1); c++ )
-            if( outside->map[r][c].is_wall == true )
-                set_loc( '.' , &inside->map[r][c] );
-            else if( outside->map[r][c].is_floor == true )
-                set_loc( '#' , &inside->map[r][c] );
-            else if( outside->map[r][c].is_door == true ) {
-                //Both a door and exit to lv
-                set_loc( '.' , &inside->map[r][c] );
-                //tmp use trap to help find door location
-                inside->map[r][c].is_trap = true;
-            }/* end outside_door if */
-
-    /* Locate/Create exit doors */
-    for( r = 1; r < (MAX_ROW -1); r++ )
-        for( c = 1; c < (MAX_COL -1); c++ )
-            if( inside->map[r][c].is_trap == true ) {
-                //second found wall should usually be made exit door
-                inside->map[r][c].is_trap = false;//stop tmp use
-                found_first = false;
-                done  = false;
-                for( i = r-1; i <= r+1; i++ )
-                    if( done  == true ) break;
-                    else for( j = c-1; j <= c+1; j++ )
-                        if( inside->map[i][j].is_wall == true ) {
-                            if( found_first == false )
-                                found_first = true;
-                            else{
-                                set_loc( '+', &inside->map[i][j] );
-                                inside->map[i][j].is_dstair = true;
-                                done  = true;
-                                break;
-                            }/* end place exit door else */
-                        }/* end is_wall if */
-            }/* end is_trap if */
+    for( r = 1; r < (MAX_ROW -1); r++ ) for( c = 1; c < (MAX_COL -1); c++ )
+        if( outside->map[r][c].icon == WALL )
+            set_loc( &inside->map[r][c], FLOOR );
+        else if( outside->map[r][c].icon == FLOOR )
+            set_loc( &inside->map[r][c], WALL );
+        else if( outside->map[r][c].icon == DOOR ) {
+            //Both a door and exit to lv
+            set_loc( &inside->map[r][c], FLOOR );
+            //second found wall should usually be made exit door
+            found_first = false;
+            done  = false;
+            for( i = r-1; i <= r+1; i++ )
+                if( done  == true ) break;
+                else for( j = c-1; j <= c+1; j++ )
+                    if( inside->map[i][j].icon == WALL ) {
+                        if( found_first == false ) found_first = true;
+                        else{
+                            set_loc( &inside->map[i][j], DOOR );
+                            done  = true;
+                            break;
+                        }/* end place exit door else */
+                    }/* end is_wall if */
+        }/* end is_trap if */
 
     /* TODO: Generate sub buildings attached to main buildings with tunnels */
 
-    return true;//warning always succeeds
 }/* end buildgen */
 
 
@@ -288,7 +225,7 @@ bool towngen( LEVEL * l, unsigned short n )
         }/*end !done while */
 
         /* Fill Building With Wall */
-        if( fill_wall( l , room[i].a, room[i].b ) == false )
+        if( fill_wall( l, room[i].a, room[i].b ) == false )
             return( Error( "Failed to Fill Building Walls", i ) );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
@@ -297,28 +234,28 @@ bool towngen( LEVEL * l, unsigned short n )
             switch( z ) {
                 case NORTH:
                     hutspot[i].rowy = room[i].a.rowy;
-                    if( l->map[hutspot[i].rowy-1][hutspot[i].colx].is_wall )
+                    if( l->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )
                         continue;
                     break;
                 case SOUTH:
                     hutspot[i].rowy = room[i].b.rowy - 1;
-                    if( l->map[room[i].b.rowy][hutspot[i].colx].is_wall )
+                    if( l->map[room[i].b.rowy][hutspot[i].colx].icon == WALL )
                         continue;
                     break;
                 case EAST:
                     hutspot[i].colx = room[i].b.colx - 1;
-                    if( l->map[hutspot[i].rowy-1][room[i].b.colx].is_wall )
+                    if( l->map[hutspot[i].rowy-1][room[i].b.colx].icon == WALL )
                         continue;
                     break;
                 case WEST:
                     hutspot[i].colx = room[i].a.colx;
-                    if( l->map[hutspot[i].rowy][hutspot[i].colx-1].is_wall )
+                    if( l->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL )
                         continue;
                     break;
             }/* End cardinal direction Switch */
 
             /* Set Building Enterance Flags */
-            set_loc( '+', &l->map[hutspot[i].rowy][hutspot[i].colx] );//TODO: make map symbols configable
+            set_loc( &l->map[hutspot[i].rowy][hutspot[i].colx], DOOR );
             break;
         }/* End NSEW For */
     }/* End n For */
