@@ -3,7 +3,7 @@
  * Created by:      Roberto Morrel HildigerR Vergaray                         *
  ******************************************************************************/
 
-#define VERSION "0.4.1"
+#define VERSION "0.5.0"
 
 #include <time.h>
 #include "cwin.h"
@@ -199,37 +199,37 @@ int main( int argc, char* argv[] )
                     " From which direction would you like to attack? ");
                 switch( getch() ) {
                     case 'N': case 'n': case '8': /* NORTH */
-                        pc.locc = 1 + rng( MAX_COL - 2 );
-                        pc.locr = 1;
+                        pc.locr = 0;
+                        pc.locc = rng( MAX_COL );
                         break;
                     case 'S': case 's': case '2': /* SOUTH */
-                        pc.locc = 1 + rng( MAX_COL - 2 );
-                        pc.locr = ( MAX_ROW - 2 );
+                        pc.locr = ( MAX_ROW - 1 );
+                        pc.locc = rng( MAX_COL );
                         break;
                     case 'E': case 'e': case '6': /* EAST */
-                        pc.locr = 1 + rng( MAX_ROW - 2 );
-                        pc.locc = ( MAX_COL - 2 );
+                        pc.locr = rng( MAX_ROW );
+                        pc.locc = ( MAX_COL - 1 );
                         break;
                     case 'W': case 'w': case '4': /* WEST */
-                        pc.locr = 1 + rng( MAX_ROW - 2 );
-                        pc.locc = 1;
+                        pc.locr = rng( MAX_ROW );
+                        pc.locc = 0;
                         break;
                     case '9': /* NORTH_EAST */
-                        pc.locc = ( MAX_COL - 2 );
-                        pc.locr = 1;
+                        pc.locr = 0;
+                        pc.locc = ( MAX_COL - 1 );
                         break;
                     case '1': /* SOUTH_WEST */
-                        pc.locr = ( MAX_ROW - 2 );
-                        pc.locc = 1;
+                        pc.locr = ( MAX_ROW - 1 );
+                        pc.locc = 0;
                         break;
                     case '3': /* SOUTH_EAST */
-                        pc.locc = ( MAX_COL - 2 );
-                        pc.locr = ( MAX_ROW - 2 );
+                        pc.locr = ( MAX_ROW - 1 );
+                        pc.locc = ( MAX_COL - 1 );
                         break;
                     case 'Q': case 'q': exit(0);
                     default: /* NORTH_WEST; */
-                        pc.locc = 1;
-                        pc.locr = 1;
+                        pc.locr = 0;
+                        pc.locc = 0;
                 }/* end attdir switch */
             }/* end initial turn if */
         }/* end is_new if */
@@ -276,11 +276,22 @@ int main( int argc, char* argv[] )
                 }/* end cmd switch */
 
                 /* MOVE assess legality */
-                if( ( r > MAX_ROW )||( r < 0 ) )
-                    exit( ERROR( NULL, "Move Out of Vertical Bounds", r ) );
-                else if( ( c > MAX_COL )||( c < 0 ) )
-                    exit( ERROR( NULL, "Move Out of Horizontal Bounds", c ) );
-                else if( ACTIVE_LOCATION.icon == WALL )
+                if( ( r >= MAX_ROW )||( r < 0 )||( c >= MAX_COL )||( c < 0 ) ) {
+                    say("Are you sure you are ready to leave this town? ");
+                    if( toupper( getch() ) == 'Y' ) {
+                        turn = -1; //TODO: Add to score
+                        pc.locr = NOT_PLACED;
+                        pc.locc = NOT_PLACED;
+                        /* Re-INITIALIZE NPC ARRAY */
+                        for( i = 0; i < MAX_NPC; i++ )
+                            if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
+                                exit( Error( "Failed to initialize NPC", i ) );
+                        //TODO: Clean up litter!
+                        /* Re-INITIALIZE MAPS */
+                        if( !dungen( curlv, npc ) )
+                            exit( Error( "Failed to generate dungeon levels.", FAIL ) );
+                    }/* End New If */
+                } else if( ACTIVE_LOCATION.icon == WALL )
                     say("You bumped into a wall!"); //Currently Takes a Turn
 
                 /* Attacking */

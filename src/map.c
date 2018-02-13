@@ -89,31 +89,6 @@ static bool fill( LEVEL * l, char t, COORD d, COORD c )
 
 
 /******************************************************************************
- * FUNCTION:    init_lv                    Initialize Level                   *
- * ARGUMENTS:   LEVEL *  l          -- The level being initialized            *
- *              short    t          -- the type of level                      *
- ******************************************************************************/
-static void init_lv( LEVEL * l, short t )
-{
-    int r, c;
-
-    /* Keep Track of Current Level and Position in curlv array */
-    l->type = t;
-
-    l->is_new = true; /* Initially Unexplored */
-
-    /* Set All map flags Initially in Case Some Slip Through */
-    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ )
-        /* Border is always wall *///TODO: This could be done much more efficiently
-        if( ( r == 0 )||( r == (MAX_ROW-1) )
-          ||( c == 0 )||( c == (MAX_COL-1) ) )
-            set_loc( &l->map[r][c], WALL );
-        else /* Interior is floors for now */
-            set_loc( &l->map[r][c], FLOOR );
-}/* End init_lv Func */
-
-
-/******************************************************************************
  * FUNCTION:    get_map_icon         Get the map icon to display for a LOC    *
  * ARGUMENTS:   LOC     here      -- The location in question.                *
  * RETURNS:     char              -- The symobl to display for this location. *
@@ -151,11 +126,9 @@ static void buildgen( LEVEL * outside, LEVEL * inside )
     bool done;
 
     /* copy/invert ouside map to inside map */
-    for( r = 1; r < (MAX_ROW -1); r++ ) for( c = 1; c < (MAX_COL -1); c++ )
+    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ )
         if( outside->map[r][c].icon == WALL )
             set_loc( &inside->map[r][c], FLOOR );
-        else if( outside->map[r][c].icon == FLOOR )
-            set_loc( &inside->map[r][c], WALL );
         else if( outside->map[r][c].icon == DOOR ) {
             //Both a door and exit to lv
             set_loc( &inside->map[r][c], FLOOR );
@@ -182,25 +155,23 @@ static void buildgen( LEVEL * outside, LEVEL * inside )
 
 /******************************************************************************
  * FUNCTION:    towngen             -- Generate the town level.               *
- * ARGUMENTS:   LEVEL * l           -- The level.                             *
- *              unsigned short n    -- qt of buildings to generate.           *
+ * ARGUMENTS:   LEVEL * outside     -- The level.                             *
  * RETURNS:     bool                -- Generation successfull                 *
  * Attempts to generate buildings MIN_HUT_DIST appart, however they may still *
  * overlap effectively generating less than n buildings. This makes them more *
  * interesting though, so it is permitted.                                    *
  ******************************************************************************/
-static bool towngen( LEVEL * l, unsigned short n )
+static bool towngen( LEVEL * outside, LEVEL * inside )
 {
+    unsigned short hut_qt = 1 + rng( MAX_HUTS );
     unsigned short i, j, z;
     int dvert, dhorz;
     COORD hutspot[MAX_HUTS];
     RECT room[MAX_HUTS];
 
-    assert( n > 0 );
-    assert( n <= MAX_HUTS );
 
-    /* Create n Huts */
-    for( i = 0; i < n; i++ ) {
+    /* Create hut_qt Huts */
+    for( i = 0; i < hut_qt; i++ ) {
 
         while( true ) {
             /* Find centers of Buildings */
@@ -227,7 +198,7 @@ static bool towngen( LEVEL * l, unsigned short n )
         }/*end !done while */
 
         /* Fill Building With Wall */
-        if( fill_wall( l, room[i].a, room[i].b ) == false ) {
+        if( fill_wall( outside, room[i].a, room[i].b ) == false ) {
             Error( "Failed to Fill Building Walls", i );
             return false;
         }/* End fill_wall If */
@@ -238,31 +209,33 @@ static bool towngen( LEVEL * l, unsigned short n )
             switch( z ) {
                 case NORTH:
                     hutspot[i].rowy = room[i].a.rowy;
-                    if( l->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )
+                    if( outside->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )
                         continue;
                     break;
                 case SOUTH:
                     hutspot[i].rowy = room[i].b.rowy - 1;
-                    if( l->map[room[i].b.rowy][hutspot[i].colx].icon == WALL )
+                    if( outside->map[room[i].b.rowy][hutspot[i].colx].icon == WALL )
                         continue;
                     break;
                 case EAST:
                     hutspot[i].colx = room[i].b.colx - 1;
-                    if( l->map[hutspot[i].rowy-1][room[i].b.colx].icon == WALL )
+                    if( outside->map[hutspot[i].rowy-1][room[i].b.colx].icon == WALL )
                         continue;
                     break;
                 case WEST:
                     hutspot[i].colx = room[i].a.colx;
-                    if( l->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL )
+                    if( outside->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL )
                         continue;
                     break;
             }/* End cardinal direction Switch */
 
             /* Set Building Enterance Flags */
-            set_loc( &l->map[hutspot[i].rowy][hutspot[i].colx], DOOR );
+            set_loc( &outside->map[hutspot[i].rowy][hutspot[i].colx], DOOR );
             break;
         }/* End NSEW For */
-    }/* End n For */
+    }/* End hut_qt For */
+
+    buildgen( outside, inside );//XXX
 
     return true;
 }/* End towngen Func */
@@ -276,17 +249,23 @@ static bool towngen( LEVEL * l, unsigned short n )
 bool dungen( LEVEL * curlv, PLAYER * npc )
 {
     int i;
-    unsigned short hut_qt = 1 + rng( MAX_HUTS );;
+    static const COORD TOP_LEFT = { 0, 0 };
+    static const COORD BTM_RIGHT = { MAX_ROW, MAX_COL };
 
     /* Initialize Maps */
-    for( i = 0; i < MAX_MAPS; i++ ) init_lv( &curlv[i], i );
+    for( i = 0; i < MAX_MAPS; i++ ) {
+        /* Keep Track of Current Level and Position in array */
+        curlv[i].type = i;
+        curlv[i].is_new = true; /* Initially Unexplored */
+        if( i == HVILLAGE ) fill_floor( &curlv[i], TOP_LEFT, BTM_RIGHT );
+        else  fill_wall( &curlv[i], TOP_LEFT, BTM_RIGHT );
+    }/* Init Maps For */
 
     /* Generate Town */
-    if( !towngen( &curlv[HVILLAGE], hut_qt ) ) {
-        return( Error( "Failed to create town with n huts : n = ", hut_qt ) );
+    if( !towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS] ) ) {
+        Error( "Failed to generate town Levels", HVILLAGE );
         return false;
-    }/* Ent towngen If */
-    buildgen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
+    }/* End towngen If */
 
     /* TODO Generate Dungeons & Castle */
 

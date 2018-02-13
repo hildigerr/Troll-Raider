@@ -129,8 +129,8 @@ typedef struct {
 } PLAYER;
 
 typedef struct {
-    int colx;
     int rowy;
+    int colx;
 } COORD;
 
 typedef struct {
