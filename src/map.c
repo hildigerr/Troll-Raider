@@ -72,7 +72,9 @@ void set_loc( LOC * spot, char type  )
  * RETURNS:     bool                Fails if area exeeds bounds of a map.     *
  * NOTE: XXX d and c use to stand for door and corner.                        *
  ******************************************************************************/
-bool fill( LEVEL * l, char t, COORD d, COORD c )
+#define fill_wall(x,y,z) fill(x,WALL,y,z)
+#define fill_floor(x,y,z) fill(x,FLOOR,y,z)
+static bool fill( LEVEL * l, char t, COORD d, COORD c )
 {
     int i, j, s = smallest( d.colx, c.colx ),
         b[2] = { biggest( d.rowy, c.rowy ), biggest( d.colx, c.colx ) };
@@ -91,7 +93,7 @@ bool fill( LEVEL * l, char t, COORD d, COORD c )
  * ARGUMENTS:   LEVEL *  l          -- The level being initialized            *
  *              short    t          -- the type of level                      *
  ******************************************************************************/
-void init_lv( LEVEL * l, short t )
+static void init_lv( LEVEL * l, short t )
 {
     int r, c;
 
@@ -142,7 +144,7 @@ void draw_map( LEVEL * curlv )
  * ARGUMENTS:   LEVEL *  outside        -- The exterior level                 *
  *              LEVEL *  inside         -- The generated interior level       *
  ******************************************************************************/
-void buildgen( LEVEL * outside, LEVEL * inside )
+static void buildgen( LEVEL * outside, LEVEL * inside )
 {
     int r, c, i, j;
     bool found_first;
@@ -187,7 +189,7 @@ void buildgen( LEVEL * outside, LEVEL * inside )
  * overlap effectively generating less than n buildings. This makes them more *
  * interesting though, so it is permitted.                                    *
  ******************************************************************************/
-bool towngen( LEVEL * l, unsigned short n )
+static bool towngen( LEVEL * l, unsigned short n )
 {
     unsigned short i, j, z;
     int dvert, dhorz;
@@ -225,8 +227,10 @@ bool towngen( LEVEL * l, unsigned short n )
         }/*end !done while */
 
         /* Fill Building With Wall */
-        if( fill_wall( l, room[i].a, room[i].b ) == false )
-            return( Error( "Failed to Fill Building Walls", i ) );
+        if( fill_wall( l, room[i].a, room[i].b ) == false ) {
+            Error( "Failed to Fill Building Walls", i );
+            return false;
+        }/* End fill_wall If */
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
@@ -260,11 +264,36 @@ bool towngen( LEVEL * l, unsigned short n )
         }/* End NSEW For */
     }/* End n For */
 
-    /* TODO: Place NPCs */
-
-
     return true;
 }/* End towngen Func */
+
+
+/******************************************************************************
+ * FUNCTION:    dungen                   Generate the Dungeon Maps            *
+ * ARGUMENTS:   LEVEL    *     curlv       -- The Array of Levels             *
+ *              PLAYER   *     npc         -- The Array of NPCs (initialized) *
+ ******************************************************************************/
+bool dungen( LEVEL * curlv, PLAYER * npc )
+{
+    int i;
+    unsigned short hut_qt = 1 + rng( MAX_HUTS );;
+
+    /* Initialize Maps */
+    for( i = 0; i < MAX_MAPS; i++ ) init_lv( &curlv[i], i );
+
+    /* Generate Town */
+    if( !towngen( &curlv[HVILLAGE], hut_qt ) ) {
+        return( Error( "Failed to create town with n huts : n = ", hut_qt ) );
+        return false;
+    }/* Ent towngen If */
+    buildgen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
+
+    /* TODO Generate Dungeons & Castle */
+
+    /* TODO: Place NPCs */
+
+    return true;
+}/* End dungen Func */
 
 
 

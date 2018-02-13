@@ -121,7 +121,6 @@ int main( int argc, char* argv[] )
     PLAYER pc;      /* player's character */
     PLAYER npc[MAX_NPC];   /* non player characters */
     unsigned long turn = 0;
-    unsigned short hut_qt;
     LEVEL curlv[MAX_MAPS]; /* current levels */
     bool run, need_more_cmd, skip_a_turn;
 //    FILE* indata;   /* saved game file access */
@@ -144,21 +143,16 @@ int main( int argc, char* argv[] )
 
     /* INITIALIZE PLAYER */
     if( init_player( &pc ) == false )
-        exit( ERROR( NULL, "Failed to initialize player", FAIL ) );
-
-    /* INITIALIZE MAPS */
-    for( i = 0; i < MAX_MAPS; i++ ) init_lv( &curlv[i], i );
+        exit( Error( "Failed to initialize player", FAIL ) );
 
     /* INITIALIZE NPC ARRAY */
     for( i = 0; i < MAX_NPC; i++ )
-        if( init_mon( &npc[i], rng(NPC_TYPE_QT) ) == false )
-            return( ERROR( NULL, "Failed to initialize NPC", i ) );
+        if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
+            exit( Error( "Failed to initialize NPC", i ) );
 
-    /* Generate Dungeon */
-    hut_qt = 1 + rng( MAX_HUTS );
-    if( towngen(&curlv[HVILLAGE], hut_qt) == false )
-        exit( Error( "Failed to create town with n huts : n = ", hut_qt ) );
-    buildgen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
+    /* INITIALIZE MAPS */
+    if( !dungen( curlv, npc ) )
+        exit( Error( "Failed to generate dungeon levels.", FAIL ) );
 
     //XXX visible only after program termination:
     printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
@@ -182,13 +176,11 @@ int main( int argc, char* argv[] )
     keypad(stdscr, TRUE); /* enable arrowkeys and such */
 
     /* RUN GAME */
-    while( run == true ) {
+    while( run ) {
 
         /* Set-up/Update RH Display */
         if( init_display_right( display_right, &pc, turn ) == false )
-            exit( ERROR( NULL,
-                "Failed to (re)initialize right hand display", turn ) );
-
+            exit( Error( "Failed to (re)initialize right hand display",turn ) );
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
         if( curlv[pc.maplv].is_new == true ) {

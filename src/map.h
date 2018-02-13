@@ -25,27 +25,6 @@ void set_loc( LOC * spot, char type  );
 
 
 /******************************************************************************
- * FUNCTION:    fill                Fill an area with a certain LOC type      *
- * ARGUMENTS:   LEVEL *  l          -- The level with an area to fill         *
- *              char     t          -- The LOC type                           *
- *              COORD    d,c        -- Two opposite corners defining the area *
- * RETURNS:     bool                Fails if area exeeds bounds of a map.     *
- * NOTE: XXX d and c use to stand for door and corner.                        *
- ******************************************************************************/
-bool fill( LEVEL * l, char t, COORD d, COORD c );
-#define fill_wall(x,y,z) fill(x,WALL,y,z)
-#define fill_floor(x,y,z) fill(x,FLOOR,y,z)
-
-
-/******************************************************************************
- * FUNCTION:    init_lv                    Initialize Level                   *
- * ARGUMENTS:   LEVEL *  l          -- The level being initialized            *
- *              short    t          -- the type of level                      *
- ******************************************************************************/
-void init_lv( LEVEL * l, short t );
-
-
-/******************************************************************************
  * FUNCTION:    get_map_icon         Get the map icon to display for a LOC    *
  * ARGUMENTS:   LOC     here      -- The location in question.                *
  * RETURNS:     char              -- The symobl to display for this location. *
@@ -61,23 +40,11 @@ void draw_map( LEVEL * curlv );
 
 
 /******************************************************************************
- * FUNCTION:    buildgen                -- Generate building interiors        *
- * ARGUMENTS:   LEVEL *  outside        -- The exterior level                 *
- *              LEVEL *  inside         -- The generated interior level       *
+ * FUNCTION:    dungen                   Generate the Dungeon Maps            *
+ * ARGUMENTS:   LEVEL    *     curlv       -- The Array of Levels             *
+ *              PLAYER   *     npc         -- The Array of NPCs (initialized) *
  ******************************************************************************/
-void buildgen( LEVEL * outside, LEVEL * inside );
-
-
-/******************************************************************************
- * FUNCTION:    towngen             -- Generate the town level.               *
- * ARGUMENTS:   LEVEL * l           -- The level.                             *
- *              unsigned short n    -- qt of buildings to generate.           *
- * RETURNS:     bool                -- Generation successfull                 *
- * Attempts to generate buildings MIN_HUT_DIST appart, however they may still *
- * overlap effectively generating less than n buildings. This makes them more *
- * interesting though, so it is permitted.                                    *
- ******************************************************************************/
-bool towngen( LEVEL * l, unsigned short n );
+bool dungen( LEVEL * curlv, PLAYER * npc );
 
 
 
