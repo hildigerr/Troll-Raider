@@ -115,45 +115,6 @@ void draw_map( LEVEL * curlv )
 
 
 /******************************************************************************
- * FUNCTION:    buildgen                -- Generate building interiors        *
- * ARGUMENTS:   LEVEL *  outside        -- The exterior level                 *
- *              LEVEL *  inside         -- The generated interior level       *
- ******************************************************************************/
-static void buildgen( LEVEL * outside, LEVEL * inside )
-{
-    int r, c, i, j;
-    bool found_first;
-    bool done;
-
-    /* copy/invert ouside map to inside map */
-    for( r = 0; r < MAX_ROW; r++ ) for( c = 0; c < MAX_COL; c++ )
-        if( outside->map[r][c].icon == WALL )
-            set_loc( &inside->map[r][c], FLOOR );
-        else if( outside->map[r][c].icon == DOOR ) {
-            //Both a door and exit to lv
-            set_loc( &inside->map[r][c], FLOOR );
-            //second found wall should usually be made exit door
-            found_first = false;
-            done  = false;
-            for( i = r-1; i <= r+1; i++ )
-                if( done  == true ) break;
-                else for( j = c-1; j <= c+1; j++ )
-                    if( inside->map[i][j].icon == WALL ) {
-                        if( found_first == false ) found_first = true;
-                        else{
-                            set_loc( &inside->map[i][j], DOOR );
-                            done  = true;
-                            break;
-                        }/* end place exit door else */
-                    }/* end is_wall if */
-        }/* end is_trap if */
-
-    /* TODO: Generate sub buildings attached to main buildings with tunnels */
-
-}/* end buildgen */
-
-
-/******************************************************************************
  * FUNCTION:    towngen             -- Generate the town level.               *
  * ARGUMENTS:   LEVEL * outside     -- The level.                             *
  * RETURNS:     bool                -- Generation successfull                 *
@@ -198,10 +159,14 @@ static bool towngen( LEVEL * outside, LEVEL * inside )
         }/*end !done while */
 
         /* Fill Building With Wall */
-        if( fill_wall( outside, room[i].a, room[i].b ) == false ) {
+        if( !fill_wall( outside, room[i].a, room[i].b ) ) {
             Error( "Failed to Fill Building Walls", i );
             return false;
         }/* End fill_wall If */
+        if( !fill_floor( inside, room[i].a, room[i].b ) ) {
+            Error( "Failed to Fill Building Floors", i );
+            return false;
+        }/* End fill_floor If */
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
@@ -231,11 +196,19 @@ static bool towngen( LEVEL * outside, LEVEL * inside )
 
             /* Set Building Enterance Flags */
             set_loc( &outside->map[hutspot[i].rowy][hutspot[i].colx], DOOR );
+            if( inside->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )      /* North */
+                set_loc( &inside->map[hutspot[i].rowy-1][hutspot[i].colx], DOOR );
+            else if( inside->map[hutspot[i].rowy+1][hutspot[i].colx].icon == WALL ) /* South */
+                set_loc( &inside->map[hutspot[i].rowy+1][hutspot[i].colx], DOOR );
+            else if( inside->map[hutspot[i].rowy][hutspot[i].colx+1].icon == WALL ) /* East */
+                set_loc( &inside->map[hutspot[i].rowy][hutspot[i].colx+1], DOOR );
+            else if( inside->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL ) /* West */
+                set_loc( &inside->map[hutspot[i].rowy][hutspot[i].colx-1], DOOR );
             break;
         }/* End NSEW For */
     }/* End hut_qt For */
 
-    buildgen( outside, inside );//XXX
+    //TODO: Generate sub buildings attached to main buildings with tunnels
 
     return true;
 }/* End towngen Func */
