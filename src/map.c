@@ -70,18 +70,17 @@ void set_loc( LOC * spot, char type  )
  * FUNCTION:    fill                Fill an area with a certain LOC type      *
  * ARGUMENTS:   LEVEL *  l          -- The level with an area to fill         *
  *              char     t          -- The LOC type                           *
- *              COORD    d,c        -- Two opposite corners defining the area *
- * NOTE: XXX d and c use to stand for door and corner.                        *
+ *              RECT    c           -- The rectangular area to fill.          *
  ******************************************************************************/
-#define fill_wall(x,y,z) fill(x,WALL,y,z)
-#define fill_floor(x,y,z) fill(x,FLOOR,y,z)
-static void fill( LEVEL * l, char t, COORD d, COORD c )
+#define fill_wall(x,y) fill(x,WALL,y)
+#define fill_floor(x,y) fill(x,FLOOR,y)
+static void fill( LEVEL * l, char t, RECT x )
 {
-    int i, j, s = smallest( d.colx, c.colx ),
-        b[2] = { biggest( d.rowy, c.rowy ), biggest( d.colx, c.colx ) };
+    int i, j, s = smallest( x.a.colx, x.b.colx ),
+        b[2] = { biggest( x.a.rowy, x.b.rowy ), biggest( x.a.colx, x.b.colx ) };
     /* NOTE: Biggest returns zero if it's arguments are the same. */
 
-    for( i = smallest( d.rowy, c.rowy ); i < b[0]; i++ ) {
+    for( i = smallest( x.a.rowy, x.b.rowy ); i < b[0]; i++ ) {
         for( j = s; j < b[1]; j++ ) {
             assert( i < MAX_ROW );
             assert( j < MAX_COL );
@@ -118,6 +117,31 @@ void draw_map( LEVEL * curlv )
 
 
 /******************************************************************************
+ * FUNCTION:    roomgen                 Genearate a Room                      *
+ * ARGUMENTS:   RECT * room            -- The room to be generated.           *
+ *              COORD  center          -- Center the room here.               *
+ * RETURNS:     bool                    True if room is within bounds.        *
+ ******************************************************************************/
+static bool roomgen( RECT * room, COORD center )
+{
+    /* Expand Room Dimensions */
+    int dvert = MIN_HUT_HGT + rng(MAX_HUT_HGT),
+        dhorz = MIN_HUT_WID + rng(MAX_HUT_WID);
+
+    room->a.rowy = center.rowy - dvert;
+    room->a.colx = center.colx - dhorz;
+    room->b.rowy = center.rowy + dvert;
+    room->b.colx = center.colx + dhorz;
+
+    /* Don't Bump the Outer Wall */
+    if( ( room->a.rowy < 2  )||( room->a.colx < 2 ) ) return false;
+    if( room->b.rowy > ( MAX_ROW - 2 ) ) return false;
+    if( room->b.colx > ( MAX_COL - 2 ) ) return false;
+    return true;
+}/* End roomgen Func  */
+
+
+/******************************************************************************
  * FUNCTION:    towngen             -- Generate the town level.               *
  * ARGUMENTS:   LEVEL * outside     -- The level.                             *
  * RETURNS:     bool                -- Generation successfull                 *
@@ -129,40 +153,22 @@ static void towngen( LEVEL * outside, LEVEL * inside )
 {
     unsigned short hut_qt = 1 + rng( MAX_HUTS );
     unsigned short i, j, z;
-    int dvert, dhorz;
     COORD hutspot[MAX_HUTS];
     RECT room[MAX_HUTS];
 
     /* Create hut_qt Huts */
     for( i = 0; i < hut_qt; i++ ) {
 
-        while( true ) {
-            /* Find centers of Buildings */
+        do { /* Find centers of Buildings */
             hutspot[i].rowy =  ( 2 + MIN_HUT_HGT ) + rng( MAX_ROW - ( 2 + MIN_HUT_HGT ) );
             hutspot[i].colx =  ( 2 + MIN_HUT_WID ) + rng( MAX_COL - ( 2 + MIN_HUT_WID ) );
             if( i > 0 ) for( z = 0; z < i; z++ )
                 if( dist( hutspot[z], hutspot[i] ) < MIN_HUT_DIST ) continue;
-
-            /* Expand Building Dimensions */
-            dvert = MIN_HUT_HGT + rng(MAX_HUT_HGT);
-            dhorz = MIN_HUT_WID + rng(MAX_HUT_WID);
-
-            room[i].a.rowy = hutspot[i].rowy - dvert;
-            room[i].a.colx = hutspot[i].colx - dhorz;
-            room[i].b.rowy = hutspot[i].rowy + dvert;
-            room[i].b.colx = hutspot[i].colx + dhorz;
-
-            /* Don't Bump the Outer Wall */
-            if( ( room[i].a.rowy < 2  )||( room[i].a.colx < 2 ) ) continue;
-            if( room[i].b.rowy > ( MAX_ROW - 2 ) ) continue;
-            if( room[i].b.colx > ( MAX_COL - 2 ) ) continue;
-
-            break;
-        }/*end !done while */
+        } while( !roomgen( &room[i], hutspot[i]) );
 
         /* Fill Buildings */
-        fill_wall( outside, room[i].a, room[i].b );
-        fill_floor( inside, room[i].a, room[i].b );
+        fill_wall( outside, room[i] );
+        fill_floor( inside, room[i] );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
@@ -223,22 +229,31 @@ bool dungen( LEVEL * curlv, PLAYER * npc )
     int i;
     static const COORD TOP_LEFT = { 0, 0 };
     static const COORD BTM_RIGHT = { MAX_ROW, MAX_COL };
+    RECT room = { TOP_LEFT, BTM_RIGHT }; /* Full Map */
 
     /* Initialize Maps */
     for( i = 0; i < MAX_MAPS; i++ ) {
         /* Keep Track of Current Level and Position in array */
         curlv[i].type = i;
         curlv[i].is_new = true; /* Initially Unexplored */
-        if( i == HVILLAGE ) fill_floor( &curlv[i], TOP_LEFT, BTM_RIGHT );
-        else  fill_wall( &curlv[i], TOP_LEFT, BTM_RIGHT );
+        if( i == HVILLAGE ) fill_floor( &curlv[i], room );
+        else  fill_wall( &curlv[i], room );
     }/* Init Maps For */
 
     /* Generate Town */
     towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
 
-    /* TODO Generate Dungeons & Castle */
+    /*** Generate Dungeons & Castle ***/
 
-    /* TODO: Place NPCs */
+    /* Dungeon Starts in a Room */
+    while( !roomgen( &room, prev_stair_spot) );
+    fill_floor( &curlv[CASL_DN0], room );
+
+    /* TODO: Link Stairs */
+
+    /* TODO: Generate More Rooms and Paths */
+
+    /* TODO: Place NPCs, traps, ... */
 
     return true;
 }/* End dungen Func */
