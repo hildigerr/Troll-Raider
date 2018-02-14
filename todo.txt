@@ -25,5 +25,5 @@ Make unarmed values based on abilities
 
 Display And Save High Score Report
 
-When town is cleared output qt of family saved, and continue to next town
+When town is cleared output qt of family saved
 Track family saved for score

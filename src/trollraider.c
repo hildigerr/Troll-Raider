@@ -122,7 +122,7 @@ int main( int argc, char* argv[] )
     PLAYER npc[MAX_NPC];   /* non player characters */
     unsigned long turn = 0;
     LEVEL curlv[MAX_MAPS]; /* current levels */
-    bool run, need_more_cmd, skip_a_turn;
+    bool run, need_more_cmd, skip_a_turn, generate_new_levels = true;
 //    FILE* indata;   /* saved game file access */
     WINDOW  * display_right,
             * sub_win_root, * sub_win_lhs, * sub_win_rhs;
@@ -132,12 +132,13 @@ int main( int argc, char* argv[] )
     run = true;
     skip_a_turn = false;
 
-    /* READ IN DATA FILE(S) For Saved Game */
-//    if( ( indata = fopen( dat_file_name, READ_ONLY ) ) == NULL )
-//        exit( ERROR(NULL, "Missing \"item.dat\" file", FAIL ) );
+    printf( "\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
+
+    /* Get Race and Class */
+    printf( "You are a man-eating troll!\n" );
 
     /* Get Player Name */
-    printf("\nWhat is the name for your character? ");
+    printf( "\nWhat is the name for your character? " );
     if( !fgets( pc.name, MAX_NAME_LEN+1, stdin ) )
         exit( ERROR( "fgets", "failed to get string", MAX_NAME_LEN ) );
 
@@ -145,17 +146,9 @@ int main( int argc, char* argv[] )
     if( init_player( &pc ) == false )
         exit( Error( "Failed to initialize player", FAIL ) );
 
-    /* INITIALIZE NPC ARRAY */
-    for( i = 0; i < MAX_NPC; i++ )
-        if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
-            exit( Error( "Failed to initialize NPC", i ) );
-
-    /* INITIALIZE MAPS */
-    if( !dungen( curlv, npc ) )
-        exit( Error( "Failed to generate dungeon levels.", FAIL ) );
-
-    //XXX visible only after program termination:
-    printf("\n\n\tTroll Raider v%s\tBy HILDIGERR\n\n", VERSION );
+    /* READ IN DATA FILE(S) For Saved Game */
+//    if( ( indata = fopen( dat_file_name, READ_ONLY ) ) == NULL )
+//        exit( ERROR(NULL, "Missing \"item.dat\" file", FAIL ) );
 
     /* INITIALIZE CURSES */
     initscr(); /* Start curses mode *///RETURNS WINDOW*
@@ -178,8 +171,22 @@ int main( int argc, char* argv[] )
     /* RUN GAME */
     while( run ) {
 
+        if( generate_new_levels ) {
+            generate_new_levels = false;
+
+            /* INITIALIZE NPC ARRAY */
+            for( i = 0; i < MAX_NPC; i++ )
+                if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
+                    exit( Error( "Failed to initialize NPC", i ) );
+
+            /* INITIALIZE MAPS */
+            if( !dungen( curlv, npc ) )
+                exit( Error( "Failed to generate dungeon levels.", FAIL ) );
+
+        }/* End generate_new_levels If */
+
         /* Set-up/Update RH Display */
-        if( init_display_right( display_right, &pc, turn ) == false )
+        if( !init_display_right( display_right, &pc, turn ) )
             exit( Error( "Failed to (re)initialize right hand display",turn ) );
 
         /* INITIALIZE CURRENT LEVEL IF NEEDED */
@@ -190,9 +197,6 @@ int main( int argc, char* argv[] )
 
             if( turn == 0 ) {
                 refresh();
-
-                /* Get Race and Class */
-                say("You are a man-eating troll!");
 
                 /* Get Attack Direction */
                 say("You approach the human village."
@@ -239,8 +243,6 @@ int main( int argc, char* argv[] )
 
         /* UPDATE SCREEN */
         refresh();
-        wrefresh(display_btm);
-        wrefresh(display_right);
 
         if( skip_a_turn == true ) skip_a_turn = false; //TODO: use pc.is_awake?
         else /* TAKE TURN */ do {
@@ -250,16 +252,8 @@ int main( int argc, char* argv[] )
             need_more_cmd = false;
             r = pc.locr; c = pc.locc;
 
-            /* PROCESS CMD */
-            if( cmd == QUIT ) {
-                say("Are you sure you want to quit? ");
-                if( toupper(getch()) == 'Y' ) run = false;
-//                else say("Oh ok, then we wont kick you out of here.");
-                continue;
-            }/* end QUIT */
-
             /* MOVING */
-            else if( ( cmd > NO_ACTION )&&( cmd < WAIT )) {
+            if( ( cmd > NO_ACTION )&&( cmd < WAIT )) {
                 /* Find Target Location */
                 switch( cmd ) {
                     case SOUTH_WEST: { r += 1; c -= 1; } break;
@@ -284,17 +278,14 @@ int main( int argc, char* argv[] )
                     } else { /* In HVILLAGE */
                         say("Are you sure you are ready to leave this town? ");
                         if( toupper( getch() ) == 'Y' ) {
-                            turn = -1; //TODO: Add to score
-                            pc.locr = NOT_PLACED;
-                            pc.locc = NOT_PLACED;
-                            /* Re-INITIALIZE NPC ARRAY */
-                            for( i = 0; i < MAX_NPC; i++ )
-                                if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
-                                    exit( Error( "Failed to initialize NPC", i ) );
+                            generate_new_levels = true;
+                            turn = -1;
+                            //TODO: Add to score
+                            //TODO: output qt of family saved, heroes killt, etc
                             //TODO: Clean up litter!
-                            /* Re-INITIALIZE MAPS */
-                            if( !dungen( curlv, npc ) )
-                                exit( Error( "Failed to generate dungeon levels.", FAIL ) );
+                            say( "You smell another human settlement nearby, "
+                                 "do you want to approach it? " );
+                            if( toupper( getch() ) != 'Y' ) run = false;
                         }/* End depart town If */
                     }/* End HVILLAGE Else */
                 } else if( ACTIVE_LOCATION.icon == WALL )
@@ -400,7 +391,15 @@ int main( int argc, char* argv[] )
                 touchwin( stdscr );
             }/* end INVENTORY cmd */
 
+            /* PROCESS OTHER CMDs */
             else switch( cmd ) {
+
+                case QUIT: {
+                    say("Are you sure you want to quit? ");
+                    if( toupper(getch()) == 'Y' ) run = false;
+                    else say("Oh ok, then we wont kick you out of here.");
+                    continue;
+                }/* End QUIT Case */ break;
 
                 case PICK_UP: {
                     need_more_cmd = true; /* Assume Nothing Happens */
@@ -454,13 +453,4 @@ int main( int argc, char* argv[] )
 }/* end main func */
 
 
-///////////////////////////////////////////////////////////////////////////TODO:
-// wsay( where, "You have saved all your family "
-//              "and slaughered the humans." );
-// //TODO: output qt of family saved
-// mypause(0);//more();
-// wsay( where, "You smell another human settlement nearby, "
-//              "do you want to approach it? " );
-// //TODO: output direction and? you must attack from that direction
-// if( toupper(getch()) == 'Y' )
-
+/************************************EOF***************************************/
