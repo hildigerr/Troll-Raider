@@ -65,7 +65,8 @@ void vsay( const char * fmt, ... )
 bool init_display_right( WINDOW * d, PLAYER * p, unsigned long turn )
 {
     int i;
-    char* dflav[DFMAX] = { /* for each dungeon lv an arbitrary 5 letter name */
+    static const char* dflav[] = {
+        /* for each dungeon lv an arbitrary 5 letter name */
                              "Vault",
                              "Jails",
                              "Depth"
@@ -90,7 +91,7 @@ bool init_display_right( WINDOW * d, PLAYER * p, unsigned long turn )
     wprintw( d, "\n\n  Food: %d\n  Family Saved: %d ", p->food, 0 ); //TODO: s->family );
 
     /* Initialize i for Flavor */
-    i = rng(DFMAX);
+    i = rng(3);//XXX
 
     switch(p->maplv) {
 //        case TVILLAGE:    wprintw(d,"\n\n Troll Village ");    break;

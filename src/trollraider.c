@@ -251,8 +251,7 @@ int main( int argc, char* argv[] )
             r = pc.locr; c = pc.locc;
 
             /* PROCESS CMD */
-            if( cmd == WAIT ) say("You wait...");
-            else if( cmd == QUIT ) {
+            if( cmd == QUIT ) {
                 say("Are you sure you want to quit? ");
                 if( toupper(getch()) == 'Y' ) run = false;
 //                else say("Oh ok, then we wont kick you out of here.");
@@ -277,20 +276,27 @@ int main( int argc, char* argv[] )
 
                 /* MOVE assess legality */
                 if( ( r >= MAX_ROW )||( r < 0 )||( c >= MAX_COL )||( c < 0 ) ) {
-                    say("Are you sure you are ready to leave this town? ");
-                    if( toupper( getch() ) == 'Y' ) {
-                        turn = -1; //TODO: Add to score
-                        pc.locr = NOT_PLACED;
-                        pc.locc = NOT_PLACED;
-                        /* Re-INITIALIZE NPC ARRAY */
-                        for( i = 0; i < MAX_NPC; i++ )
-                            if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
-                                exit( Error( "Failed to initialize NPC", i ) );
-                        //TODO: Clean up litter!
-                        /* Re-INITIALIZE MAPS */
-                        if( !dungen( curlv, npc ) )
-                            exit( Error( "Failed to generate dungeon levels.", FAIL ) );
-                    }/* End New If */
+                    if( pc.maplv == CASL_GRD ) { //TODO: test, confirm is as desired
+                        say("After you pass through the castle gate the"
+                            "portcullis shuts behind you.");
+                        curlv[CASL_GRD].is_new = true;
+                        pc.maplv = HVILLAGE;
+                    } else { /* In HVILLAGE */
+                        say("Are you sure you are ready to leave this town? ");
+                        if( toupper( getch() ) == 'Y' ) {
+                            turn = -1; //TODO: Add to score
+                            pc.locr = NOT_PLACED;
+                            pc.locc = NOT_PLACED;
+                            /* Re-INITIALIZE NPC ARRAY */
+                            for( i = 0; i < MAX_NPC; i++ )
+                                if( !init_mon( &npc[i], rng(NPC_TYPE_QT) ) )
+                                    exit( Error( "Failed to initialize NPC", i ) );
+                            //TODO: Clean up litter!
+                            /* Re-INITIALIZE MAPS */
+                            if( !dungen( curlv, npc ) )
+                                exit( Error( "Failed to generate dungeon levels.", FAIL ) );
+                        }/* End depart town If */
+                    }/* End HVILLAGE Else */
                 } else if( ACTIVE_LOCATION.icon == WALL )
                     say("You bumped into a wall!"); //Currently Takes a Turn
 
@@ -327,9 +333,11 @@ int main( int argc, char* argv[] )
                 }/* end door if */ else /* Move Normally */ {
                     if( ACTIVE_LOCATION.icon == USTAIR )
                         say("You found some ascending stairs!");
-                    else if( ACTIVE_LOCATION.icon == DSTAIR )
-                        say("You found some descending stairs!");
-                    else if( ACTIVE_LOCATION.is_trap == true ) {
+                    else if( ACTIVE_LOCATION.icon == DSTAIR ) {
+                        if( pc.maplv <= IN_HHUTS )
+                            say("You found a trapdoor covering a deep hole!");
+                        else say("You found some descending stairs!");
+                    } else if( ACTIVE_LOCATION.is_trap == true ) {
                         say("You have stepped into a trap!"); //TODO
                     } else if( ACTIVE_LOCATION.litter != NULL ) {
                         say("You have found an item!"); //TODO
@@ -392,25 +400,46 @@ int main( int argc, char* argv[] )
                 touchwin( stdscr );
             }/* end INVENTORY cmd */
 
-            else if( cmd == PICK_UP ) {
-                need_more_cmd = true; /* Assume Nothing Happens */
-                if( !ACTIVE_LOCATION.litter )
-                    say("There is nothing to pick up.");
-                else {
-                    for(i = 0; i < MAX_HOLD; i++ ) {
-                        if( !pc.inventory[i] ) {
-                            pc.inventory[i] = ACTIVE_LOCATION.litter;
-                            ACTIVE_LOCATION.litter = NULL;
-                            vsay("You picked up the %s!",pc.inventory[i]->name);
-                            need_more_cmd = false;
-                            break;
-                        }/* end got empty slot if */
-                    }/* end MAX_SLOTS for */
-                    if( i == MAX_SLOTS ) say("You're inventory is full!");
-                }/* end pickup else */
-            }/* end PICK_UP if */
+            else switch( cmd ) {
 
-            else exit( ERROR( NULL, "cmd processing", cmd ) );
+                case PICK_UP: {
+                    need_more_cmd = true; /* Assume Nothing Happens */
+                    if( !ACTIVE_LOCATION.litter )
+                        say("There is nothing to pick up.");
+                    else {
+                        for(i = 0; i < MAX_HOLD; i++ ) {
+                            if( !pc.inventory[i] ) {
+                                pc.inventory[i] = ACTIVE_LOCATION.litter;
+                                ACTIVE_LOCATION.litter = NULL;
+                                vsay("You picked up the %s!",pc.inventory[i]->name);
+                                need_more_cmd = false;
+                                break;
+                            }/* end got empty slot if */
+                        }/* end MAX_SLOTS for */
+                        if( i == MAX_SLOTS ) say("You're inventory is full!");
+                    }/* end pickup else */
+                }/* end PICK_UP case */ break;
+
+                case WAIT: {
+                    if( ACTIVE_LOCATION.icon == DSTAIR ) {
+                         curlv[pc.maplv].is_new = true;
+                         if( pc.maplv <= IN_HHUTS ) { /* Descend 1-Way */
+                            say("You leap down into the depths.");
+                            pc.maplv = CASL_DN0;
+                         } else { /* Descend Stairs */
+                            say("You descend down the stairs.");
+                            pc.maplv++;
+                         }/* End  Else */
+                    } else if( ACTIVE_LOCATION.icon == USTAIR ) {
+                        say("You ascend up the stairs.");
+                        curlv[pc.maplv--].is_new = true;
+                    } else say("You wait...");
+                }/* End WAIT Case */ break;
+
+                default: exit( ERROR( NULL, "cmd processing", cmd ) );
+
+            }/* End cmd Switch */
+
         } while( need_more_cmd == true );/* end need more cmd do */
 
         //TODO: Enemy actions

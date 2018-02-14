@@ -8,7 +8,6 @@ Magic, potions, ...
 
 Adjust Item Based on it's Lv and Whatever?
 
-Generate sub buildings attached to main buildings with tunnels.
 Make map symbols configable.
 
 Make skill_check more interesting.

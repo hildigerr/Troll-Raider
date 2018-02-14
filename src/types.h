@@ -95,15 +95,38 @@
 /* Current Level Array Access Definitions */
 #define HVILLAGE    0 /* Human Village */
 #define IN_HHUTS    1 /* Inside Human Huts */
-#define CASL_GRD    2 /* Castles Ground Level */
-#define CASL_UP0    3 /* Castles 1st Upper Level */
-#define CASL_UP1    4 /* Castles 2nd Upper Level */
-#define CASL_UP2    5 /* Castles 3rd Upper Level *///current "highest" level
+#define CASL_UP2    2 /* Castles 3rd Upper Level *///current "highest" level
+#define CASL_UP1    3 /* Castles 2nd Upper Level */
+#define CASL_UP0    4 /* Castles 1st Upper Level */
+#define CASL_GRD    5 /* Castles Ground Level */
 #define CASL_DN0    6 /* Castles 1st Lower Level */
 #define CASL_DN1    7 /* Castles 2nd Lower Level */
 #define CASL_DN2    8 /* Castles 3rd Lower Level *///current "lowest" level
-#define DFMAX       3 /* Maximum Dungeon Name Flavors */
 #define MAX_MAPS    9 /* TOTAL NUMBER OF MAPS PER GAME */
+
+/******************************************************************************
+ *                            -----------                                     *
+ *                           / CASL_UPX /       Player starts in HVILLAGE     *
+ *                           -----------        which is paired with IN_HHUTS *
+ *                                  ^                                         *
+ *                                 ...          Player may leave town or      *
+ *                                  v               decend into CASL_DN0.     *
+ *                            -----------                                     *
+ *                           / CASL_GRD /       The CASL_DNX levels           *
+ *    ----------- <---------------------            are underground.          *
+ *   / HVILLAGE /                   ^           CASL_UPX levels are above.    *
+ *   -----------                    v                                         *
+ *        ^                    -----------      From the CASL_GRD level       *
+ *        +-----------------> / CASL_DN0 /        the player may exit back    *
+ *        v                  -----------          to the HVILLAGE.            *
+ *    -----------                   ^                                         *
+ *   / IN_HHUTS /                  ...                                        *
+ *   -----------                    v                                         *
+ *                            -----------                                     *
+ *                           / CASL_DNX /                                     *
+ *                           -----------                                      *
+ ******************************************************************************/
+
 
 typedef struct {
     char name[MAX_ITEM_NAME_LEN + 1];

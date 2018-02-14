@@ -16,6 +16,8 @@ const char DOOR   = '+';
 const char USTAIR = '>';
 const char DSTAIR = '<';
 
+COORD prev_stair_spot;
+
 /* Macro Functions */
 #define squared(x) (x * x)
 
@@ -69,22 +71,23 @@ void set_loc( LOC * spot, char type  )
  * ARGUMENTS:   LEVEL *  l          -- The level with an area to fill         *
  *              char     t          -- The LOC type                           *
  *              COORD    d,c        -- Two opposite corners defining the area *
- * RETURNS:     bool                Fails if area exeeds bounds of a map.     *
  * NOTE: XXX d and c use to stand for door and corner.                        *
  ******************************************************************************/
 #define fill_wall(x,y,z) fill(x,WALL,y,z)
 #define fill_floor(x,y,z) fill(x,FLOOR,y,z)
-static bool fill( LEVEL * l, char t, COORD d, COORD c )
+static void fill( LEVEL * l, char t, COORD d, COORD c )
 {
     int i, j, s = smallest( d.colx, c.colx ),
         b[2] = { biggest( d.rowy, c.rowy ), biggest( d.colx, c.colx ) };
     /* NOTE: Biggest returns zero if it's arguments are the same. */
 
-    for( i = smallest( d.rowy, c.rowy ); i < b[0]; i++ )
-        for( j = s; j < b[1]; j++ )
-            if( ( i > MAX_ROW )||( j > MAX_COL ) ) return false;
-            else set_loc( &l->map[i][j], t );
-    return true;
+    for( i = smallest( d.rowy, c.rowy ); i < b[0]; i++ ) {
+        for( j = s; j < b[1]; j++ ) {
+            assert( i < MAX_ROW );
+            assert( j < MAX_COL );
+            set_loc( &l->map[i][j], t );
+        }/* End j For */
+    }/* End i For */
 }/* End fill Func */
 
 
@@ -122,14 +125,13 @@ void draw_map( LEVEL * curlv )
  * overlap effectively generating less than n buildings. This makes them more *
  * interesting though, so it is permitted.                                    *
  ******************************************************************************/
-static bool towngen( LEVEL * outside, LEVEL * inside )
+static void towngen( LEVEL * outside, LEVEL * inside )
 {
     unsigned short hut_qt = 1 + rng( MAX_HUTS );
     unsigned short i, j, z;
     int dvert, dhorz;
     COORD hutspot[MAX_HUTS];
     RECT room[MAX_HUTS];
-
 
     /* Create hut_qt Huts */
     for( i = 0; i < hut_qt; i++ ) {
@@ -158,15 +160,9 @@ static bool towngen( LEVEL * outside, LEVEL * inside )
             break;
         }/*end !done while */
 
-        /* Fill Building With Wall */
-        if( !fill_wall( outside, room[i].a, room[i].b ) ) {
-            Error( "Failed to Fill Building Walls", i );
-            return false;
-        }/* End fill_wall If */
-        if( !fill_floor( inside, room[i].a, room[i].b ) ) {
-            Error( "Failed to Fill Building Floors", i );
-            return false;
-        }/* End fill_floor If */
+        /* Fill Buildings */
+        fill_wall( outside, room[i].a, room[i].b );
+        fill_floor( inside, room[i].a, room[i].b );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
@@ -208,9 +204,12 @@ static bool towngen( LEVEL * outside, LEVEL * inside )
         }/* End NSEW For */
     }/* End hut_qt For */
 
-    //TODO: Generate sub buildings attached to main buildings with tunnels
+    /* Place Decending Stair */
+    i = rng( MAX_ROW ); j = rng( MAX_COL );
+    if( outside->map[i][j].icon == WALL ) set_loc( &inside->map[i][j], DSTAIR );
+    else set_loc( &outside->map[i][j], DSTAIR );
+    prev_stair_spot.rowy = i; prev_stair_spot.colx = j;
 
-    return true;
 }/* End towngen Func */
 
 
@@ -235,10 +234,7 @@ bool dungen( LEVEL * curlv, PLAYER * npc )
     }/* Init Maps For */
 
     /* Generate Town */
-    if( !towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS] ) ) {
-        Error( "Failed to generate town Levels", HVILLAGE );
-        return false;
-    }/* End towngen If */
+    towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
 
     /* TODO Generate Dungeons & Castle */
 
