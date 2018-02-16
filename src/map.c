@@ -9,14 +9,20 @@
 #include "map.h"
 #include "item.h"
 
+#define MAX_HUTS     5
+#define MAX_HUT_WID  6
+#define MAX_HUT_HGT  4
+#define MIN_HUT_WID  2
+#define MIN_HUT_HGT  2
+#define MIN_HUT_DIST 2.0
+//TODO make these ^ defaults for input parameters //if!YAGNI?
+
 //TODO: make map symbols configable
 const char WALL   = '#';
 const char FLOOR  = '.';
 const char DOOR   = '+';
 const char USTAIR = '>';
 const char DSTAIR = '<';
-
-COORD prev_stair_spot;
 
 /* Macro Functions */
 #define squared(x) (x * x)
@@ -117,6 +123,18 @@ void draw_map( LEVEL * curlv )
 
 
 /******************************************************************************
+ * FUNCTION:    randspot            -- Find a random spot                     *
+ * RGUMENTS:   COORD * me           -- [IN/OUT] The Spot                      *
+ * Generates a coord with enough space to build a room (usually).             *
+ ******************************************************************************/
+static void randspot( COORD * me )
+{
+    me->rowy = ( 1 + MIN_HUT_HGT ) + rng( MAX_ROW - ( 2 + MIN_HUT_HGT ) );
+    me->colx = ( 1 + MIN_HUT_WID ) + rng( MAX_COL - ( 2 + MIN_HUT_WID ) );
+}/* End randspot Func */
+
+
+/******************************************************************************
  * FUNCTION:    roomgen                 Genearate a Room                      *
  * ARGUMENTS:   RECT * room            -- The room to be generated.           *
  *              COORD  center          -- Center the room here.               *
@@ -134,7 +152,7 @@ static bool roomgen( RECT * room, COORD center )
     room->b.colx = center.colx + dhorz;
 
     /* Don't Bump the Outer Wall */
-    if( ( room->a.rowy < 2  )||( room->a.colx < 2 ) ) return false;
+    if( ( room->a.rowy < 1  )||( room->a.colx < 1 ) ) return false;
     if( room->b.rowy > ( MAX_ROW - 2 ) ) return false;
     if( room->b.colx > ( MAX_COL - 2 ) ) return false;
     return true;
@@ -143,78 +161,85 @@ static bool roomgen( RECT * room, COORD center )
 
 /******************************************************************************
  * FUNCTION:    towngen             -- Generate the town level.               *
- * ARGUMENTS:   LEVEL * outside     -- The level.                             *
+ * ARGUMENTS:   LEVEL * outside     -- [IN/OUT] The outside of the level.     *
+ *              LEVEL * inside      -- [IN/OUT] The inside of the level.      *
+ *              COORD * stair_spot  -- [IN/OUT] The enterance of the dungeon. *
  * RETURNS:     bool                -- Generation successfull                 *
  * Attempts to generate buildings MIN_HUT_DIST appart, however they may still *
  * overlap effectively generating less than n buildings. This makes them more *
  * interesting though, so it is permitted.                                    *
  ******************************************************************************/
-static void towngen( LEVEL * outside, LEVEL * inside )
+static void towngen( LEVEL * outside, LEVEL * inside, COORD * stair_spot )
 {
     unsigned short hut_qt = 1 + rng( MAX_HUTS );
     unsigned short i, j, z;
     COORD hutspot[MAX_HUTS];
-    RECT room[MAX_HUTS];
+    RECT room;
 
     /* Create hut_qt Huts */
     for( i = 0; i < hut_qt; i++ ) {
 
         do { /* Find centers of Buildings */
-            hutspot[i].rowy =  ( 2 + MIN_HUT_HGT ) + rng( MAX_ROW - ( 2 + MIN_HUT_HGT ) );
-            hutspot[i].colx =  ( 2 + MIN_HUT_WID ) + rng( MAX_COL - ( 2 + MIN_HUT_WID ) );
+            randspot( &hutspot[i] );
             if( i > 0 ) for( z = 0; z < i; z++ )
                 if( dist( hutspot[z], hutspot[i] ) < MIN_HUT_DIST ) continue;
-        } while( !roomgen( &room[i], hutspot[i]) );
+        } while( !roomgen( &room, hutspot[i]) );
 
         /* Fill Buildings */
-        fill_wall( outside, room[i] );
-        fill_floor( inside, room[i] );
+        fill_wall( outside, room );
+        fill_floor( inside, room );
 
         /* Place Doors */ //inline with center//TODO:+-rng(dvert||dhorz -1)
         for( j = 0, z = rng(4) ; j < 4; j++ ) { /* Try Up to Each Direction NSEW *///TODO: Perhaps try only once
             if( ++z > WEST ) z = NORTH;
             switch( z ) {
                 case NORTH:
-                    hutspot[i].rowy = room[i].a.rowy;
-                    if( outside->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )
-                        continue;
+                    hutspot[i].rowy = room.a.rowy;
+                    assert( hutspot[i].rowy-1 > -1 );
+                    if( outside->map[hutspot[i].rowy-1]
+                                    [hutspot[i].colx].icon == WALL ) continue;
                     break;
                 case SOUTH:
-                    hutspot[i].rowy = room[i].b.rowy - 1;
-                    if( outside->map[room[i].b.rowy][hutspot[i].colx].icon == WALL )
-                        continue;
+                    hutspot[i].rowy = room.b.rowy - 1;
+                    if( outside->map[room.b.rowy]
+                                    [hutspot[i].colx].icon == WALL ) continue;
                     break;
                 case EAST:
-                    hutspot[i].colx = room[i].b.colx - 1;
-                    if( outside->map[hutspot[i].rowy-1][room[i].b.colx].icon == WALL )
-                        continue;
+                    hutspot[i].colx = room.b.colx - 1;
+                    if( outside->map[hutspot[i].rowy]
+                                    [room.b.colx].icon == WALL ) continue;
                     break;
                 case WEST:
-                    hutspot[i].colx = room[i].a.colx;
-                    if( outside->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL )
-                        continue;
+                    hutspot[i].colx = room.a.colx;
+                    assert( hutspot[i].colx-1 > -1);
+                    if( outside->map[hutspot[i].rowy]
+                                    [hutspot[i].colx-1].icon == WALL ) continue;
                     break;
             }/* End cardinal direction Switch */
 
             /* Set Building Enterance Flags */
             set_loc( &outside->map[hutspot[i].rowy][hutspot[i].colx], DOOR );
-            if( inside->map[hutspot[i].rowy-1][hutspot[i].colx].icon == WALL )      /* North */
-                set_loc( &inside->map[hutspot[i].rowy-1][hutspot[i].colx], DOOR );
-            else if( inside->map[hutspot[i].rowy+1][hutspot[i].colx].icon == WALL ) /* South */
-                set_loc( &inside->map[hutspot[i].rowy+1][hutspot[i].colx], DOOR );
-            else if( inside->map[hutspot[i].rowy][hutspot[i].colx+1].icon == WALL ) /* East */
-                set_loc( &inside->map[hutspot[i].rowy][hutspot[i].colx+1], DOOR );
-            else if( inside->map[hutspot[i].rowy][hutspot[i].colx-1].icon == WALL ) /* West */
-                set_loc( &inside->map[hutspot[i].rowy][hutspot[i].colx-1], DOOR );
+            if( inside->map[hutspot[i].rowy-1]
+                           [hutspot[i].colx].icon == WALL )      /* North */
+                set_loc(&inside->map[hutspot[i].rowy-1][hutspot[i].colx], DOOR);
+            else if( inside->map[hutspot[i].rowy+1]
+                                [hutspot[i].colx].icon == WALL ) /* South */
+                set_loc(&inside->map[hutspot[i].rowy+1][hutspot[i].colx], DOOR);
+            else if( inside->map[hutspot[i].rowy]
+                                [hutspot[i].colx+1].icon == WALL ) /* East */
+                set_loc(&inside->map[hutspot[i].rowy][hutspot[i].colx+1], DOOR);
+            else if( inside->map[hutspot[i].rowy]
+                                [hutspot[i].colx-1].icon == WALL ) /* West */
+                set_loc(&inside->map[hutspot[i].rowy][hutspot[i].colx-1], DOOR);
             break;
         }/* End NSEW For */
     }/* End hut_qt For */
 
     /* Place Decending Stair */
-    i = rng( MAX_ROW ); j = rng( MAX_COL );
-    if( outside->map[i][j].icon == WALL ) set_loc( &inside->map[i][j], DSTAIR );
-    else set_loc( &outside->map[i][j], DSTAIR );
-    prev_stair_spot.rowy = i; prev_stair_spot.colx = j;
+    randspot( stair_spot );
+    if( outside->map[stair_spot->rowy][stair_spot->colx].icon == WALL )
+        set_loc( &inside->map[stair_spot->rowy][stair_spot->colx], DSTAIR );
+    else set_loc( &outside->map[stair_spot->rowy][stair_spot->colx], DSTAIR );
 
 }/* End towngen Func */
 
@@ -227,9 +252,10 @@ static void towngen( LEVEL * outside, LEVEL * inside )
 bool dungen( LEVEL * curlv, PLAYER * npc )
 {
     int i;
-    static const COORD TOP_LEFT = { 0, 0 };
-    static const COORD BTM_RIGHT = { MAX_ROW, MAX_COL };
-    RECT room = { TOP_LEFT, BTM_RIGHT }; /* Full Map */
+    COORD prev_stair_spot;
+    COORD top_left = { 0, 0 };
+    COORD btm_right = { MAX_ROW, MAX_COL };
+    RECT room = { top_left, btm_right }; /* Full Map */
 
     /* Initialize Maps */
     for( i = 0; i < MAX_MAPS; i++ ) {
@@ -241,15 +267,38 @@ bool dungen( LEVEL * curlv, PLAYER * npc )
     }/* Init Maps For */
 
     /* Generate Town */
-    towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS] );
+    towngen( &curlv[HVILLAGE], &curlv[IN_HHUTS], &prev_stair_spot );
 
     /*** Generate Dungeons & Castle ***/
 
     /* Dungeon Starts in a Room */
-    while( !roomgen( &room, prev_stair_spot) );
-    fill_floor( &curlv[CASL_DN0], room );
+    if( !roomgen( &room, prev_stair_spot ) ) { /* Stairs Too near Edge of Map */
+        set_loc( &( curlv[CASL_DN0].map[prev_stair_spot.rowy]
+                                       [prev_stair_spot.colx] ), FLOOR );
+        //TODO: Perhaps generate special map with outer cooridor, else
+        //      Generate hall and room, else what?
+    } else fill_floor( &curlv[CASL_DN0], room );
 
-    /* TODO: Link Stairs */
+    /* Link Stairs */
+//     i = MAX_MAPS-1;                 /* From Deepest level */
+//     do{ randspot( &prev_stair_spot ); }
+//     while( !roomgen(&room, prev_stair_spot) );
+//     fill_floor( &curlv[i], room );
+//     set_loc(&(curlv[i].map[prev_stair_spot.rowy][prev_stair_spot.colx]),USTAIR);
+//     for( i--; i > CASL_GRD; i-- ) {   /* Up to GRD */
+// //         while( !roomgen( &room, prev_stair_spot ) );
+// //         fill_floor( &curlv[i], room );
+// //         set_loc( &(curlv[i].map[prev_stair_spot.rowy][prev_stair_spot.colx]), DSTAIR );
+// //         do{ randspot( &prev_stair_spot ); } while( !roomgen(&room, prev_stair_spot) ); // && No DSTAIR within room
+// //         fill_floor( &curlv[i], room );
+// //         set_loc( &(curlv[i].map[prev_stair_spot.rowy][prev_stair_spot.colx]), USTAIR );
+//     }/* End i to CASTL_GRD For */
+    // TODO: Fill all with floor
+    // TODO: set DSTAIR
+    // TODO: Create Tower and exit
+    // TODO: create USTAIR in tower
+    // TODO: for each continue upward to top
+
 
     /* TODO: Generate More Rooms and Paths */
 

@@ -81,14 +81,6 @@
 #define MAX_ROW 20
 #define MAX_COL 60
 
-#define MAX_HUTS     5
-#define MAX_HUT_WID  6
-#define MAX_HUT_HGT  4
-#define MIN_HUT_WID  2
-#define MIN_HUT_HGT  2
-#define MIN_HUT_DIST 2.0
-//TODO make these ^ defaults for input parameters //if!YAGNI?
-
 #define EAST_WEST   0
 #define NORTH_SOUTH 1
 
